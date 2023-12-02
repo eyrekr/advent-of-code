@@ -15,15 +15,8 @@ public class Day1 {
 
     public static void main(final String... args) throws Exception {
         final List<String> lines = Files.readAllLines(Path.of("src/main/resources/01.txt"));
-
-        final var sum = lines.stream()
-                .parallel()
-                .map(Day1::translate)
-                .map(text -> "" + text.charAt(0) + text.charAt(text.length() - 1))
-                .mapToInt(Integer::parseInt)
-                .sum();
-
-        System.out.printf("SUM = %d\n", sum);
+        final var sum = lines.stream().map(Day1::translate).mapToInt(Day1::toNumber).sum();
+        System.out.println(sum);
     }
 
 
@@ -52,5 +45,9 @@ public class Day1 {
         text = StringUtils.replace(text, "nine", "9");
 
         return StringUtils.removeAll(text, "[a-zA-Z_]");
+    }
+
+    static int toNumber(final String input) {
+        return (input.charAt(0) - '0') * 10 + (input.charAt(input.length() - 1) - '0');
     }
 }
