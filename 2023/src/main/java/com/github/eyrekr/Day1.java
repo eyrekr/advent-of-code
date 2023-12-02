@@ -4,12 +4,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
  * <a href="https://adventofcode.com/2023/day/1">...</a>
- * <p>
  * 1) 54331
  * 2) 54518
  */
@@ -28,6 +26,7 @@ public class Day1 {
 
         System.out.printf("SUM = %d\n", sum);
     }
+
 
     static String translate(String input) {
         String text = input;
