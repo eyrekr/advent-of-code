@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * <a href="https://adventofcode.com/2023/day/1">...</a>
@@ -14,36 +15,11 @@ import java.util.LinkedHashMap;
  */
 public class Day1 {
 
-    static final LinkedHashMap<String, String> REPLACEMENTS;
-
-    static {
-        REPLACEMENTS = new LinkedHashMap<>();
-        //mixed
-        REPLACEMENTS.put("oneight", "18");
-        REPLACEMENTS.put("twone", "21");
-        REPLACEMENTS.put("threeight", "38");
-        REPLACEMENTS.put("fiveight", "58");
-        REPLACEMENTS.put("sevenine", "79");
-        REPLACEMENTS.put("eightwo", "82");
-        REPLACEMENTS.put("eighthree", "83");
-        REPLACEMENTS.put("nineight", "98");
-        //simple
-        REPLACEMENTS.put("one", "1");
-        REPLACEMENTS.put("two", "2");
-        REPLACEMENTS.put("three", "3");
-        REPLACEMENTS.put("four", "4");
-        REPLACEMENTS.put("five", "5");
-        REPLACEMENTS.put("six", "6");
-        REPLACEMENTS.put("seven", "7");
-        REPLACEMENTS.put("eight", "8");
-        REPLACEMENTS.put("nine", "9");
-    }
-
     public static void main(String... args) throws Exception {
-        String input = Files.readString(Path.of("src/main/resources/01.txt"));
+        List<String> lines = Files.readAllLines(Path.of("src/main/resources/01.txt"));
 
         long sum = 0;
-        for (String line : StringUtils.split(input)) {
+        for (String line : lines) {
             String translated = translate(line);
             int value = Integer.parseInt("" + translated.charAt(0) + translated.charAt(translated.length() - 1));
             sum += value;
@@ -55,9 +31,28 @@ public class Day1 {
 
     static String translate(String input) {
         String text = input;
-        for (var entry : REPLACEMENTS.entrySet()) {
-            text = StringUtils.replace(text, entry.getKey(), entry.getValue());
-        }
-        return StringUtils.removeAll(text, "[a-z]");
+
+        //mixed
+        text = StringUtils.replace(text, "oneight", "18");
+        text = StringUtils.replace(text, "twone", "21");
+        text = StringUtils.replace(text, "threeight", "38");
+        text = StringUtils.replace(text, "fiveight", "58");
+        text = StringUtils.replace(text, "sevenine", "79");
+        text = StringUtils.replace(text, "eightwo", "82");
+        text = StringUtils.replace(text, "eighthree", "83");
+        text = StringUtils.replace(text, "nineight", "98");
+
+        //simple
+        text = StringUtils.replace(text, "one", "1");
+        text = StringUtils.replace(text, "two", "2");
+        text = StringUtils.replace(text, "three", "3");
+        text = StringUtils.replace(text, "four", "4");
+        text = StringUtils.replace(text, "five", "5");
+        text = StringUtils.replace(text, "six", "6");
+        text = StringUtils.replace(text, "seven", "7");
+        text = StringUtils.replace(text, "eight", "8");
+        text = StringUtils.replace(text, "nine", "9");
+
+        return StringUtils.removeAll(text, "[a-zA-Z_]");
     }
 }
