@@ -13,22 +13,21 @@ import java.util.List;
  */
 public class Day1 {
 
-    public static void main(String... args) throws Exception {
-        List<String> lines = Files.readAllLines(Path.of("src/main/resources/01.txt"));
+    public static void main(final String... args) throws Exception {
+        final List<String> lines = Files.readAllLines(Path.of("src/main/resources/01.txt"));
 
-        long sum = 0;
-        for (String line : lines) {
-            String translated = translate(line);
-            int value = Integer.parseInt("" + translated.charAt(0) + translated.charAt(translated.length() - 1));
-            sum += value;
-            System.out.printf("%-60s%20s%4d\n", line, translated, value);
-        }
+        final var sum = lines.stream()
+                .parallel()
+                .map(Day1::translate)
+                .map(text -> "" + text.charAt(0) + text.charAt(text.length() - 1))
+                .mapToInt(Integer::parseInt)
+                .sum();
 
         System.out.printf("SUM = %d\n", sum);
     }
 
 
-    static String translate(String input) {
+    static String translate(final String input) {
         String text = input;
 
         //mixed
