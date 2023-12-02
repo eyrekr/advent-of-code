@@ -19,7 +19,6 @@ public class Day1 {
         System.out.println(sum);
     }
 
-
     static String translate(final String input) {
         String text = input;
 
