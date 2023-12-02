@@ -5,9 +5,15 @@ import org.apache.commons.lang3.StringUtils;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * <a href="https://adventofcode.com/2023/day/1">...</a>
+ * <p>
+ * 1) 54331
+ * 2) 54518
+ */
 public class Day1 {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String... args) throws Exception {
         final String input = Files.readString(Path.of("src/main/resources/01.txt"));
 
         long sum = 0;
@@ -17,11 +23,10 @@ public class Day1 {
             System.out.printf("%-60s%10d%20d%10d\n", line, control.number, control.number, control.value);
         }
 
-        System.out.printf("SUM = %d\n", sum /*54518*/);
+        System.out.printf("SUM = %d\n", sum);
     }
 
     record Transition(int from, char over, int to, int emit) {
-
         private static final Transition RESET = new Transition(0, '*', 0);
 
         private Transition(final int from, final char over, final int to) {
