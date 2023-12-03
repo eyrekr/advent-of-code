@@ -77,17 +77,17 @@ class Day3 {
                 .toArray(Symbol[]::new);
     }
 
-    record Symbol(char ch, P position) {
-    }
 
     static class Part {
         int number = 0;
         boolean nearSymbol = false;
 
-        Part addDigit(final int digit) {
+        void addDigit(final int digit) {
             number = number * 10 + digit;
-            return this;
         }
+    }
+
+    record Symbol(char ch, P position) {
     }
 
     record P(int x, int y) {
@@ -109,16 +109,4 @@ class Day3 {
         }
     }
 
-    static final String SAMPLE = """
-            467..114..
-            ...*......
-            ..35..633.
-            ......#...
-            617*......
-            .....+.581
-            ..592.....
-            ......755.
-            ...$.*....
-            .664.598..
-            """;
 }
