@@ -6,11 +6,12 @@ import com.google.common.collect.Multimap;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * <a href="https://adventofcode.com/2023/day/3">...</a>
  * 1) 514969
- * 2)
+ * 2) 78915902
  */
 class Day3 {
 
@@ -20,9 +21,8 @@ class Day3 {
         final Multimap<P, Part> gears = LinkedHashMultimap.create();
 
         for (int y = 0; y < lines.length; y++) {
-            Part part = new Part();
-
             System.out.printf("%4d:  ", y + 1);
+            Part part = new Part();
 
             for (int x = 0; x < lines[0].length(); x++) {
                 final char ch = lines[y].charAt(x);
@@ -59,6 +59,13 @@ class Day3 {
         }
 
         System.out.printf("SUM = %d\n", sum);
+
+        // gears
+        final var gearRatioSum = gears.asMap().values().stream()
+                .filter(collection -> collection.size() == 2)
+                .mapToInt(collection -> collection.stream().mapToInt(part -> part.number).reduce((a, b) -> a * b).getAsInt())
+                .sum();
+        System.out.printf("GEARS = %d\n",gearRatioSum);
     }
 
     static Symbol[] nearbySymbols(final String[] lines, final int x, final int y) {
