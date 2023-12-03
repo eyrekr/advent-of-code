@@ -1,47 +1,58 @@
 package com.github.eyrekr;
 
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
-//516986 too high
+/**
+ * <a href="https://adventofcode.com/2023/day/3">...</a>
+ * 1) 514969
+ * 2)
+ */
 class Day3 {
 
     public static void main(String[] args) throws Exception {
         final String[] lines = Files.readAllLines(Path.of("src/main/resources/03.txt")).toArray(String[]::new);
         long sum = 0;
+        final Multimap<P, Part> gears = LinkedHashMultimap.create();
 
         for (int y = 0; y < lines.length; y++) {
-            int number = 0;
-            boolean isPart = false;
+            Part part = new Part();
 
             System.out.printf("%4d:  ", y + 1);
 
             for (int x = 0; x < lines[0].length(); x++) {
-                char ch = lines[y].charAt(x);
-                int digit = "0123456789".indexOf(ch);
+                final char ch = lines[y].charAt(x);
+                final int digit = "0123456789".indexOf(ch);
                 if (digit >= 0) {
-                    number = number * 10 + digit;
-                    if (!isPart) {
-                        isPart = isSymbolNearby(lines, x, y);
+                    part.addDigit(digit);
+                    final Symbol[] symbols = nearbySymbols(lines, x, y);
+                    part.nearSymbol = part.nearSymbol || symbols.length > 0;
+                    for (final Symbol symbol : symbols) {
+                        if (symbol.ch == '*') {
+                            gears.put(symbol.position, part);
+                        }
                     }
                 } else {
-                    if (number > 0) {
-                        System.out.printf("%s%3d\033[0m  ", isPart ? "\033[0;32m" : "\033[0;31m", number);
+                    if (part.number > 0) {
+                        System.out.printf("%s%3d\033[0m  ", part.nearSymbol ? "\033[0;32m" : "\033[0;31m", part.number);
                     }
-                    if (isPart) {
-                        sum = sum + number;
+                    if (part.nearSymbol) {
+                        sum = sum + part.number;
                     }
-                    number = 0;
-                    isPart = false;
+                    part = new Part();
+                    part.nearSymbol = false;
                 }
             }
 
-            if (number > 0) {
-                System.out.printf("%s%3d\033[0m  ", isPart ? "\033[0;32m" : "\033[0;31m", number);
+            if (part.number > 0) {
+                System.out.printf("%s%3d\033[0m  ", part.nearSymbol ? "\033[0;32m" : "\033[0;31m", part.number);
             }
-            if (isPart && number > 0) { // when line ends with number
-                sum = sum + number;
+            if (part.nearSymbol && part.number > 0) { // when line ends with number
+                sum = sum + part.number;
             }
 
             System.out.println();
@@ -50,22 +61,35 @@ class Day3 {
         System.out.printf("SUM = %d\n", sum);
     }
 
-    static boolean isSymbolNearby(String[] lines, int x, int y) {
+    static Symbol[] nearbySymbols(final String[] lines, final int x, final int y) {
         int n = lines.length;
         int m = lines[0].length();
         return Arrays.stream(P.around(x, y))
                 .filter(p -> p.isValid(m, n))
-                .map(p -> lines[p.y].charAt(p.x))
-                .filter(ch -> "0123456789.".indexOf(ch) < 0)
-                .count() > 0;
+                .map(p -> new Symbol(lines[p.y].charAt(p.x), p))
+                .filter(symbol -> "0123456789.".indexOf(symbol.ch) < 0)
+                .toArray(Symbol[]::new);
+    }
+
+    record Symbol(char ch, P position) {
+    }
+
+    static class Part {
+        int number = 0;
+        boolean nearSymbol = false;
+
+        Part addDigit(final int digit) {
+            number = number * 10 + digit;
+            return this;
+        }
     }
 
     record P(int x, int y) {
-        boolean isValid(int m, int n) {
+        boolean isValid(final int m, final int n) {
             return x >= 0 && y >= 0 && x < m && y < n;
         }
 
-        static P[] around(int x, int y) {
+        static P[] around(final int x, final int y) {
             return new P[]{
                     new P(x - 1, y - 1),
                     new P(x, y - 1),
@@ -79,21 +103,16 @@ class Day3 {
         }
     }
 
-    static final String SAMPLE_INPUT = """
-                467..114..
-                ...*......
-                ..35..633.
-                ......#...
-                617*......
-                .....+.581
-                ..592.....
-                ......755.
-                ...$.*....
-                .664.598..
-            """;
-
-
-    static final String INPUT = """
-
+    static final String SAMPLE = """
+            467..114..
+            ...*......
+            ..35..633.
+            ......#...
+            617*......
+            .....+.581
+            ..592.....
+            ......755.
+            ...$.*....
+            .664.598..
             """;
 }
