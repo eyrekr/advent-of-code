@@ -6,7 +6,6 @@ import com.google.common.collect.Multimap;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * <a href="https://adventofcode.com/2023/day/3">...</a>
@@ -65,7 +64,7 @@ class Day3 {
                 .filter(collection -> collection.size() == 2)
                 .mapToInt(collection -> collection.stream().mapToInt(part -> part.number).reduce((a, b) -> a * b).getAsInt())
                 .sum();
-        System.out.printf("GEARS = %d\n",gearRatioSum);
+        System.out.printf("GEARS = %d\n", gearRatioSum);
     }
 
     static Symbol[] nearbySymbols(final String[] lines, final int x, final int y) {
