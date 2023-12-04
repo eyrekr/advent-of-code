@@ -19,15 +19,15 @@ class Day4 {
             """;
 
     public static void main(String[] args) throws Exception {
-        //StringUtils.split(SAMPLE, '\n')
         final Card[] deck = Files.readAllLines(Path.of("src/main/resources/04.txt")).stream()
                 .map(Card::from)
                 .toArray(Card[]::new);
 
         long sum = 0;
-        for (int i = 0; i < deck.length; i++) {
-            final Card card = deck[i];
+        for (int cardNumber = 0; cardNumber < deck.length; cardNumber++) {
+            final Card card = deck[cardNumber];
 
+            // part I
             long points = 0;
             for (final String numberYouHave : card.numbersYouHave) {
                 if (card.winningNumbers.contains(numberYouHave)) {
@@ -38,11 +38,17 @@ class Day4 {
                     }
                 }
             }
-
             sum += points;
+
+            // part II
+            for (int d = 1; d <= card.matchingNumbers && cardNumber + d < deck.length; d++) {
+                final Card cardYouWin = deck[cardNumber + d];
+                cardYouWin.instances += card.instances; // you win as many times as you have this card
+            }
         }
 
-        System.out.printf("SUM = %d", sum);
+        System.out.printf("SUM = %d\n", sum);
+        System.out.printf("TOTAL = %d\n", Arrays.stream(deck).mapToLong(card -> card.instances).sum());
     }
 
     static class Card {
@@ -50,7 +56,7 @@ class Day4 {
         final String[] numbersYouHave;
         final long matchingNumbers;
 
-        int instances = 1;
+        long instances = 1;
 
         Card(final Set<String> winningNumbers, final String[] numbersYouHave) {
             this.winningNumbers = winningNumbers;
