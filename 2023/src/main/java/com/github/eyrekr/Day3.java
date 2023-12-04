@@ -3,9 +3,8 @@ package com.github.eyrekr;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.stream.Stream;
 
 /**
  * <a href="https://adventofcode.com/2023/day/3">...</a>
@@ -15,98 +14,78 @@ import java.util.Arrays;
 class Day3 {
 
     public static void main(String[] args) throws Exception {
-        final String[] lines = Files.readAllLines(Path.of("src/main/resources/03.txt")).toArray(String[]::new);
+        final Grid grid = Grid.from(Path.of("src/main/resources/03.txt"));
+
         long sum = 0;
-        final Multimap<P, Part> gears = LinkedHashMultimap.create();
+        final Multimap<Integer, Part> gears = LinkedHashMultimap.create();
+        Part part = new Part();
 
-        for (int y = 0; y < lines.length; y++) {
-            System.out.printf("%4d:  ", y + 1);
-            Part part = new Part();
+        for (final Grid.It it : grid) {
+            if (it.firstOnLine) {
+                System.out.printf("%4d:  ", it.y + 1);
+            }
 
-            for (int x = 0; x < lines[0].length(); x++) {
-                final char ch = lines[y].charAt(x);
-                final int digit = "0123456789".indexOf(ch);
-                if (digit >= 0) {
-                    part.addDigit(digit);
-                    final Symbol[] symbols = nearbySymbols(lines, x, y);
-                    part.nearSymbol = part.nearSymbol || symbols.length > 0;
-                    for (final Symbol symbol : symbols) {
-                        if (symbol.ch == '*') {
-                            gears.put(symbol.position, part);
-                        }
-                    }
-                } else {
-                    if (part.number > 0) {
-                        System.out.printf("%s%3d\033[0m  ", part.nearSymbol ? "\033[0;32m" : "\033[0;31m", part.number);
-                    }
-                    if (part.nearSymbol) {
-                        sum = sum + part.number;
-                    }
-                    part = new Part();
-                    part.nearSymbol = false;
+            if (it.digit >= 0) {
+                part.number = part.number * 10 + it.digit;
+                part.nearSymbol = part.nearSymbol || hasSymbolAround(it);
+
+                for (final int star : stars(it)) {
+                    gears.put(star, part);
                 }
             }
-
-            if (part.number > 0) {
-                System.out.printf("%s%3d\033[0m  ", part.nearSymbol ? "\033[0;32m" : "\033[0;31m", part.number);
+            if (it.digit < 0 || it.lastOnLine) {
+                if (part.number > 0) {
+                    System.out.printf("%s%3d\033[0m  ", part.nearSymbol ? "\033[0;32m" : "\033[0;31m", part.number);
+                }
+                if (part.nearSymbol && part.number > 0) {
+                    sum = sum + part.number;
+                }
+                part = new Part();
             }
-            if (part.nearSymbol && part.number > 0) { // when line ends with number
-                sum = sum + part.number;
+            if (it.lastOnLine) {
+                System.out.println();
             }
-
-            System.out.println();
         }
 
-        System.out.printf("SUM = %d\n", sum);
+        System.out.printf(
+                "SUM = %d\nGEARS = %d\n",
+                sum,
+                gears.asMap().values().stream()
+                        .filter(collection -> collection.size() == 2)
+                        .mapToInt(collection -> collection.stream().mapToInt(p -> p.number).reduce((a, b) -> a * b).getAsInt())
+                        .sum());
 
-        // gears
-        final var gearRatioSum = gears.asMap().values().stream()
-                .filter(collection -> collection.size() == 2)
-                .mapToInt(collection -> collection.stream().mapToInt(part -> part.number).reduce((a, b) -> a * b).getAsInt())
-                .sum();
-        System.out.printf("GEARS = %d\n", gearRatioSum);
     }
 
-    static Symbol[] nearbySymbols(final String[] lines, final int x, final int y) {
-        int n = lines.length;
-        int m = lines[0].length();
-        return Arrays.stream(P.around(x, y))
-                .filter(p -> p.isValid(m, n))
-                .map(p -> new Symbol(lines[p.y].charAt(p.x), p))
-                .filter(symbol -> "0123456789.".indexOf(symbol.ch) < 0)
-                .toArray(Symbol[]::new);
+    static boolean hasSymbolAround(final Grid.It it) {
+        for (final char ch : it.neighbours8) {
+            if ("0123456789.\0".indexOf(ch) < 0) { // '\0' means "nothing there"
+                return true;
+            }
+        }
+        return false;
     }
 
+    static int[] stars(final Grid.It it) {
+        record P(int i, char ch) {
+        }
+        return Stream.of(
+                        new P(it.i - it.m - 1, it.neighbours8[0]),
+                        new P(it.i - it.m, it.neighbours8[1]),
+                        new P(it.i - it.m + 1, it.neighbours8[2]),
+                        new P(it.i - 1, it.neighbours8[3]),
+                        new P(it.i + 1, it.neighbours8[4]),
+                        new P(it.i + it.m - 1, it.neighbours8[5]),
+                        new P(it.i + it.m, it.neighbours8[6]),
+                        new P(it.i + it.m + 1, it.neighbours8[7]))
+                .filter(p -> p.ch == '*')
+                .mapToInt(p -> p.i)
+                .toArray();
+    }
 
     static class Part {
         int number = 0;
         boolean nearSymbol = false;
-
-        void addDigit(final int digit) {
-            number = number * 10 + digit;
-        }
-    }
-
-    record Symbol(char ch, P position) {
-    }
-
-    record P(int x, int y) {
-        boolean isValid(final int m, final int n) {
-            return x >= 0 && y >= 0 && x < m && y < n;
-        }
-
-        static P[] around(final int x, final int y) {
-            return new P[]{
-                    new P(x - 1, y - 1),
-                    new P(x, y - 1),
-                    new P(x + 1, y - 1),
-                    new P(x - 1, y),
-                    new P(x + 1, y),
-                    new P(x - 1, y + 1),
-                    new P(x, y + 1),
-                    new P(x + 1, y + 1)
-            };
-        }
     }
 
 }

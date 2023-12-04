@@ -51,8 +51,38 @@ record Grid(int m, int n, char[][] data) implements Iterable<Grid.It> {
         return new GridIterator();
     }
 
-    record It(int x, int y, char ch, char[] neighbours4, char[] neighbours8, int digit,
-              boolean first, boolean last, boolean firstOnLine, boolean lastOnLine) {
+    static class It {
+        final int i;
+        final int x;
+        final int y;
+        final int m;
+        final int n;
+        final char ch;
+        final char[] neighbours4;
+        final char[] neighbours8;
+        final int digit;
+        final boolean first;
+        final boolean last;
+        final boolean firstOnLine;
+        final boolean lastOnLine;
+
+        private It(final int i, final int x, final int y, final int m, final int n, final char ch,
+                   final char[] neighbours4, final char[] neighbours8, final int digit,
+                   final boolean first, final boolean last, final boolean firstOnLine, final boolean lastOnLine) {
+            this.i = i;
+            this.x = x;
+            this.y = y;
+            this.m = m;
+            this.n = n;
+            this.ch = ch;
+            this.neighbours4 = neighbours4;
+            this.neighbours8 = neighbours8;
+            this.digit = digit;
+            this.first = first;
+            this.last = last;
+            this.firstOnLine = firstOnLine;
+            this.lastOnLine = lastOnLine;
+        }
     }
 
     private class GridIterator implements Iterator<It> {
@@ -73,7 +103,12 @@ record Grid(int m, int n, char[][] data) implements Iterable<Grid.It> {
             final char ch = data[x][y];
             final char[] ch4 = new char[]{at(x, y - 1), at(x - 1, y), at(x + 1, y), at(x, y + 1)};
             final char[] ch8 = new char[]{at(x - 1, y - 1), at(x, y - 1), at(x + 1, y - 1), at(x - 1, y), at(x + 1, y), at(x - 1, y + 1), at(x, y + 1), at(x + 1, y + 1)};
-            final It it = new It(x, y, ch, ch4, ch8, "0123456789".indexOf(ch), i == 0, i == m * n - 1, x == 0, x == m - 1);
+            final int digit = Character.isDigit(ch) ? Character.digit(ch, 10) : -1;
+            final It it = new It(
+                    i, x, y, m, n,
+                    ch, ch4, ch8,
+                    digit,
+                    i == 0, i == m * n - 1, x == 0, x == m - 1);
             i++;
             return it;
         }
