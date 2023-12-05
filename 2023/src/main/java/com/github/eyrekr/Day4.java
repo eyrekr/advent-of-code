@@ -38,7 +38,7 @@ class Day4 {
             final var numbers = Seq.fromArray(StringUtils.split(line, ":|")).map(Str::longs);
             final var numbersYouHave = numbers.at(1);
             final var winningNumbers = numbers.at(2);
-            this.matchingNumbers = numbersYouHave.filter(winningNumbers::has).length;
+            this.matchingNumbers = numbersYouHave.where(winningNumbers::has).length;
             this.points = matchingNumbers > 0 ? (long) Math.pow(2, matchingNumbers - 1) : 0;
         }
     }

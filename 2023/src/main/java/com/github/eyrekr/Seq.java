@@ -59,7 +59,7 @@ final class Seq<E> implements Iterable<E> {
     }
 
     Seq<E> addSeq(final Seq<E> seq) {
-        return seq.reduce(this, (sum, element) -> new Seq<>(element, sum));
+        return seq.reduceR(this, (sum, element) -> new Seq<>(element, sum));
     }
 
     E at(final int i) {
@@ -75,7 +75,7 @@ final class Seq<E> implements Iterable<E> {
     }
 
     <R> Seq<R> flatMap(final Function<? super E, Seq<R>> translate) {
-        return reduce(empty(), (seq, element) -> seq.addSeq(translate.apply(element)));
+        return reduceR(empty(), (seq, element) -> seq.addSeq(translate.apply(element)));
     }
 
     <R> Seq<R> genMap(final Generator<? super E, R> generator) {
@@ -93,28 +93,28 @@ final class Seq<E> implements Iterable<E> {
         Seq<R> generate(T previous, T current, T next);
     }
 
-    <R> R reduce(final R init, final BiFunction<? super R, ? super E, ? extends R> combine) { // left-to-right
-        return isEmpty ? init : combine.apply(tail.reduce(init, combine), value);
+    <R> R reduceR(final R init, final BiFunction<? super R, ? super E, ? extends R> combine) { // left-to-right
+        return isEmpty ? init : combine.apply(tail.reduceR(init, combine), value);
     }
 
-    <R> R reduceR(final R init, final BiFunction<? super R, ? super E, ? extends R> combine) { // right-to-left
-        return isEmpty ? init : tail.reduceR(combine.apply(init, value), combine);
+    <R> R reduce(final R init, final BiFunction<? super R, ? super E, ? extends R> combine) { // right-to-left
+        return isEmpty ? init : tail.reduce(combine.apply(init, value), combine);
     }
 
-    Seq<E> filter(final Predicate<? super E> predicate) {
-        return isEmpty ? this : predicate.test(value) ? new Seq<>(value, tail.filter(predicate)) : tail.filter(predicate);
+    Seq<E> where(final Predicate<? super E> predicate) {
+        return isEmpty ? this : predicate.test(value) ? new Seq<>(value, tail.where(predicate)) : tail.where(predicate);
     }
 
     Seq<E> reverse() {
-        return reduceR(empty(), (seq, element) -> new Seq<>(element, seq));
+        return reduce(empty(), (seq, element) -> new Seq<>(element, seq));
     }
 
     Seq<E> sortedBy(final Comparator<? super E> comparator) {
         if (isEmpty) {
             return this;
         }
-        final Seq<E> lower = tail.filter(element -> comparator.compare(value, element) <= 0).sortedBy(comparator);
-        final Seq<E> upper = tail.filter(element -> comparator.compare(value, element) > 0).sortedBy(comparator);
+        final Seq<E> lower = tail.where(element -> comparator.compare(value, element) <= 0).sortedBy(comparator);
+        final Seq<E> upper = tail.where(element -> comparator.compare(value, element) > 0).sortedBy(comparator);
         return lower.add(value).addSeq(upper);
     }
 
@@ -139,7 +139,7 @@ final class Seq<E> implements Iterable<E> {
     }
 
     Seq<Seq<E>> split(final Predicate<? super E> predicate) {
-        return reduce(Seq.of(empty(), empty()), (acc, element) -> predicate.test(element) ? Seq.of(acc.value, acc.tail.value.add(element)) : Seq.of(acc.value.add(element), acc.tail.value));
+        return reduceR(Seq.of(empty(), empty()), (acc, element) -> predicate.test(element) ? Seq.of(acc.value, acc.tail.value.add(element)) : Seq.of(acc.value.add(element), acc.tail.value));
     }
 
     Seq<E> first(final int n) {
@@ -171,7 +171,7 @@ final class Seq<E> implements Iterable<E> {
     Seq<Seq<E>> batch(final int size) {
         record Accumulator<E>(Seq<Seq<E>> all, Seq<E> batch) {
         }
-        final Accumulator<E> acc = reduce(
+        final Accumulator<E> acc = reduceR(
                 new Accumulator<>(empty(), empty()),
                 (accumulator, element) -> accumulator.batch.length < size
                         ? new Accumulator<>(accumulator.all, accumulator.batch.add(element))
@@ -185,13 +185,13 @@ final class Seq<E> implements Iterable<E> {
     }
 
     Seq<E> print(final String separator) {
-        System.out.println("[" + reduce("", (sum, element) -> sum.isBlank() ? element + "" : element + separator + sum) + "]");
+        System.out.println("[" + reduceR("", (sum, element) -> sum.isBlank() ? element + "" : element + separator + sum) + "]");
         return this;
     }
 
     @Override
     public String toString() {
-        return "[" + reduce("", (sum, element) -> sum.isBlank() ? element + "" : element + " " + sum) + "]";
+        return "[" + reduceR("", (sum, element) -> sum.isBlank() ? element + "" : element + " " + sum) + "]";
     }
 
     @Override

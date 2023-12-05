@@ -4,20 +4,36 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 
+/**
+ * <a href="https://adventofcode.com/2023/day/5">...</a>
+ * 1) 214922730
+ * 2) 148041808
+ */
 class Day5 {
 
     public static void main(String[] args) throws Exception {
-        final var sections = Seq.fromArray(Files.readString(Path.of("src/main/resources/05.txt")).split("\n\n"));
-        final var seeds = Str.longs(sections.value).batch(2).print();
+        //final var sections = Seq.fromArray(Files.readString(Path.of("src/main/resources/05.txt")).split("\n\n"));
+        final var sections = Seq.fromArray(SAMPLE.split("\n\n"));
+        //final var seeds = Str.longs(sections.value).batch(2).print();
+        final var seeds = Str.longs(sections.value).map(value -> Seq.of(value, 1L)).print();
         final var layers = sections.skip(1)
                 .map(section -> Str.longs(section).batch(3).map(Range::new).map(Interval::new))
                 .map(Layer::new);
         final var collapsedIntervals = layers
                 .map(Layer::complete)
                 .print("\n")
-                .reduceR(Layer.L0, Layer::merge)
-                .intervals;
-        collapsedIntervals.print("\n");
+                .reduce(Layer.L0, Layer::merge)
+                .intervals
+                .print("\n");
+        final var location = seeds.flatMap(input -> {
+                    final var a = input.value;
+                    final var b =  a + input.tail.value - 1;
+                    return collapsedIntervals
+                            .where(interval -> interval.a <= a && interval.b >= b)
+                            .map(interval -> Math.max(interval.a, a) + interval.delta);
+                })
+                .min(Long::compare);
+        System.out.println(location);
     }
 
     record Layer(Seq<Interval> intervals) {
@@ -41,7 +57,7 @@ class Day5 {
             return new Layer(completeIntervals);
         }
 
-        Layer merge(final Layer layer) {
+        Layer merge(final Layer layer) {//FIXME the merging logic is flawed because we must consider the the mapped src intervals, not the original intervals!!
             if (this == L0) {
                 return layer;
             }
@@ -82,4 +98,40 @@ class Day5 {
             this(range.src, range.src + range.length - 1, range.dst - range.src);
         }
     }
+
+    static final String SAMPLE = """
+            seeds: 79 14 55 13
+                        
+            seed-to-soil map:
+            50 98 2
+            52 50 48
+                        
+            soil-to-fertilizer map:
+            0 15 37
+            37 52 2
+            39 0 15
+                        
+            fertilizer-to-water map:
+            49 53 8
+            0 11 42
+            42 0 7
+            57 7 4
+                        
+            water-to-light map:
+            88 18 7
+            18 25 70
+                        
+            light-to-temperature map:
+            45 77 23
+            81 45 19
+            68 64 13
+                        
+            temperature-to-humidity map:
+            0 69 1
+            1 0 69
+                        
+            humidity-to-location map:
+            60 56 37
+            56 93 4
+            """;
 }
