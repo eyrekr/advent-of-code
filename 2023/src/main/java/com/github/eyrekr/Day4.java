@@ -5,9 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 /**
  * <a href="https://adventofcode.com/2023/day/4">...</a>
@@ -17,7 +14,7 @@ import java.util.Set;
 class Day4 {
 
     public static void main(String[] args) throws Exception {
-        final Card[] deck = Files.readAllLines(Path.of("src/main/resources/04.txt")).stream().map(Card::from).toArray(Card[]::new);
+        final Card[] deck = Files.readAllLines(Path.of("src/main/resources/04.txt")).stream().map(Card::new).toArray(Card[]::new);
 
         for (int cardNumber = 0; cardNumber < deck.length; cardNumber++) {
             final Card card = deck[cardNumber];
@@ -37,18 +34,12 @@ class Day4 {
         final long points;
         long instances = 1;
 
-        Card(final Collection<String> winningNumbers, final Collection<String> numbersYouHave) {
-            this.matchingNumbers = numbersYouHave.stream().filter(winningNumbers::contains).count();
+        Card(final String line) {
+            final var numbers = Seq.fromArray(StringUtils.split(line, ":|")).map(Str::longs);
+            final var numbersYouHave = numbers.at(1);
+            final var winningNumbers = numbers.at(2);
+            this.matchingNumbers = numbersYouHave.filter(winningNumbers::has).length;
             this.points = matchingNumbers > 0 ? (long) Math.pow(2, matchingNumbers - 1) : 0;
-        }
-
-        static Card from(final String line) {
-            final String ticket = StringUtils.substringAfter(line, ":");
-            final String[] numbers = StringUtils.split(ticket, '|');
-            final Set<String> winningNumbers = Set.of(StringUtils.split(numbers[0]));
-            final List<String> numbersYouHave = List.of(StringUtils.split(numbers[1]));
-
-            return new Card(winningNumbers, numbersYouHave);
         }
     }
 }
