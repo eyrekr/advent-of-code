@@ -57,11 +57,12 @@ class Day5 {
             return new Layer(completeIntervals);
         }
 
-        Layer merge(final Layer layer) {//FIXME the merging logic is flawed because we must consider the the mapped src intervals, not the original intervals!!
+        Layer merge(final Layer layer) {
             if (this == L0) {
                 return layer;
             }
 
+            //FIXME the merging logic is flawed because we must consider the the mapped src intervals, not the original intervals!!
             var src = intervals;
             var dst = layer.intervals;
             var merged = Seq.<Interval>empty();
@@ -80,9 +81,6 @@ class Day5 {
                     src = src.tail.add(new Interval(dst.value.a, src.value.b, src.value.delta));
                 }
             }
-            //drain - should not be necessary
-            //if(!src.isEmpty) merged = merged.add(src.value);
-            //if(!dst.isEmpty) merged = merged.add(dst.value);
             return new Layer(merged.sortedBy(Comparator.comparing(Interval::a)));
         }
     }
