@@ -74,6 +74,10 @@ final class Seq<E> implements Iterable<E> {
         return isEmpty ? empty() : new Seq<>(translate.apply(value), tail.map(translate));
     }
 
+    <F, R> Seq<R> mapWith(final Seq<F> seq, final BiFunction<? super E, ? super F, R> translate) {
+        return isEmpty || seq.isEmpty ? empty() : new Seq<>(translate.apply(value, seq.value), tail.mapWith(seq.tail, translate));
+    }
+
     <R> Seq<R> flatMap(final Function<? super E, Seq<R>> translate) {
         return reduceR(empty(), (seq, element) -> seq.addSeq(translate.apply(element)));
     }
@@ -97,8 +101,16 @@ final class Seq<E> implements Iterable<E> {
         return isEmpty ? init : combine.apply(tail.reduceR(init, combine), value);
     }
 
+    E reduceR(final BiFunction<? super E, ? super E, ? extends E> combine) {
+        return isEmpty ? null : tail.reduceR(value, combine);
+    }
+
     <R> R reduce(final R init, final BiFunction<? super R, ? super E, ? extends R> combine) { // right-to-left
         return isEmpty ? init : tail.reduce(combine.apply(init, value), combine);
+    }
+
+    E reduce(final BiFunction<? super E, ? super E, ? extends E> combine) {
+        return isEmpty ? null : tail.reduce(value, combine);
     }
 
     Seq<E> where(final Predicate<? super E> predicate) {
