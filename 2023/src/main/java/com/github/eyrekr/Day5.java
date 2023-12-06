@@ -1,7 +1,5 @@
 package com.github.eyrekr;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Comparator;
 
 /**
@@ -40,18 +38,19 @@ class Day5 {
         static final Layer L0 = new Layer(Seq.of(new Interval(0, Long.MAX_VALUE, 0)));
 
         Layer complete() {
-            final var completeIntervals = intervals.sortedBy(Comparator.comparing(Interval::a))
-                    .genMap((previous, current, next) -> {
+            var completeIntervals = intervals.sortedBy(Comparator.comparing(Interval::a));
+            var a = completeIntervals.value.a;
+            if(a != 0) {
+                completeIntervals = completeIntervals.add(new Interval(0, a - 1, 0));
+            }
+            completeIntervals = completeIntervals.mapWithNext((interval, next) -> {
                         Seq<Interval> acc = Seq.empty();
                         if (next == null) {
-                            acc = acc.add(new Interval(current.b + 1, Long.MAX_VALUE, 0));
-                        } else if (current.b + 1 < next.a) {
-                            acc = acc.add(new Interval(current.b + 1, next.a - 1, 0));
+                            acc = acc.add(new Interval(interval.b + 1, Long.MAX_VALUE, 0));
+                        } else if (interval.b + 1 < next.a) {
+                            acc = acc.add(new Interval(interval.b + 1, next.a - 1, 0));
                         }
-                        acc = acc.add(current);
-                        if (previous == null && current.a > 0) {
-                            acc = acc.add(new Interval(0, current.a - 1, 0));
-                        }
+                        acc = acc.add(interval);
                         return acc;
                     });
             return new Layer(completeIntervals);
@@ -94,6 +93,10 @@ class Day5 {
     record Interval(long a, long b, long delta) {
         Interval(final Range range) {
             this(range.src, range.src + range.length - 1, range.dst - range.src);
+        }
+
+        boolean overlaps(final Interval interval) {
+            return (a <= interval.a && interval.a <= b) || (a <= interval.b && interval.b <= b);
         }
     }
 

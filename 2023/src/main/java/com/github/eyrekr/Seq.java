@@ -82,19 +82,12 @@ final class Seq<E> implements Iterable<E> {
         return reduceR(empty(), (seq, element) -> seq.addSeq(translate.apply(element)));
     }
 
-    <R> Seq<R> genMap(final Generator<? super E, R> generator) {
-        return genMapContextual(generator, null);
+    <R> Seq<R> mapWithNext(final BiFunction<? super E, ? super E, R> translate) {
+        return isEmpty ? empty() : new Seq<>(translate.apply(value, tail.value), tail.mapWithNext(translate));
     }
 
-    private <R> Seq<R> genMapContextual(final Generator<? super E, R> generator, final E previous) {
-        return isEmpty
-                ? empty()
-                : tail.genMapContextual(generator, value).addSeq(generator.generate(previous, value, tail.value));
-    }
-
-    @FunctionalInterface
-    interface Generator<T, R> {
-        Seq<R> generate(T previous, T current, T next);
+    <R> Seq<R> mapWithPrev(final BiFunction<? super E, ? super E, R> translate) {
+        return mapWith(add(null), translate);
     }
 
     <R> R reduceR(final R init, final BiFunction<? super R, ? super E, ? extends R> combine) { // left-to-right
@@ -226,6 +219,7 @@ final class Seq<E> implements Iterable<E> {
     }
 
     public static void main(String[] args) {
-        Seq.of("a", "b", "c", "d", "e").genMap((prev, cur, next)->Seq.of(prev+cur, cur, cur+next)).print();
+        Seq.of("a", "b", "c", "d", "e").mapWithPrev((value, prev) -> prev+"=>"+value).print();
+        Seq.of("a", "b", "c", "d", "e").mapWithNext((value, next) -> value+"=>"+next).print();
     }
 }
