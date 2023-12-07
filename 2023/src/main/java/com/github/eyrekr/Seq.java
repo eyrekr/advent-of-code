@@ -25,12 +25,13 @@ final class Seq<E> implements Iterable<E> {
         return new Seq<>(null, null);
     }
 
+    @SafeVarargs
     static <T> Seq<T> of(final T first, final T... rest) {
         return rest != null ? fromArray(rest).add(first) : new Seq<>(first, empty());
     }
 
     static <T> Seq<T> fromArray(final T[] array) {
-        return array == null ? empty() : range(0, array.length).carryMap(array, (arr, i)->arr[i.intValue()]);
+        return array == null ? empty() : range(0, array.length).carryMap(array, (arr, i) -> arr[i.intValue()]);
     }
 
     static <T> Seq<T> fromIterable(final Iterable<T> collection) {
@@ -74,7 +75,7 @@ final class Seq<E> implements Iterable<E> {
     }
 
     <R> Seq<R> flatMap(final Function<? super E, Seq<R>> translate) {
-        return reduceR(empty(), (seq, element) -> seq.addSeq(translate.apply(element)));
+        return reduceR(empty(), (acc, element) -> acc.addSeq(translate.apply(element)));
     }
 
     <R> Seq<R> mapWithNext(final BiFunction<? super E, ? super E, R> translate) {
@@ -106,12 +107,14 @@ final class Seq<E> implements Iterable<E> {
     }
 
     Seq<E> reverse() {
-        return reduce(empty(), (seq, element) -> new Seq<>(element, seq));
+        return reduce(empty(), (acc, element) -> new Seq<>(element, acc));
     }
 
     Seq<E> sortedBy(final Comparator<? super E> comparator) {
         if (length <= 1) {
             return this;
+        } else if (length == 2) {
+            return comparator.compare(value, tail.value) <= 0 ? this : Seq.of(tail.value, value);
         }
         final Seq<E> lower = tail.where(element -> comparator.compare(value, element) <= 0).sortedBy(comparator);
         final Seq<E> upper = tail.where(element -> comparator.compare(value, element) > 0).sortedBy(comparator);
@@ -126,12 +129,24 @@ final class Seq<E> implements Iterable<E> {
         return reduce((a, b) -> comparator.compare(a, b) < 0 ? a : b);
     }
 
+    E min() {
+        return (E) min(Comparator.comparing((Object a) -> ((Comparable) a)));
+    }
+
     E max(final Comparator<? super E> comparator) {
         return reduce((a, b) -> comparator.compare(a, b) > 0 ? a : b);
     }
 
+    E max() {
+        return (E) max(Comparator.comparing((Object a) -> ((Comparable) a)));
+    }
+
     Seq<Seq<E>> split(final Predicate<? super E> predicate) {
-        return reduceR(Seq.of(empty(), empty()), (acc, element) -> predicate.test(element) ? Seq.of(acc.value, acc.tail.value.add(element)) : Seq.of(acc.value.add(element), acc.tail.value));
+        return reduceR(
+                Seq.of(empty(), empty()),
+                (acc, element) -> predicate.test(element)
+                        ? Seq.of(acc.value, acc.tail.value.add(element))
+                        : Seq.of(acc.value.add(element), acc.tail.value));
     }
 
     Seq<E> first(final int n) {
@@ -207,7 +222,8 @@ final class Seq<E> implements Iterable<E> {
 
     public static void main(String[] args) {
         Seq.range(1, 10).print();
-        System.out.println(Seq.of(10,20, -5, 7).max(Integer::compare));
+        System.out.println(Seq.of(10, 20, -5, 7).max(Integer::compare));
+        Seq.of(10, 7, 20, -5, 7, 0).sortedBy(Integer::compare).print();
         Seq.fromIterable(List.of("x", "y", "z")).print();
         Seq.of("a", "b", "c", "d", "e").mapWithPrev((value, prev) -> prev + "=>" + value).print();
         Seq.of("a", "b", "c", "d", "e").mapWithNext((value, next) -> value + "=>" + next).print();
