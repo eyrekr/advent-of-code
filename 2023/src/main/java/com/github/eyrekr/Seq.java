@@ -54,6 +54,14 @@ final class Seq<E> implements Iterable<E> {
         return seq.reverse();
     }
 
+    static Seq<Long> range(final long startInclusive, final long endExclusive) {
+        Seq<Long> seq = empty();
+        for (long i = endExclusive - 1; i >= startInclusive; i--) {
+            seq = seq.add(i);
+        }
+        return seq;
+    }
+
     Seq<E> add(final E value) {
         return new Seq<>(value, this);
     }
@@ -219,7 +227,7 @@ final class Seq<E> implements Iterable<E> {
     }
 
     public static void main(String[] args) {
-        Seq.of("a", "b", "c", "d", "e").mapWithPrev((value, prev) -> prev+"=>"+value).print();
-        Seq.of("a", "b", "c", "d", "e").mapWithNext((value, next) -> value+"=>"+next).print();
+        Seq.of("a", "b", "c", "d", "e").mapWithPrev((value, prev) -> prev + "=>" + value).print();
+        Seq.of("a", "b", "c", "d", "e").mapWithNext((value, next) -> value + "=>" + next).print();
     }
 }

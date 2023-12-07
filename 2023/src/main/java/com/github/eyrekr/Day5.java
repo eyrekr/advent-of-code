@@ -12,7 +12,7 @@ class Day5 {
     public static void main(String[] args) throws Exception {
         //final var sections = Seq.fromArray(Files.readString(Path.of("src/main/resources/05.txt")).split("\n\n"));
         final var sections = Seq.fromArray(SAMPLE.split("\n\n"));
-        //final var seeds = Str.longs(sections.value).batch(2).print();
+        //final var seeds = Str.longs(sections.order).batch(2).print();
         final var seeds = Str.longs(sections.value).map(value -> Seq.of(value, 1L)).print();
         final var layers = sections.skip(1)
                 .map(section -> Str.longs(section).batch(3).map(Range::new).map(Interval::new))
@@ -43,16 +43,16 @@ class Day5 {
             if(a != 0) {
                 completeIntervals = completeIntervals.add(new Interval(0, a - 1, 0));
             }
-            completeIntervals = completeIntervals.mapWithNext((interval, next) -> {
-                        Seq<Interval> acc = Seq.empty();
-                        if (next == null) {
-                            acc = acc.add(new Interval(interval.b + 1, Long.MAX_VALUE, 0));
-                        } else if (interval.b + 1 < next.a) {
-                            acc = acc.add(new Interval(interval.b + 1, next.a - 1, 0));
-                        }
-                        acc = acc.add(interval);
-                        return acc;
-                    });
+//            completeIntervals = completeIntervals.mapWithNext((interval, next) -> {
+//                        Seq<Interval> acc = Seq.empty();
+//                        if (next == null) {
+//                            acc = acc.add(new Interval(interval.b + 1, Long.MAX_VALUE, 0));
+//                        } else if (interval.b + 1 < next.a) {
+//                            acc = acc.add(new Interval(interval.b + 1, next.a - 1, 0));
+//                        }
+//                        acc = acc.add(interval);
+//                        return acc;
+//                    });
             return new Layer(completeIntervals);
         }
 
