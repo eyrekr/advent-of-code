@@ -2,6 +2,7 @@ package com.github.eyrekr;
 
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -25,41 +26,23 @@ final class Seq<E> implements Iterable<E> {
     }
 
     static <T> Seq<T> of(final T first, final T... rest) {
-        Seq<T> seq = empty();
-        if (rest != null) {
-            for (int i = rest.length - 1; i >= 0; i--) {
-                seq = new Seq<>(rest[i], seq);
-            }
-        }
-        return seq.add(first);
+        return rest != null ? fromArray(rest).add(first) : new Seq<>(first, empty());
     }
 
     static <T> Seq<T> fromArray(final T[] array) {
-        Seq<T> seq = empty();
-        if (array != null) {
-            for (int i = array.length - 1; i >= 0; i--) {
-                seq = new Seq<>(array[i], seq);
-            }
-        }
-        return seq;
+        return array == null ? empty() : range(0, array.length).carryMap(array, (arr, i)->arr[i.intValue()]);
     }
 
     static <T> Seq<T> fromIterable(final Iterable<T> collection) {
-        Seq<T> seq = empty();
-        if (collection != null) {
-            for (final T element : collection) {
-                seq = new Seq<>(element, seq);
-            }
-        }
-        return seq.reverse();
+        return fromIterator(collection.iterator());
+    }
+
+    static <T> Seq<T> fromIterator(final Iterator<T> iterator) {
+        return iterator.hasNext() ? new Seq<>(iterator.next(), fromIterator(iterator)) : empty();
     }
 
     static Seq<Long> range(final long startInclusive, final long endExclusive) {
-        Seq<Long> seq = empty();
-        for (long i = endExclusive - 1; i >= startInclusive; i--) {
-            seq = seq.add(i);
-        }
-        return seq;
+        return startInclusive >= endExclusive ? empty() : new Seq<>(startInclusive, range(startInclusive + 1, endExclusive));
     }
 
     Seq<E> add(final E value) {
@@ -67,7 +50,7 @@ final class Seq<E> implements Iterable<E> {
     }
 
     Seq<E> addSeq(final Seq<E> seq) {
-        return seq.reduceR(this, (sum, element) -> new Seq<>(element, sum));
+        return seq.reduceR(this, (acc, element) -> new Seq<>(element, acc));
     }
 
     E at(final int i) {
@@ -80,6 +63,10 @@ final class Seq<E> implements Iterable<E> {
 
     <R> Seq<R> map(final Function<? super E, R> translate) {
         return isEmpty ? empty() : new Seq<>(translate.apply(value), tail.map(translate));
+    }
+
+    <C, R> Seq<R> carryMap(final C carry, final BiFunction<? super C, ? super E, R> translate) {
+        return isEmpty ? empty() : new Seq<>(translate.apply(carry, value), tail.carryMap(carry, translate));
     }
 
     <F, R> Seq<R> mapWith(final Seq<F> seq, final BiFunction<? super E, ? super F, R> translate) {
@@ -123,7 +110,7 @@ final class Seq<E> implements Iterable<E> {
     }
 
     Seq<E> sortedBy(final Comparator<? super E> comparator) {
-        if (isEmpty) {
+        if (length <= 1) {
             return this;
         }
         final Seq<E> lower = tail.where(element -> comparator.compare(value, element) <= 0).sortedBy(comparator);
@@ -136,19 +123,11 @@ final class Seq<E> implements Iterable<E> {
     }
 
     E min(final Comparator<? super E> comparator) {
-        if (isEmpty) {
-            return null;
-        }
-        final E min = tail.min(comparator);
-        return min == null ? value : comparator.compare(value, min) < 0 ? value : min;
+        return reduce((a, b) -> comparator.compare(a, b) < 0 ? a : b);
     }
 
     E max(final Comparator<? super E> comparator) {
-        if (isEmpty) {
-            return null;
-        }
-        final E max = tail.max(comparator);
-        return max == null ? value : comparator.compare(value, max) > 0 ? value : max;
+        return reduce((a, b) -> comparator.compare(a, b) > 0 ? a : b);
     }
 
     Seq<Seq<E>> split(final Predicate<? super E> predicate) {
@@ -227,6 +206,9 @@ final class Seq<E> implements Iterable<E> {
     }
 
     public static void main(String[] args) {
+        Seq.range(1, 10).print();
+        System.out.println(Seq.of(10,20, -5, 7).max(Integer::compare));
+        Seq.fromIterable(List.of("x", "y", "z")).print();
         Seq.of("a", "b", "c", "d", "e").mapWithPrev((value, prev) -> prev + "=>" + value).print();
         Seq.of("a", "b", "c", "d", "e").mapWithNext((value, next) -> value + "=>" + next).print();
     }

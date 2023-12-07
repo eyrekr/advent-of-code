@@ -15,14 +15,13 @@ import static java.util.stream.Collectors.groupingBy;
  * 2) 249631254
  */
 class Day7 {
-
     static final char JOKER = '*';
 
     public static void main(String[] args) throws Exception {
-        final String[] lines = Files.readString(Path.of("src/main/resources/07.txt")).split("\n");
+        final Seq<String> lines = Seq.fromArray(Files.readString(Path.of("src/main/resources/07.txt")).split("\n"));
         System.out.printf("%d\n%d\n",
-                solve(Seq.fromArray(lines).map(line -> Card.from(line, false))),
-                solve(Seq.fromArray(lines).map(line -> Card.from(line, true))));
+                solve(lines.map(line -> Card.from(line, false))),
+                solve(lines.map(line -> Card.from(line, true))));
     }
 
     static long solve(final Seq<Card> cards) {
@@ -79,8 +78,8 @@ class Day7 {
         static Card from(final String input, final boolean jokersAllowed) {
             final var raw = StringUtils.split(input);
             final var hand = jokersAllowed ? StringUtils.replaceChars(raw[0], 'J', JOKER) : raw[0];
-            final var order = StringUtils.replaceChars(hand, "AKQJT98765432" + JOKER, "NMLKJIHGFEDCBA");
-            return new Card(Type.from(hand), hand, Long.parseLong(raw[1]), order, 0L);
+            final var compareBy = StringUtils.replaceChars(hand, "AKQJT98765432" + JOKER, "NMLKJIHGFEDCBA");
+            return new Card(Type.from(hand), hand, Long.parseLong(raw[1]), compareBy, 0L);
         }
 
         Card changeOrder(final long order) {
@@ -95,7 +94,7 @@ class Day7 {
 
         @Override
         public String toString() {
-            return String.format("%4d: %s -> %s", order, hand, type);
+            return String.format("%4d: %s %s", order, hand, type);
         }
     }
 }
