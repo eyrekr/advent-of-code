@@ -1,5 +1,8 @@
 package com.github.eyrekr;
 
+import com.github.eyrekr.util.Seq;
+import com.github.eyrekr.util.Str;
+
 import java.util.Comparator;
 
 /**

@@ -1,5 +1,6 @@
 package com.github.eyrekr;
 
+import com.github.eyrekr.util.Seq;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Files;

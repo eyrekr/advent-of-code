@@ -1,4 +1,4 @@
-package com.github.eyrekr;
+package com.github.eyrekr.util;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -6,11 +6,20 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
 
-record Grid(int m, int n, char[][] data) implements Iterable<Grid.It> {
+public final class Grid implements Iterable<Grid.It> {
+    public static final char C0 = '\0';
 
-    static final char C0 = '\0';
+    public final int m;
+    public final int n;
+    public final char[][] data;
 
-    static Grid from(final Path path) {
+    private Grid(final int m, final  int n, final char[][] data) {
+        this.m = m;
+        this.n = n;
+        this.data = data;
+    }
+
+    public static Grid from(final Path path) {
         try {
             return Grid.of(Files.readAllLines(path));
         } catch (final IOException e) {
@@ -18,7 +27,7 @@ record Grid(int m, int n, char[][] data) implements Iterable<Grid.It> {
         }
     }
 
-    static Grid of(final List<String> lines) {
+    public static Grid of(final List<String> lines) {
         final int n = lines.size();
         final int m = lines.get(0).length();
         final char[][] data = new char[m][n];
@@ -31,11 +40,11 @@ record Grid(int m, int n, char[][] data) implements Iterable<Grid.It> {
         return new Grid(m, n, data);
     }
 
-    char at(int x, int y) {
+    public char at(int x, int y) {
         return x >= 0 && x < m && y >= 0 && y < n ? data[x][y] : C0;
     }
 
-    Grid transpose() {
+    public Grid transpose() {
         final char[][] transposed = new char[n][m];
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < m; x++) {
@@ -51,20 +60,20 @@ record Grid(int m, int n, char[][] data) implements Iterable<Grid.It> {
         return new GridIterator();
     }
 
-    static class It {
-        final int i;
-        final int x;
-        final int y;
-        final int m;
-        final int n;
-        final char ch;
-        final char[] neighbours4;
-        final char[] neighbours8;
-        final int digit;
-        final boolean first;
-        final boolean last;
-        final boolean firstOnLine;
-        final boolean lastOnLine;
+    public static class It {
+        public final int i;
+        public final int x;
+        public final int y;
+        public final int m;
+        public final int n;
+        public final char ch;
+        public final char[] neighbours4;
+        public final char[] neighbours8;
+        public final int digit;
+        public final boolean first;
+        public final boolean last;
+        public final boolean firstOnLine;
+        public final boolean lastOnLine;
 
         private It(final int i, final int x, final int y, final int m, final int n, final char ch,
                    final char[] neighbours4, final char[] neighbours8, final int digit,

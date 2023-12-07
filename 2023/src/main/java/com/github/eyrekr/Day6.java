@@ -1,5 +1,7 @@
 package com.github.eyrekr;
 
+import com.github.eyrekr.util.Seq;
+
 /**
  * <a href="https://adventofcode.com/2023/day/6">...</a>
  * 1) 281600
