@@ -5,7 +5,6 @@ import com.github.eyrekr.util.Seq;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * https://adventofcode.com/2023/day/8
@@ -18,14 +17,11 @@ class D08 extends AoC<D08.In> {
         new D08().run(In::from);
     }
 
-    record In(String directions, Map<String, Step> map) {
+    record In(Seq<Direction> directions, Map<String, Step> map) {
         static In from(Seq<String> lines) {
-            return new In(lines.value, lines.tail.tail.map(Step::from).toMap(Step::source));
-        }
-
-        String next(final String from, final long step) {
-            final int i = (int) (step % directions.length());
-            return Objects.equals(directions.charAt(i), 'L') ? map.get(from).left : map.get(from).right;
+            return new In(
+                    Seq.fromString(lines.value).map(ch -> ch == 'L' ? Direction.L : Direction.R),
+                    lines.tail.tail.map(Step::from).toMap(Step::source));
         }
     }
 
@@ -36,22 +32,22 @@ class D08 extends AoC<D08.In> {
         }
     }
 
+    enum Direction {L, R}
+
     long star1() {
         return steps("AAA", "ZZZ");
     }
 
     long star2() {
-        return Seq.fromIterable(in.map.keySet())
-                .where(key -> key.endsWith("A"))
-                .map(start -> steps(start, "Z"))
-                .reduce(1L, Mth::lcm);
+        return Seq.fromIterable(in.map.keySet()).where(key -> key.endsWith("A")).map(start -> steps(start, "Z")).reduce(1L, Mth::lcm);
     }
 
     long steps(final String start, final String end) {
         String current = start;
         long step = 0;
+        final var direction = in.directions.loopingIterator();
         while (!current.endsWith(end)) {
-            current = in.next(current, step);
+            current = direction.next() == Direction.L ? in.map.get(current).left : in.map.get(current).right;
             step++;
         }
         return step;

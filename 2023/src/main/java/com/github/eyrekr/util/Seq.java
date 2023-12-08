@@ -40,6 +40,10 @@ public final class Seq<E> implements Iterable<E> {
         return iterator.hasNext() ? new Seq<>(iterator.next(), fromIterator(iterator)) : empty();
     }
 
+    public static Seq<Character> fromString(final String string) {
+        return string == null ? empty() : range(0, string.length()).carryMap(string, (str, i) -> str.charAt(i.intValue()));
+    }
+
     public static Seq<Long> range(final long startInclusive, final long endExclusive) {
         return startInclusive >= endExclusive ? empty() : new Seq<>(startInclusive, range(startInclusive + 1, endExclusive));
     }
@@ -58,6 +62,10 @@ public final class Seq<E> implements Iterable<E> {
 
     public E at(final int i) {
         return (i % length == 0) ? value : i > 0 ? tail.at((i % length) - 1) : tail.at(i % length);
+    }
+
+    public E at(final long i) {
+        return (i % length == 0) ? value : i > 0 ? tail.at((i % length) - 1L) : tail.at(i % length);
     }
 
     public boolean has(final E value) {
@@ -215,22 +223,38 @@ public final class Seq<E> implements Iterable<E> {
 
     @Override
     public Iterator<E> iterator() {
-        return new Iterator<>() {
-            private Seq<E> seq = Seq.this;
-
-            @Override
-            public boolean hasNext() {
-                return !seq.isEmpty;
-            }
-
-            @Override
-            public E next() {
-                final E value = seq.value;
-                seq = seq.tail;
-                return value;
-            }
-        };
+        return new It();
     }
+
+    public Iterator<E> loopingIterator() {
+        final It it = new It();
+        it.loop = true;
+        return it;
+    }
+
+    private class It implements Iterator<E> {
+        private Seq<E> seq = Seq.this;
+        private boolean loop = false;
+
+        @Override
+        public boolean hasNext() {
+            return loop || !seq.isEmpty;
+        }
+
+        @Override
+        public E next() {
+            if (seq.isEmpty) {
+                if (loop) {
+                    seq = Seq.this;
+                }
+                throw new IllegalStateException();
+            }
+            final E value = seq.value;
+            seq = seq.tail;
+            return value;
+        }
+    }
+
 
     public static void main(String[] args) {
         Seq.range(1, 10).print();
