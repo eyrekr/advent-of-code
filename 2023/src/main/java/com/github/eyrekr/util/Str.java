@@ -3,6 +3,8 @@ package com.github.eyrekr.util;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 public final class Str {
@@ -51,6 +53,22 @@ public final class Str {
             seq = seq.prepend(Long.parseLong(matcher.group()));
         }
         return seq.reverse();
+    }
+
+    public static String mainResource(final String name) {
+        try {
+            return Files.readString(Path.of(String.format("src/main/resources/" + name)));
+        } catch (final Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static String testResource(final String name) {
+        try {
+            return Files.readString(Path.of(String.format("src/test/resources/" + name)));
+        } catch (final Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     public static void print(final String format, final Object... args) {
