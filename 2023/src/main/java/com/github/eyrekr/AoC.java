@@ -2,7 +2,7 @@ package com.github.eyrekr;
 
 import com.github.eyrekr.util.Seq;
 
-abstract class AoC {
+class AoC {
 
     final String input;
     final Seq<String> lines;
@@ -12,8 +12,11 @@ abstract class AoC {
         this.lines = Seq.ofLinesFromString(input);
     }
 
-    abstract long star1();
+    long star1() {
+        return 0L;
+    }
 
-    abstract long star2();
-
+    long star2() {
+        return 0L;
+    }
 }
