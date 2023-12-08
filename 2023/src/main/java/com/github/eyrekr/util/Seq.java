@@ -222,19 +222,22 @@ public final class Seq<E> implements Iterable<E> {
     }
 
     @Override
-    public Iterator<E> iterator() {
-        return new It();
+    public It iterator() {
+        return new It(false);
     }
 
-    public Iterator<E> loopingIterator() {
-        final It it = new It();
-        it.loop = true;
-        return it;
+    public It loopingIterator() {
+        return new It(true);
     }
 
-    private class It implements Iterator<E> {
+    public final class It implements Iterator<E> {
         private Seq<E> seq = Seq.this;
-        private boolean loop = false;
+        public final boolean loop;
+        public long steps = 0;
+
+        private It(final boolean loop) {
+            this.loop = loop;
+        }
 
         @Override
         public boolean hasNext() {
@@ -244,13 +247,14 @@ public final class Seq<E> implements Iterable<E> {
         @Override
         public E next() {
             if (seq.isEmpty) {
-                if (loop) {
-                    seq = Seq.this;
+                if (!loop) {
+                    throw new IllegalStateException();
                 }
-                throw new IllegalStateException();
+                seq = Seq.this;
             }
             final E value = seq.value;
             seq = seq.tail;
+            steps++;
             return value;
         }
     }

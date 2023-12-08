@@ -43,14 +43,12 @@ class D08 extends AoC<D08.In> {
     }
 
     long steps(final String start, final String end) {
-        String current = start;
-        long step = 0;
+        String position = start;
         final var direction = in.directions.loopingIterator();
-        while (!current.endsWith(end)) {
-            current = direction.next() == Direction.L ? in.map.get(current).left : in.map.get(current).right;
-            step++;
+        while (!position.endsWith(end)) {
+            position = direction.next() == Direction.L ? in.map.get(position).left : in.map.get(position).right;
         }
-        return step;
+        return direction.steps;
     }
 
 }
