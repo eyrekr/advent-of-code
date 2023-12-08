@@ -7,10 +7,12 @@ package com.github.eyrekr;
  */
 class D09 extends AoC {
 
+    //TODO parsed input
+
     D09(final String input) {
         super(input);
+        //TODO  parse input
     }
-
 
     long star1() {
         return 0L;
