@@ -11,56 +11,46 @@ import java.util.Objects;
  * 1) 19241
  * 2) 9606140307013
  */
-class Day8 extends AoC<Day8.Input> {
+class Day8 extends AoC<Day8.In> {
 
     public static void main(String[] args) {
-        new Day8().run(8, Input::from);
+        new Day8().run(8, In::from);
     }
 
-    record Input(String navigation, Map<String, Instruction> instructions) {
-        static Input from(Seq<String> lines) {
-            final String navigation = lines.value;
-            final Map<String, Instruction> instructions = lines.tail.tail.map(Instruction::from).print("\n").toMap(Instruction::source);
-            return new Input(navigation, instructions);
+    record In(String directions, Map<String, Step> map) {
+        static In from(Seq<String> lines) {
+            return new In(lines.value, lines.tail.tail.map(Step::from).toMap(Step::source));
+        }
+
+        String next(final String from, final long step) {
+            final int i = (int) (step % directions.length());
+            return Objects.equals(directions.charAt(i), 'L') ? map.get(from).left : map.get(from).right;
         }
     }
 
-    record Instruction(String source, String left, String right) {
-        static Instruction from(final String input) {
+    record Step(String source, String left, String right) {
+        static Step from(final String input) {
             final String[] data = StringUtils.split(input, " =(),");
-            return new Instruction(data[0], data[1], data[2]);
+            return new Step(data[0], data[1], data[2]);
         }
     }
 
-    long star1(final Input input) {
-        String current = "AAA";
-        int step = 0;
-        final int n = input.navigation.length();
-        while (!current.equalsIgnoreCase("ZZZ")) {
-            current = Objects.equals(input.navigation.charAt(step % n), 'L')
-                    ? input.instructions.get(current).left
-                    : input.instructions.get(current).right;
-            step++;
-        }
-        return (long) step;
+    long star1(final In in) {
+        return steps(in, "AAA", "ZZZ");
     }
 
-    long star2(Input input) {
-        long steps = Seq.fromIterable(input.instructions.keySet())
+    long star2(final In in) {
+        return Seq.fromIterable(in.map.keySet())
                 .where(key -> key.endsWith("A"))
-                .map(start -> steps(start, input.instructions, input.navigation))
+                .map(start -> steps(in, start, "Z"))
                 .reduce(1L, Mth::lcm);
-        return steps;
     }
 
-    static long steps(final String start, final Map<String, Instruction> instructions, final String navigation) {
+    static long steps(final In in, final String start, final String end) {
         String current = start;
         long step = 0;
-        final long n = navigation.length();
-        while (!current.endsWith("Z")) {
-            final int i = (int) (step % n);
-            final boolean left = Objects.equals(navigation.charAt(i), 'L');
-            current = left ? instructions.get(current).left : instructions.get(current).right;
+        while (!current.endsWith(end)) {
+            current = in.next(current, step);
             step++;
         }
         return step;
