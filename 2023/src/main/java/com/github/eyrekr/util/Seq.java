@@ -1,8 +1,6 @@
 package com.github.eyrekr.util;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -188,6 +186,16 @@ public final class Seq<E> implements Iterable<E> {
                         ? new Accumulator<>(accumulator.all, accumulator.batch.prepend(element))
                         : new Accumulator<>(accumulator.all.prepend(accumulator.batch), Seq.of(element)));
         return acc.batch.isEmpty ? acc.all : acc.all.prepend(acc.batch);
+    }
+
+    public <K, V> Map<K, V> toMap(final Function<? super E, K> key, final Function<? super E, V> value) {
+        final var map = new HashMap<K, V>(length);
+        each(element -> map.put(key.apply(element), value.apply(element)));
+        return map;
+    }
+
+    public <K> Map<K, E> toMap(final Function<? super E, K> key) {
+        return toMap(key, element -> element);
     }
 
     public Seq<E> print() {
