@@ -7,29 +7,42 @@ import java.util.regex.Pattern;
 
 public final class Str {
 
+    private  interface Ascii {
+        String RESET = "\033[0m";
+        String BOLD = "\033[1m";
+        String UNDERLINE = "\033[4m";
+        String ITALIC = "\033[3m";
+        String BLACK = "\033[30m";
+        String RED = "\033[31m";
+        String GREEN = "\033[32m";
+        String YELLOW = "\033[33m";
+        String BLUE = "\033[34m";
+        String MAGENTA = "\033[35m";
+        String CYAN = "\033[36m";
+        String WHITE = "\033[37m";
+        String LIGHT_BLACK = "\033[90m";
+        String LIGHT_RED = "\033[91m";
+        String LIGHT_GREEN = "\033[92m";
+        String LIGHT_YELLOW = "\033[93m";
+        String LIGHT_BLUE = "\033[94m";
+        String LIGHT_MAGENTA = "\033[95m";
+        String LIGHT_CYAN = "\033[96m";
+        String LIGHT_WHITE = "\033[97m";
+
+    }
+
     private static final Pattern NUMBERS = Pattern.compile("(\\d+)", Pattern.MULTILINE | Pattern.DOTALL);
-    private static final String[][] FORMATTING = new String[][] {
-      new String[]{"@@", "\033[0m"},
-      new String[]{"@k", "\033[30m"},
-      new String[]{"@r", "\033[31m"},
-      new String[]{"@g", "\033[32m"},
-      new String[]{"@y", "\033[33m"},
-      new String[]{"@b", "\033[34m"},
-      new String[]{"@m", "\033[35m"},
-      new String[]{"@c", "\033[36m"},
-      new String[]{"@w", "\033[37m"},
-      new String[]{"@K", "\033[90m"},
-      new String[]{"@R", "\033[91m"},
-      new String[]{"@G", "\033[92m"},
-      new String[]{"@Y", "\033[93m"},
-      new String[]{"@B", "\033[94m"},
-      new String[]{"@M", "\033[95m"},
-      new String[]{"@C", "\033[96m"},
-      new String[]{"@W", "\033[97m"},
-      new String[]{"**", "\033[1m", "\033[0m"},
-      new String[]{"__", "\033[4m", "\033[0m"},
-      new String[]{"//", "\033[3m", "\033[0m"},
+    private static final String[] FORMAT_CONTROL = new String[]{
+            "@@",
+            "@k", "@r", "@g", "@y", "@b", "@m", "@c", "@w",
+            "@K", "@R", "@G", "@Y", "@B", "@M", "@C", "@W"
     };
+    private static final String[] FORMAT_ASCII = new String[]{
+            Ascii.RESET,
+            Ascii.BLACK, Ascii.RED, Ascii.GREEN, Ascii.YELLOW, Ascii.BLUE, Ascii.MAGENTA, Ascii.CYAN, Ascii.WHITE,
+            Ascii.LIGHT_BLACK, Ascii.LIGHT_RED, Ascii.LIGHT_GREEN, Ascii.LIGHT_YELLOW, Ascii.LIGHT_BLUE, Ascii.LIGHT_MAGENTA, Ascii.LIGHT_CYAN, Ascii.LIGHT_WHITE
+    };
+
 
     public static Seq<Long> longs(final String input) {
         final var matcher = NUMBERS.matcher(input);
@@ -40,18 +53,40 @@ public final class Str {
         return seq.reverse();
     }
 
-    static void print(final String format, final Object... args) {
-        final StringBuilder b = new StringBuilder();
+    public static void print(final String format, final Object... args) {
+        final String fmt = StringUtils.replaceEachRepeatedly(format, FORMAT_CONTROL, FORMAT_ASCII);
+        final StringBuilder builder = new StringBuilder();
+        final int n = fmt.length();
         int i = 0;
-        while(i < format.length()) {
-            final char ch = format.charAt(i);
-            switch()
+        boolean bold = false, italic = false, underline = false;
+        while (i < fmt.length()) {
+            final char ch = fmt.charAt(i);
+            final char la = (i + 1 < n) ? fmt.charAt(i + 1) : '\0';
+            switch ("" + ch + la) {
+                case "**" -> {
+                    builder.append(bold ? Ascii.RESET : Ascii.BOLD);
+                    bold = !bold;
+                    i++;
+                }
+                case "__" -> {
+                    builder.append(underline ? Ascii.RESET : Ascii.UNDERLINE);
+                    underline = !underline;
+                    i++;
+                }
+                case "//" -> {
+                    builder.append(italic ? Ascii.RESET : Ascii.ITALIC);
+                    italic = !italic;
+                    i++;
+                }
+                default -> builder.append(ch);
+            }
+            i++;
         }
-        System.out.printf(tmp, args);
+        System.out.printf(builder.toString(), args);
     }
 
     public static void main(String[] args) {
-        print("**bold**__underline__//italic//##frame##\n");
+        print("**bold**__underline__//italic//\n");
         print("@rRED@gGREEN@bBLUE@cCYAN@mMAGENTA@yYELLOW@kBLACK@wGRAY@@\n");
         print("@RRED@GGREEN@BBLUE@CCYAN@MMAGENTA@YYELLOW@KBLACK@WGRAY@@\n");
     }
