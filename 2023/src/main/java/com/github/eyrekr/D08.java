@@ -11,42 +11,35 @@ import java.util.Map;
  * 1) 19241
  * 2) 9606140307013
  */
-class D08 extends AoC<D08.In> {
+class D08 extends AoC {
 
-    public static void main(String[] args) {
-        new D08().run(In::from);
+    private final Seq<Character> directions;
+    private final Map<String, Step> map;
+
+    D08(final String input) {
+        super(input);
+        this.directions = Seq.ofCharactersFromString(lines.value);
+        this.map = lines.tail.tail
+                .map(line -> StringUtils.split(line, " =(),"))
+                .toMap(array -> array[0], array -> new Step(array[1], array[2]));
     }
 
-    record In(Seq<Direction> directions, Map<String, Step> map) {
-        static In from(Seq<String> lines) {
-            return new In(
-                    Seq.fromString(lines.value).map(ch -> ch == 'L' ? Direction.L : Direction.R),
-                    lines.tail.tail.map(Step::from).toMap(Step::source));
-        }
+    record Step(String left, String right) {
     }
-
-    record Step(String source, String left, String right) {
-        static Step from(final String input) {
-            final String[] data = StringUtils.split(input, " =(),");
-            return new Step(data[0], data[1], data[2]);
-        }
-    }
-
-    enum Direction {L, R}
 
     long star1() {
         return steps("AAA", "ZZZ");
     }
 
     long star2() {
-        return Seq.fromIterable(in.map.keySet()).where(key -> key.endsWith("A")).map(start -> steps(start, "Z")).reduce(1L, Mth::lcm);
+        return Seq.fromIterable(map.keySet()).where(key -> key.endsWith("A")).map(start -> steps(start, "Z")).reduce(1L, Mth::lcm);
     }
 
     long steps(final String start, final String end) {
         String position = start;
-        final var direction = in.directions.loopingIterator();
+        final var direction = directions.loopingIterator();
         while (!position.endsWith(end)) {
-            position = direction.next() == Direction.L ? in.map.get(position).left : in.map.get(position).right;
+            position = direction.next() == 'L' ? map.get(position).left : map.get(position).right;
         }
         return direction.steps;
     }

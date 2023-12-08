@@ -40,8 +40,12 @@ public final class Seq<E> implements Iterable<E> {
         return iterator.hasNext() ? new Seq<>(iterator.next(), fromIterator(iterator)) : empty();
     }
 
-    public static Seq<Character> fromString(final String string) {
+    public static Seq<Character> ofCharactersFromString(final String string) {
         return string == null ? empty() : range(0, string.length()).carryMap(string, (str, i) -> str.charAt(i.intValue()));
+    }
+
+    public static Seq<String> ofLinesFromString(final String string) {
+        return fromArray(string.split("\n"));
     }
 
     public static Seq<Long> range(final long startInclusive, final long endExclusive) {
