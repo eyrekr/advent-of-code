@@ -7,22 +7,27 @@ import java.nio.file.Path;
 import java.util.function.Function;
 
 abstract class AoC<IN> {
+    IN in;
 
-    void run(final int day, final Function<Seq<String>, IN> parse) {
+    void run(final Function<Seq<String>, IN> parse) {
         try {
-            final String input = Files.readString(Path.of(String.format("src/main/resources/%02d.txt", day)));
+            final String input = Files.readString(Path.of(String.format("src/main/resources/%s.txt", getClass().getSimpleName())));
             final Seq<String> lines = Seq.fromArray(input.split("\n"));
-            final IN in = parse.apply(lines);
-            System.out.println("1) " + star1(in));
-            System.out.println("2) " + star2(in));
+            this.in = parse.apply(lines);
 
+            print("1) %d\n", star1());
+            print("2) %d\n", star2());
         } catch (final Exception e) {
             throw new IllegalStateException(e);
         }
     }
 
-    abstract long star1(final IN in);
+    abstract long star1();
 
-    abstract long star2(final IN in);
+    abstract long star2();
+
+    static void print(final String format, final Object... args) {
+        System.out.printf(format, args);
+    }
 
 }

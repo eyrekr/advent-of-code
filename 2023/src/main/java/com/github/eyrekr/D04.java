@@ -9,14 +9,14 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 /**
- * <a href="https://adventofcode.com/2023/day/4">...</a>
+ * https://adventofcode.com/2023/day/4
  * 1) 26426
  * 2) 6227972
  */
-class Day4 {
+class D04 {
 
     public static void main(String[] args) throws Exception {
-        final Card[] deck = Files.readAllLines(Path.of("src/main/resources/04.txt")).stream().map(Card::new).toArray(Card[]::new);
+        final Card[] deck = Files.readAllLines(Path.of("src/main/resources/D04.txt")).stream().map(Card::new).toArray(Card[]::new);
 
         for (int cardNumber = 0; cardNumber < deck.length; cardNumber++) {
             final Card card = deck[cardNumber];

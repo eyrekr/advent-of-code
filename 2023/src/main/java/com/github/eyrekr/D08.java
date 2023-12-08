@@ -8,13 +8,14 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
+ * https://adventofcode.com/2023/day/8
  * 1) 19241
  * 2) 9606140307013
  */
-class Day8 extends AoC<Day8.In> {
+class D08 extends AoC<D08.In> {
 
     public static void main(String[] args) {
-        new Day8().run(8, In::from);
+        new D08().run(In::from);
     }
 
     record In(String directions, Map<String, Step> map) {
@@ -35,18 +36,18 @@ class Day8 extends AoC<Day8.In> {
         }
     }
 
-    long star1(final In in) {
-        return steps(in, "AAA", "ZZZ");
+    long star1() {
+        return steps("AAA", "ZZZ");
     }
 
-    long star2(final In in) {
+    long star2() {
         return Seq.fromIterable(in.map.keySet())
                 .where(key -> key.endsWith("A"))
-                .map(start -> steps(in, start, "Z"))
+                .map(start -> steps(start, "Z"))
                 .reduce(1L, Mth::lcm);
     }
 
-    static long steps(final In in, final String start, final String end) {
+    long steps(final String start, final String end) {
         String current = start;
         long step = 0;
         while (!current.endsWith(end)) {

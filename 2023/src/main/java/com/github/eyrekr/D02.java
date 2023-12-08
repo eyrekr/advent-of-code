@@ -8,14 +8,14 @@ import java.nio.file.Path;
 import java.util.stream.Stream;
 
 /**
- * <a href="https://adventofcode.com/2023/day/3">...</a>
+ * https://adventofcode.com/2023/day/3
  * 1) 514969
  * 2) 78915902
  */
-class Day3 {
+class D02 {
 
     public static void main(String[] args) throws Exception {
-        final Grid grid = Grid.from(Path.of("src/main/resources/03.txt"));
+        final Grid grid = Grid.from(Path.of("src/main/resources/D03.txt"));
 
         long sum = 0;
         final Multimap<Integer, Part> gears = LinkedHashMultimap.create();

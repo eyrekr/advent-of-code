@@ -3,11 +3,11 @@ package com.github.eyrekr;
 import com.github.eyrekr.util.Seq;
 
 /**
- * <a href="https://adventofcode.com/2023/day/6">...</a>
+ * https://adventofcode.com/2023/day/6
  * 1) 281600
  * 2) 33875953
  */
-class Day6 {
+class D06 {
 
     static final Seq<Input> SAMPLE = Seq.of(new Input(7, 9), new Input(15, 40), new Input(30, 200));
     static final Seq<Input> STAR1 = Seq.of(new Input(47, 282), new Input(70, 1079), new Input(75, 1147), new Input(66, 1062));

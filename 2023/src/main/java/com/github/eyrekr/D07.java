@@ -11,15 +11,15 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 
 /**
- * <a href="https://adventofcode.com/2023/day/7">...</a>
+ * https://adventofcode.com/2023/day/7
  * 1) 248559379
  * 2) 249631254
  */
-class Day7 {
+class D07 {
     static final char JOKER = '*';
 
     public static void main(String[] args) throws Exception {
-        final Seq<String> lines = Seq.fromArray(Files.readString(Path.of("src/main/resources/07.txt")).split("\n"));
+        final Seq<String> lines = Seq.fromArray(Files.readString(Path.of("src/main/resources/D07.txt")).split("\n"));
         System.out.printf("%d\n%d\n",
                 solve(lines.map(line -> Card.from(line, false))),
                 solve(lines.map(line -> Card.from(line, true))));

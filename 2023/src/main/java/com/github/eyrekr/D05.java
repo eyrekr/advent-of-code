@@ -6,14 +6,14 @@ import com.github.eyrekr.util.Str;
 import java.util.Comparator;
 
 /**
- * <a href="https://adventofcode.com/2023/day/5">...</a>
+ * https://adventofcode.com/2023/day/5
  * 1) 214922730
  * 2) 148041808
  */
-class Day5 {
+class D05 {
 
     public static void main(String[] args) throws Exception {
-        //final var sections = Seq.fromArray(Files.readString(Path.of("src/main/resources/05.txt")).split("\n\n"));
+        //final var sections = Seq.fromArray(Files.readString(Path.of("src/main/resources/D05.txt")).split("\n\n"));
         final var sections = Seq.fromArray(SAMPLE.split("\n\n"));
         //final var seeds = Str.longs(sections.order).batch(2).print();
         final var seeds = Str.longs(sections.value).map(value -> Seq.of(value, 1L)).print();

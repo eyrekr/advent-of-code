@@ -7,15 +7,15 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * <a href="https://adventofcode.com/2023/day/1">...</a>
+ * https://adventofcode.com/2023/day/1
  * 1) 54331
  * 2) 54518
  */
-public class Day1 {
+public class D01 {
 
     public static void main(final String... args) throws Exception {
-        final List<String> lines = Files.readAllLines(Path.of("src/main/resources/01.txt"));
-        final var sum = lines.stream().map(Day1::translate).mapToInt(Day1::toNumber).sum();
+        final List<String> lines = Files.readAllLines(Path.of("src/main/resources/D01.txt"));
+        final var sum = lines.stream().map(D01::translate).mapToInt(D01::toNumber).sum();
         System.out.println(sum);
     }
 
