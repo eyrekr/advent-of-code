@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public final class Str {
 
-    private  interface Ascii {
+    private interface Ascii {
         String RESET = "\033[0m";
         String BOLD = "\033[1m";
         String UNDERLINE = "\033[4m";
@@ -35,12 +35,12 @@ public final class Str {
     private static final String[] FORMAT_CONTROL = new String[]{
             "@@",
             "@k", "@r", "@g", "@y", "@b", "@m", "@c", "@w",
-            "@K", "@R", "@G", "@Y", "@B", "@M", "@C", "@W"
+            "@K", "@R", "@G", "@Y", "@B", "@M", "@C", "@W",
     };
     private static final String[] FORMAT_ASCII = new String[]{
             Ascii.RESET,
             Ascii.BLACK, Ascii.RED, Ascii.GREEN, Ascii.YELLOW, Ascii.BLUE, Ascii.MAGENTA, Ascii.CYAN, Ascii.WHITE,
-            Ascii.LIGHT_BLACK, Ascii.LIGHT_RED, Ascii.LIGHT_GREEN, Ascii.LIGHT_YELLOW, Ascii.LIGHT_BLUE, Ascii.LIGHT_MAGENTA, Ascii.LIGHT_CYAN, Ascii.LIGHT_WHITE
+            Ascii.LIGHT_BLACK, Ascii.LIGHT_RED, Ascii.LIGHT_GREEN, Ascii.LIGHT_YELLOW, Ascii.LIGHT_BLUE, Ascii.LIGHT_MAGENTA, Ascii.LIGHT_CYAN, Ascii.LIGHT_WHITE,
     };
 
 
@@ -63,17 +63,17 @@ public final class Str {
             final char ch = fmt.charAt(i);
             final char la = (i + 1 < n) ? fmt.charAt(i + 1) : '\0';
             switch ("" + ch + la) {
-                case "**" -> {
+                case "**" -> { // **bold**
                     builder.append(bold ? Ascii.RESET : Ascii.BOLD);
                     bold = !bold;
                     i++;
                 }
-                case "__" -> {
+                case "__" -> { // __underline__
                     builder.append(underline ? Ascii.RESET : Ascii.UNDERLINE);
                     underline = !underline;
                     i++;
                 }
-                case "//" -> {
+                case "//" -> { // //italic//
                     builder.append(italic ? Ascii.RESET : Ascii.ITALIC);
                     italic = !italic;
                     i++;
@@ -82,6 +82,7 @@ public final class Str {
             }
             i++;
         }
+        builder.append(Ascii.RESET);
         System.out.printf(builder.toString(), args);
     }
 
