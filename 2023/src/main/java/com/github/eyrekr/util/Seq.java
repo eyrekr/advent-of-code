@@ -6,6 +6,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * Sequence of objects.
+ */
 public final class Seq<E> implements Iterable<E> {
     public final E value;
     public final E lastValue;
