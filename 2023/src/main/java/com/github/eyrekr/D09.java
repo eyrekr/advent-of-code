@@ -26,23 +26,23 @@ class D09 extends AoC {
     }
 
     long extrapolateNext(final Seq<Long> numbers) {
-        var tmp = numbers;
+        var seq = numbers;
         var lastValues = Seq.<Long>empty();
-        while (!tmp.allMatch(0L)) {
-            lastValues = lastValues.prepend(tmp.last(1).value);
-            tmp = tmp.mapWithPrev((value, previous) -> previous == null ? null : value - previous).tail;
-            tmp.print();
+        while (!seq.allMatch(0L)) {
+            lastValues = lastValues.prepend(seq.lastValue);
+            seq = seq.mapWithPrev((value, previous) -> previous == null ? null : value - previous).tail;
+            seq.print();
         }
         return lastValues.reduce(Long::sum).longValue();
     }
 
     long extrapolatePrevious(final Seq<Long> numbers) {
-        var tmp = numbers;
+        var seq = numbers;
         var firstValues = Seq.<Long>empty();
-        while (!tmp.allMatch(0L)) {
-            firstValues = firstValues.prepend(tmp.value);
-            tmp = tmp.mapWithPrev((value, previous) -> previous == null ? null : value - previous).tail;
-            tmp.print();
+        while (!seq.allMatch(0L)) {
+            firstValues = firstValues.prepend(seq.value);
+            seq = seq.mapWithPrev((value, previous) -> previous == null ? null : value - previous).tail;
+            seq.print();
         }
         return firstValues.reduce((acc, value) -> value - acc).longValue();
     }

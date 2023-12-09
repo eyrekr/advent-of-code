@@ -8,12 +8,14 @@ import java.util.function.Predicate;
 
 public final class Seq<E> implements Iterable<E> {
     public final E value;
+    public final E lastValue;
     public final int length;
     public final Seq<E> tail;
     public final boolean isEmpty;
 
     private Seq(final E value, final Seq<E> tail) {
         this.value = value;
+        this.lastValue = (tail == null || tail.length == 0) ? value : tail.lastValue;
         this.length = (tail == null) ? 0 : tail.length + 1;
         this.tail = tail;
         this.isEmpty = (tail == null);
@@ -300,5 +302,9 @@ public final class Seq<E> implements Iterable<E> {
         Seq.of("a", "b", "c", "d", "e").mapWithPrev((value, prev) -> prev + "=>" + value).print();
         Seq.of("a", "b", "c", "d", "e").mapWithNext((value, next) -> value + "=>" + next).print();
         Seq.of("m", "n", "o", "p").append("Q").print();
+        Str.print("%s - %s\n",
+                Seq.of("m", "n", "o", "p").lastValue,
+                Seq.of("m").lastValue
+        );
     }
 }
