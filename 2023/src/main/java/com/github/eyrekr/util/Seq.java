@@ -76,12 +76,28 @@ public final class Seq<E> implements Iterable<E> {
         return !isEmpty && (this.value == value || tail.has(value));
     }
 
+    public boolean atLeastOneIs(final Predicate<? super E> predicate) {
+        return !isEmpty && (predicate.test(value) || tail.atLeastOneIs(predicate));
+    }
+
+    public boolean atLeastOneIsNot(final Predicate<? super E> predicate) {
+        return atLeastOneIs(predicate.negate());
+    }
+
     public boolean allMatch(final E value) {
-        return isEmpty ? true : Objects.equals(this.value, value) && tail.allMatch(value);
+        return allAre(element -> Objects.equals(element, value));
+    }
+
+    public boolean allAre(final Predicate<? super E> predicate) {
+        return isEmpty || predicate.test(this.value) && tail.allAre(predicate);
     }
 
     public boolean noneMatch(final E value) {
-        return isEmpty ? true : !Objects.equals(this.value, value) && tail.noneMatch(value);
+        return noneIs(element -> Objects.equals(element, value));
+    }
+
+    public boolean noneIs(final Predicate<? super E> predicate) {
+        return isEmpty || !predicate.test(value) && tail.noneIs(predicate);
     }
 
     public <R> Seq<R> map(final Function<? super E, R> translate) {
@@ -219,12 +235,16 @@ public final class Seq<E> implements Iterable<E> {
     }
 
     public Seq<E> print() {
-        System.out.println(this);
-        return this;
+        return print(" ");
     }
 
     public Seq<E> print(final String separator) {
-        System.out.println("[" + reduceR("", (sum, element) -> sum.isBlank() ? element + "" : element + separator + sum) + "]");
+        return print(separator, String::valueOf);
+    }
+
+    public Seq<E> print(final String separator, final Function<? super E, String> format) {
+        final String string = "[" + reduceR("", (sum, element) -> sum.isBlank() ? format.apply(element) : format.apply(element) + separator + sum) + "]\n";
+        Str.print(string);
         return this;
     }
 
