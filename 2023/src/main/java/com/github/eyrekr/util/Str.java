@@ -33,7 +33,7 @@ public final class Str {
 
     }
 
-    private static final Pattern NUMBERS = Pattern.compile("(\\d+)", Pattern.MULTILINE | Pattern.DOTALL);
+    private static final Pattern NUMBERS = Pattern.compile("(-?\\d+)", Pattern.MULTILINE | Pattern.DOTALL);
     private static final String[] FORMAT_CONTROL = new String[]{
             "@@",
             "@k", "@r", "@g", "@y", "@b", "@m", "@c", "@w",

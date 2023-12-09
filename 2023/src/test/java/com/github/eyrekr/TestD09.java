@@ -7,17 +7,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class TestD09 {
     final String SAMPLE = """
-                        
+            0 3 6 9 12 15
+            1 3 6 10 15 21
+            10 13 16 21 30 45         
             """;
 
     @Test
     void sampleStar1() {
-        assertThat(new D09(SAMPLE).star1()).isEqualTo(0L);
+        assertThat(new D09(SAMPLE).star1()).isEqualTo(114L);
     }
 
     @Test
     void sampleStar2() {
-        assertThat(new D09(SAMPLE).star2()).isEqualTo(0L);
+        assertThat(new D09(SAMPLE).star2()).isEqualTo(2L);
     }
 
     @Test

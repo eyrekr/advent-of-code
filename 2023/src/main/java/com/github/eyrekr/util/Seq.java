@@ -76,6 +76,14 @@ public final class Seq<E> implements Iterable<E> {
         return !isEmpty && (this.value == value || tail.has(value));
     }
 
+    public boolean allMatch(final E value) {
+        return isEmpty ? true : Objects.equals(this.value, value) && tail.allMatch(value);
+    }
+
+    public boolean noneMatch(final E value) {
+        return isEmpty ? true : !Objects.equals(this.value, value) && tail.noneMatch(value);
+    }
+
     public <R> Seq<R> map(final Function<? super E, R> translate) {
         return isEmpty ? empty() : new Seq<>(translate.apply(value), tail.map(translate));
     }
