@@ -46,7 +46,7 @@ class D10 extends AoC {
             for (int x = 0; x < grid.m; x++) {
                 final char ch = xx[y][x];
                 if (ch > 0) { // border
-                    Str.print("@R%s", ch);
+                    Str.print("@w%s", ch);
                     if(ch=='─') {
                         //no change
                     } else if(ch == '│') {
@@ -62,7 +62,7 @@ class D10 extends AoC {
                         open = ch;
                     }
                 } else if (inside) { // empty space inside
-                    Str.print("@YX");
+                    Str.print("@R**X**");
                     area++;
                 } else { // empty space outside
                     Str.print(" ");
@@ -122,7 +122,6 @@ class D10 extends AoC {
                 default -> throw new IllegalStateException(p.toString());
             };
             path.addLast(next);
-            //Str.print("%5d    [%d;%d]%s->%s ==> [%d;%d]%s\n", p.l, p.x, p.y, p.d, ch, next.x, next.y, next.d);
         }
         return 0L;
     }

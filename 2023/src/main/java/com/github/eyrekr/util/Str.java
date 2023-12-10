@@ -72,14 +72,14 @@ public final class Str {
     }
 
     public static void print(final String format, final Object... args) {
-        final String fmt = StringUtils.replaceEachRepeatedly(format, FORMAT_CONTROL, FORMAT_ASCII);
+        final String str = StringUtils.replaceEachRepeatedly(String.format(format, args), FORMAT_CONTROL, FORMAT_ASCII);
         final StringBuilder builder = new StringBuilder();
-        final int n = fmt.length();
+        final int n = str.length();
         int i = 0;
         boolean bold = false, italic = false, underline = false;
-        while (i < fmt.length()) {
-            final char ch = fmt.charAt(i);
-            final char la = (i + 1 < n) ? fmt.charAt(i + 1) : '\0';
+        while (i < str.length()) {
+            final char ch = str.charAt(i);
+            final char la = (i + 1 < n) ? str.charAt(i + 1) : '\0';
             switch ("" + ch + la) {
                 case "**" -> { // **bold**
                     builder.append(bold ? Ascii.RESET : Ascii.BOLD);
@@ -101,7 +101,7 @@ public final class Str {
             i++;
         }
         builder.append(Ascii.RESET);
-        System.out.printf(builder.toString(), args);
+        System.out.print(builder);
     }
 
     public static void main(String[] args) {
