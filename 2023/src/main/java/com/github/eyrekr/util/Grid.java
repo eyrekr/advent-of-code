@@ -40,6 +40,19 @@ public final class Grid implements Iterable<Grid.It> {
         return new Grid(m, n, data);
     }
 
+    public static Grid of(final Seq<String> lines) {
+        final int n = lines.length;
+        final int m = lines.value.length();
+        final char[][] data = new char[m][n];
+        for (int y = 0; y < n; y++) {
+            final char[] line = lines.at(y).toCharArray();
+            for (int x = 0; x < m; x++) {
+                data[x][y] = line[x];
+            }
+        }
+        return new Grid(m, n, data);
+    }
+
     public char at(int x, int y) {
         return x >= 0 && x < m && y >= 0 && y < n ? data[x][y] : C0;
     }
@@ -108,7 +121,7 @@ public final class Grid implements Iterable<Grid.It> {
                 throw new IllegalStateException();
             }
             final int x = i % m;
-            final int y = i / n;
+            final int y = i / m;
             final char ch = data[x][y];
             final char[] ch4 = new char[]{at(x, y - 1), at(x - 1, y), at(x + 1, y), at(x, y + 1)};
             final char[] ch8 = new char[]{at(x - 1, y - 1), at(x, y - 1), at(x + 1, y - 1), at(x - 1, y), at(x + 1, y), at(x - 1, y + 1), at(x, y + 1), at(x + 1, y + 1)};
