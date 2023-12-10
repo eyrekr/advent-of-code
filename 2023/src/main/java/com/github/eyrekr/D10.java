@@ -28,24 +28,27 @@ class D10 extends AoC {
 
     D10(final String input) {
         super(input);
-        this.grid = Grid.of(lines).map(it -> NICER.getOrDefault(it.ch, Grid.C0)).print();
+        this.grid = Grid.of(lines).map(it -> NICER.getOrDefault(it.ch, Grid.C0));
     }
 
     long star1() {
-        return traverse(ignored -> {
+        return traverse(x -> {
         });
     }
 
     long star2() {
-        final char[][] xx = new char[grid.n][grid.m];
+        final char[][] stencil = new char[grid.m][grid.n];
+        traverse(it -> stencil[it.x][it.y] = it.ch);
+        return area(stencil);
+    }
 
-        traverse(state -> xx[state.it.y][state.it.x] = state.it.ch);
+    private long area(final char[][] stencil) { // ray casting
         long area = 0;
         for (int y = 0; y < grid.n; y++) {
             boolean inside = false;
             char open = '\0';
             for (int x = 0; x < grid.m; x++) {
-                final char ch = xx[y][x];
+                final char ch = stencil[x][y];
                 if (ch > 0) { // border
                     Str.print("@w%s", ch);
                     if (ch == '─') {
@@ -74,20 +77,19 @@ class D10 extends AoC {
         return area;
     }
 
-    private long traverse(Consumer<State> process) {
+    private long traverse(final Consumer<Grid.It> process) {
         final Grid.It start = grid.first(it -> it.ch == '*');
         State state = new State(start, D.U, 0);
-        while (state != null) {
-            process.accept(state);
-            if (state.it.ch == '*' && state.l > 0) {
-                return state.l / 2;
+        while (true) {
+            process.accept(state.it);
+            if (state.it.ch == '*' && state.length > 0) {
+                return state.length / 2;
             }
             state = state.next();
         }
-        return 0L;
     }
 
-    record State(Grid.It it, D direction, int l) {
+    record State(Grid.It it, D direction, int length) {
         State next() {
             final D newDirection = switch (it.ch) {
                 case '*' -> StringUtils.contains("│┌┐", it.neighbours4[0]) ? D.U
@@ -101,7 +103,10 @@ class D10 extends AoC {
                 case '└' -> direction == D.D ? D.R : D.U;
                 default -> throw new IllegalStateException(toString());
             };
-            return new State(it.to(newDirection), newDirection, l + 1);
+            return new State(it.to(newDirection), newDirection, length + 1);
+        }
+        boolean end(){
+            return it.ch=='*' && length > 0;
         }
     }
 }
