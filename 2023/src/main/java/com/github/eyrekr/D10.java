@@ -74,51 +74,62 @@ class D10 extends AoC {
         return area;
     }
 
-    private long traverse(Consumer<P> process) {
-        final LinkedList<P> path = new LinkedList<>();
+    private long traverse(Consumer<State> process) {
+        final LinkedList<State> path = new LinkedList<>();
         if (start.y - 1 >= 0 && "|F7".contains("" + grid.at(start.x, start.y - 1))) {
-            path.addFirst(new P(start.x, start.y - 1, D.U, 1));
+            path.addFirst(new State(start.x, start.y - 1, D.U, 1));
         } else if ((start.y + 1 < grid.n) && "|JL".contains("" + grid.at(start.x, start.y + 1))) {
-            path.addFirst(new P(start.x, start.y + 1, D.D, 1));
+            path.addFirst(new State(start.x, start.y + 1, D.D, 1));
         } else if ((start.x - 1 >= 0) && "-LF".contains("" + grid.at(start.x - 1, start.y))) {
-            path.addFirst(new P(start.x - 1, start.y, D.L, 1));
+            path.addFirst(new State(start.x - 1, start.y, D.L, 1));
         } else if ((start.x + 1 < grid.m) && "-7J".contains("" + grid.at(start.x + 1, start.y))) {
-            path.addFirst(new P(start.x + 1, start.y, D.R, 1));
+            path.addFirst(new State(start.x + 1, start.y, D.R, 1));
         }
         while (!path.isEmpty()) {
-            final P p = path.removeFirst();
-            if (process != null) process.accept(p);
-            final char ch = grid.at(p.x, p.y);
+            final State state = path.removeFirst();
+            if (process != null) process.accept(state);
+            final char ch = grid.at(state.x, state.y);
             if (ch == 'S') { //back at start
-                return p.l / 2;
+                return state.l / 2;
             }
-            final P next = switch (ch) {
-                case '|' -> p.d == D.U
-                        ? new P(p.x, p.y - 1, D.U, p.l + 1)
-                        : new P(p.x, p.y + 1, D.D, p.l + 1);
-                case '-' -> p.d == D.R
-                        ? new P(p.x + 1, p.y, D.R, p.l + 1)
-                        : new P(p.x - 1, p.y, D.L, p.l + 1);
-                case 'F' -> p.d == D.L
-                        ? new P(p.x, p.y + 1, D.D, p.l + 1)
-                        : new P(p.x + 1, p.y, D.R, p.l + 1);
-                case '7' -> p.d == D.U
-                        ? new P(p.x - 1, p.y, D.L, p.l + 1)
-                        : new P(p.x, p.y + 1, D.D, p.l + 1);
-                case 'J' -> p.d == D.D
-                        ? new P(p.x - 1, p.y, D.L, p.l + 1)
-                        : new P(p.x, p.y - 1, D.U, p.l + 1);
-                case 'L' -> p.d == D.D
-                        ? new P(p.x + 1, p.y, D.R, p.l + 1)
-                        : new P(p.x, p.y - 1, D.U, p.l + 1);
-                default -> throw new IllegalStateException(p.toString());
+            final State next = switch (ch) {
+                case '|' -> state.d == D.U
+                        ? new State(state.x, state.y - 1, D.U, state.l + 1)
+                        : new State(state.x, state.y + 1, D.D, state.l + 1);
+                case '-' -> state.d == D.R
+                        ? new State(state.x + 1, state.y, D.R, state.l + 1)
+                        : new State(state.x - 1, state.y, D.L, state.l + 1);
+                case 'F' -> state.d == D.L
+                        ? new State(state.x, state.y + 1, D.D, state.l + 1)
+                        : new State(state.x + 1, state.y, D.R, state.l + 1);
+                case '7' -> state.d == D.U
+                        ? new State(state.x - 1, state.y, D.L, state.l + 1)
+                        : new State(state.x, state.y + 1, D.D, state.l + 1);
+                case 'J' -> state.d == D.D
+                        ? new State(state.x - 1, state.y, D.L, state.l + 1)
+                        : new State(state.x, state.y - 1, D.U, state.l + 1);
+                case 'L' -> state.d == D.D
+                        ? new State(state.x + 1, state.y, D.R, state.l + 1)
+                        : new State(state.x, state.y - 1, D.U, state.l + 1);
+                default -> throw new IllegalStateException(state.toString());
             };
             path.addLast(next);
         }
         return 0L;
     }
 
-    record P(int x, int y, D d, int l) {
+    record State(int x, int y, D d, int l) {
+        State over(final char ch) {
+            return switch (ch) {
+                case '|' -> d == D.U ? new State(x, y - 1, D.U, l + 1) : new State(x, y + 1, D.D, l + 1);
+                case '-' -> d == D.R ? new State(x + 1, y, D.R, l + 1) : new State(x - 1, y, D.L, l + 1);
+                case 'F' -> d == D.L ? new State(x, y + 1, D.D, l + 1) : new State(x + 1,y, D.R, l + 1);
+                case '7' -> d == D.U ? new State(x - 1, y, D.L, l + 1) : new State(x, y + 1, D.D, l + 1);
+                case 'J' -> d == D.D ? new State(x - 1, y, D.L, l + 1) : new State(x, y - 1, D.U, l + 1);
+                case 'L' -> d == D.D ? new State(x + 1, y, D.R, l + 1) : new State(x, y - 1, D.U, l + 1);
+                default -> throw new IllegalStateException(toString());
+            };
+        }
     }
 
 }
