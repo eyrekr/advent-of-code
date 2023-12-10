@@ -3,8 +3,8 @@ package com.github.eyrekr;
 import com.github.eyrekr.util.Grid;
 import com.github.eyrekr.util.Grid.D;
 import com.github.eyrekr.util.Str;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -16,16 +16,15 @@ import java.util.function.Consumer;
 class D10 extends AoC {
 
     final Grid grid;
-    final Grid.It start;
 
     D10(final String input) {
         super(input);
         this.grid = Grid.of(lines);
-        this.start = grid.first(it->it.ch == 'S');
     }
 
     long star1() {
-        return traverse(null);
+        return traverse(ignored -> {
+        });
     }
 
     long star2() {
@@ -39,7 +38,7 @@ class D10 extends AoC {
                 '7', '┐',
                 'L', '└'
         );
-        traverse(p -> xx[p.y][p.x] = T.getOrDefault(grid.at(p.x, p.y), '\0'));
+        traverse(state -> xx[state.it.y][state.it.x] = T.getOrDefault(state.it.ch, '\0'));
         long area = 0;
         for (int y = 0; y < grid.n; y++) {
             boolean inside = false;
@@ -48,14 +47,14 @@ class D10 extends AoC {
                 final char ch = xx[y][x];
                 if (ch > 0) { // border
                     Str.print("@w%s", ch);
-                    if(ch=='─') {
+                    if (ch == '─') {
                         //no change
-                    } else if(ch == '│') {
+                    } else if (ch == '│') {
                         inside = !inside;
-                    } else if(open == '┌' && ch == '┘') {
+                    } else if (open == '┌' && ch == '┘') {
                         // no change
                         open = '\0';
-                    } else if(open == '└' && ch == '┐' ) {
+                    } else if (open == '└' && ch == '┐') {
                         // no change
                         open = '\0';
                     } else {
@@ -75,60 +74,34 @@ class D10 extends AoC {
     }
 
     private long traverse(Consumer<State> process) {
-        final LinkedList<State> path = new LinkedList<>();
-        if (start.y - 1 >= 0 && "|F7".contains("" + grid.at(start.x, start.y - 1))) {
-            path.addFirst(new State(start.x, start.y - 1, D.U, 1));
-        } else if ((start.y + 1 < grid.n) && "|JL".contains("" + grid.at(start.x, start.y + 1))) {
-            path.addFirst(new State(start.x, start.y + 1, D.D, 1));
-        } else if ((start.x - 1 >= 0) && "-LF".contains("" + grid.at(start.x - 1, start.y))) {
-            path.addFirst(new State(start.x - 1, start.y, D.L, 1));
-        } else if ((start.x + 1 < grid.m) && "-7J".contains("" + grid.at(start.x + 1, start.y))) {
-            path.addFirst(new State(start.x + 1, start.y, D.R, 1));
-        }
-        while (!path.isEmpty()) {
-            final State state = path.removeFirst();
-            if (process != null) process.accept(state);
-            final char ch = grid.at(state.x, state.y);
-            if (ch == 'S') { //back at start
+        final Grid.It s = grid.first(it -> it.ch == 'S');
+        State state = new State(s, D.U, 0);
+        while (state != null) {
+            process.accept(state);
+            if (state.it.ch == 'S' && state.l > 0) {
                 return state.l / 2;
             }
-            final State next = switch (ch) {
-                case '|' -> state.d == D.U
-                        ? new State(state.x, state.y - 1, D.U, state.l + 1)
-                        : new State(state.x, state.y + 1, D.D, state.l + 1);
-                case '-' -> state.d == D.R
-                        ? new State(state.x + 1, state.y, D.R, state.l + 1)
-                        : new State(state.x - 1, state.y, D.L, state.l + 1);
-                case 'F' -> state.d == D.L
-                        ? new State(state.x, state.y + 1, D.D, state.l + 1)
-                        : new State(state.x + 1, state.y, D.R, state.l + 1);
-                case '7' -> state.d == D.U
-                        ? new State(state.x - 1, state.y, D.L, state.l + 1)
-                        : new State(state.x, state.y + 1, D.D, state.l + 1);
-                case 'J' -> state.d == D.D
-                        ? new State(state.x - 1, state.y, D.L, state.l + 1)
-                        : new State(state.x, state.y - 1, D.U, state.l + 1);
-                case 'L' -> state.d == D.D
-                        ? new State(state.x + 1, state.y, D.R, state.l + 1)
-                        : new State(state.x, state.y - 1, D.U, state.l + 1);
-                default -> throw new IllegalStateException(state.toString());
-            };
-            path.addLast(next);
+            state = state.next();
         }
         return 0L;
     }
 
-    record State(int x, int y, D d, int l) {
-        State over(final char ch) {
-            return switch (ch) {
-                case '|' -> d == D.U ? new State(x, y - 1, D.U, l + 1) : new State(x, y + 1, D.D, l + 1);
-                case '-' -> d == D.R ? new State(x + 1, y, D.R, l + 1) : new State(x - 1, y, D.L, l + 1);
-                case 'F' -> d == D.L ? new State(x, y + 1, D.D, l + 1) : new State(x + 1,y, D.R, l + 1);
-                case '7' -> d == D.U ? new State(x - 1, y, D.L, l + 1) : new State(x, y + 1, D.D, l + 1);
-                case 'J' -> d == D.D ? new State(x - 1, y, D.L, l + 1) : new State(x, y - 1, D.U, l + 1);
-                case 'L' -> d == D.D ? new State(x + 1, y, D.R, l + 1) : new State(x, y - 1, D.U, l + 1);
+    record State(Grid.It it, D direction, int l) {
+        State next() {
+            final D newDirection = switch (it.ch) {
+                case 'S' -> StringUtils.contains("|F7", it.neighbours4[0]) ? D.U
+                        : StringUtils.contains("|JL", it.neighbours4[3]) ? D.D
+                        : StringUtils.contains("-LF", it.neighbours4[1]) ? D.L
+                        : D.R;
+                case '|' -> direction;
+                case '-' -> direction;
+                case 'F' -> direction == D.L ? D.D : D.R;
+                case '7' -> direction == D.U ? D.L : D.D;
+                case 'J' -> direction == D.D ? D.L : D.U;
+                case 'L' -> direction == D.D ? D.R : D.U;
                 default -> throw new IllegalStateException(toString());
             };
+            return new State(it.to(newDirection), newDirection, l + 1);
         }
     }
 

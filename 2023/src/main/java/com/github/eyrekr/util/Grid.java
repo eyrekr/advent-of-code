@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public final class Grid implements Iterable<Grid.It> {
@@ -125,6 +126,16 @@ public final class Grid implements Iterable<Grid.It> {
         return new Grid(n, m, transposed);
     }
 
+    public Grid map(final Function<It, Character> transform) {
+        final Grid grid = new Grid(m, n, new char[n][m]);
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < m; x++) {
+                final Character ch = transform.apply(it(x, y));
+                grid.a[y][x] = ch == null ? C0 : ch;
+            }
+        }
+        return grid;
+    }
 
     @Override
     public Iterator<It> iterator() {
