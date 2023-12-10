@@ -14,7 +14,7 @@ class TestD10 {
             LJ.LJ
             """;
 
-    final static String SAMPLE2 = """
+    final static String SAMPLE_2A = """
             .F----7F7F7F7F-7....
             .|F--7||||||||FJ....
             .||.FJ||||||||L7....
@@ -27,7 +27,7 @@ class TestD10 {
             ....L---J.LJ.LJLJ...
             """;
 
-    final static String SAMPLE3 = """
+    final static String SAMPLE_2B = """
             FF7FSF7F7F7F7F7F---7
             L|LJ||||||||||||F--J
             FL-7LJLJ||||||LJL-77
@@ -46,13 +46,13 @@ class TestD10 {
     }
 
     @Test
-    void sampleStar2() {
-        assertThat(new D10(SAMPLE2).star2()).isEqualTo(8L);
+    void sampleStar2A() {
+        assertThat(new D10(SAMPLE_2A).star2()).isEqualTo(8L);
     }
 
     @Test
-    void sampleStar3() {
-        assertThat(new D10(SAMPLE3).star2()).isEqualTo(10L);
+    void sampleStar2B() {
+        assertThat(new D10(SAMPLE_2B).star2()).isEqualTo(10L);
     }
 
     @Test
@@ -62,6 +62,6 @@ class TestD10 {
 
     @Test
     void star2() {
-        Str.print("%d\n", new D10(Str.testResource("D10.txt")).star2());
+        assertThat(new D10(Str.testResource("D10.txt")).star2()).isEqualTo(265L);
     }
 }
