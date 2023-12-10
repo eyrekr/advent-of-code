@@ -15,11 +15,20 @@ import java.util.function.Consumer;
  */
 class D10 extends AoC {
 
+    static final Map<Character, Character> NICER = Map.of(
+            'S', '*',
+            '-', '─',
+            '|', '│',
+            'F', '┌',
+            'J', '┘',
+            '7', '┐',
+            'L', '└');
+
     final Grid grid;
 
     D10(final String input) {
         super(input);
-        this.grid = Grid.of(lines);
+        this.grid = Grid.of(lines).map(it -> NICER.getOrDefault(it.ch, Grid.C0)).print();
     }
 
     long star1() {
@@ -29,16 +38,8 @@ class D10 extends AoC {
 
     long star2() {
         final char[][] xx = new char[grid.n][grid.m];
-        final Map<Character, Character> T = Map.of(
-                'S', '*',
-                '-', '─',
-                '|', '│',
-                'F', '┌',
-                'J', '┘',
-                '7', '┐',
-                'L', '└'
-        );
-        traverse(state -> xx[state.it.y][state.it.x] = T.getOrDefault(state.it.ch, '\0'));
+
+        traverse(state -> xx[state.it.y][state.it.x] = state.it.ch);
         long area = 0;
         for (int y = 0; y < grid.n; y++) {
             boolean inside = false;
@@ -74,11 +75,11 @@ class D10 extends AoC {
     }
 
     private long traverse(Consumer<State> process) {
-        final Grid.It s = grid.first(it -> it.ch == 'S');
-        State state = new State(s, D.U, 0);
+        final Grid.It start = grid.first(it -> it.ch == '*');
+        State state = new State(start, D.U, 0);
         while (state != null) {
             process.accept(state);
-            if (state.it.ch == 'S' && state.l > 0) {
+            if (state.it.ch == '*' && state.l > 0) {
                 return state.l / 2;
             }
             state = state.next();
@@ -89,20 +90,18 @@ class D10 extends AoC {
     record State(Grid.It it, D direction, int l) {
         State next() {
             final D newDirection = switch (it.ch) {
-                case 'S' -> StringUtils.contains("|F7", it.neighbours4[0]) ? D.U
-                        : StringUtils.contains("|JL", it.neighbours4[3]) ? D.D
-                        : StringUtils.contains("-LF", it.neighbours4[1]) ? D.L
+                case '*' -> StringUtils.contains("│┌┐", it.neighbours4[0]) ? D.U
+                        : StringUtils.contains("│└┘", it.neighbours4[3]) ? D.D
                         : D.R;
-                case '|' -> direction;
-                case '-' -> direction;
-                case 'F' -> direction == D.L ? D.D : D.R;
-                case '7' -> direction == D.U ? D.L : D.D;
-                case 'J' -> direction == D.D ? D.L : D.U;
-                case 'L' -> direction == D.D ? D.R : D.U;
+                case '│' -> direction;
+                case '─' -> direction;
+                case '┌' -> direction == D.L ? D.D : D.R;
+                case '┐' -> direction == D.U ? D.L : D.D;
+                case '┘' -> direction == D.D ? D.L : D.U;
+                case '└' -> direction == D.D ? D.R : D.U;
                 default -> throw new IllegalStateException(toString());
             };
             return new State(it.to(newDirection), newDirection, l + 1);
         }
     }
-
 }

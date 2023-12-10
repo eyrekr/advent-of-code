@@ -127,14 +127,24 @@ public final class Grid implements Iterable<Grid.It> {
     }
 
     public Grid map(final Function<It, Character> transform) {
-        final Grid grid = new Grid(m, n, new char[n][m]);
+        final Grid grid = new Grid(m, n, new char[m][n]);
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < m; x++) {
                 final Character ch = transform.apply(it(x, y));
-                grid.a[y][x] = ch == null ? C0 : ch;
+                grid.a[x][y] = ch == null ? C0 : ch;
             }
         }
         return grid;
+    }
+
+    public Grid print() {
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < m; x++) {
+                Str.print(""+at(x,y));
+            }
+            System.out.println();
+        }
+        return this;
     }
 
     @Override
