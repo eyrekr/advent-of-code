@@ -178,8 +178,8 @@ public final class Seq<E> implements Iterable<E> {
 
     public Seq<E> unique() {
         final Set<E> visited = new HashSet<>();
-        return reduce(Seq.empty(), (seq, element)->{
-            if(!visited.contains(element)) {
+        return reduce(Seq.empty(), (seq, element) -> {
+            if (!visited.contains(element)) {
                 visited.add(element);
                 return new Seq<>(element, seq);
             }
@@ -264,6 +264,10 @@ public final class Seq<E> implements Iterable<E> {
                     map.put(key.apply(element), element);
                     return map;
                 });
+    }
+
+    public <F, R> Seq<R> prodMap(final Seq<F> seq, final BiFunction<? super E, ? super F, R> transform) {
+        return flatMap(left -> seq.map(right -> transform.apply(left, right)));
     }
 
     public Seq<E> print() {
