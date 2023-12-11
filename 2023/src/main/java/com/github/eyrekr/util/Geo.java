@@ -58,8 +58,16 @@ public final class Geo {
             return new P(x, y);
         }
 
+        public P translate(final long dx, final long dy) {
+            return new P(x+dx, y+dy);
+        }
+
         public long distance(final P that) {
             return Geo.distance(this, that);
+        }
+
+        public long manhattanDistance(final P that) {
+            return Math.abs(this.x - that.x) + Math.abs(this.y - that.y);
         }
     }
 }

@@ -140,7 +140,7 @@ public final class Grid implements Iterable<Grid.It> {
     public Grid print() {
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < m; x++) {
-                Str.print(""+at(x,y));
+                Str.print("" + at(x, y));
             }
             System.out.println();
         }

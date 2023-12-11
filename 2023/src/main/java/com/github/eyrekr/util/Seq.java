@@ -1,5 +1,7 @@
 package com.github.eyrekr.util;
 
+import org.apache.commons.lang3.function.TriFunction;
+
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -15,10 +17,12 @@ public final class Seq<E> implements Iterable<E> {
     public final int length;
     public final Seq<E> tail;
     public final boolean isEmpty;
+    public final boolean isLast;
 
     private Seq(final E value, final Seq<E> tail) {
         this.value = value;
-        this.lastValue = (tail == null || tail.length == 0) ? value : tail.lastValue;
+        this.isLast = (tail == null || tail.length == 0);
+        this.lastValue = this.isLast ? value : tail.lastValue;
         this.length = (tail == null) ? 0 : tail.length + 1;
         this.tail = tail;
         this.isEmpty = (tail == null);
@@ -172,6 +176,17 @@ public final class Seq<E> implements Iterable<E> {
         return sortedBy(Comparator.comparing((Object a) -> ((Comparable) a)));
     }
 
+    public Seq<E> unique() {
+        final Set<E> visited = new HashSet<>();
+        return reduce(Seq.empty(), (seq, element)->{
+            if(!visited.contains(element)) {
+                visited.add(element);
+                return new Seq<>(element, seq);
+            }
+            return seq;
+        });
+    }
+
     public E min(final Comparator<? super E> comparator) {
         return reduce((a, b) -> comparator.compare(a, b) < 0 ? a : b);
     }
@@ -234,13 +249,21 @@ public final class Seq<E> implements Iterable<E> {
     }
 
     public <K, V> Map<K, V> toMap(final Function<? super E, K> key, final Function<? super E, V> value) {
-        final var map = new HashMap<K, V>(length);
-        each(element -> map.put(key.apply(element), value.apply(element)));
-        return map;
+        return reduce(
+                new HashMap<>(length),
+                (map, element) -> {
+                    map.put(key.apply(element), value.apply(element));
+                    return map;
+                });
     }
 
-    public <K> Map<K, E> toMap(final Function<? super E, K> key) {
-        return toMap(key, element -> element);
+    public <K> Map<K, E> indexBy(final Function<? super E, K> key) {
+        return reduce(
+                new HashMap<>(length),
+                (map, element) -> {
+                    map.put(key.apply(element), element);
+                    return map;
+                });
     }
 
     public Seq<E> print() {
@@ -260,6 +283,17 @@ public final class Seq<E> implements Iterable<E> {
     @Override
     public String toString() {
         return "[" + reduceR("", (sum, element) -> sum.isBlank() ? element + "" : element + " " + sum) + "]";
+    }
+
+    public <F, R> R reduceWith(final Seq<F> seq, final R init, final TriFunction<? super R, ? super E, ? super F, ? extends R> combine) {
+        return isEmpty || seq.isEmpty ? init : tail.reduceWith(seq.tail, combine.apply(init, value, seq.value), combine);
+    }
+
+    public E[] toArray() {
+        return reduceWith(range(0, length), (E[]) (new Object[length]), (array, element, index) -> {
+            array[index.intValue()] = element;
+            return array;
+        });
     }
 
     @Override
