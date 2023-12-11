@@ -1,12 +1,14 @@
 package com.github.eyrekr;
 
+import com.github.eyrekr.util.Geo;
 import com.github.eyrekr.util.Grid;
 import com.github.eyrekr.util.Seq;
+import com.github.eyrekr.util.Str;
 
 /**
  * https://adventofcode.com/2023/day/10
- * 1) 6903
- * 2) 265
+ * 1) 9509330
+ * 2)
  */
 class D11 extends AoC {
 
@@ -18,68 +20,55 @@ class D11 extends AoC {
     }
 
     long star1() {
-        var stars = starsInExpandedSpace();
-        return stars
-                .contextMap(starA -> starA.tail
-                        .contextMap(starB -> distance(starA.value, starB.value))
-                        .min(Long::compareTo))
-                .reduce(Long::sum);
-    }
-
-    long distance(final Grid.P a, final Grid.P b) {
-        long steps = 0L;
-        int x1 = b.x, x0 = a.x, y1 = b.y, y0 = a.y;
-
-        int dx = Math.abs(x1 - x0);
-        int sx = x0 < x1 ? 1 : -1;
-        int dy = -Math.abs(y1 - y0);
-        int sy = y0 < y1 ? 1 : -1;
-        int error = dx + dy;
-
-        while (true) {
-            steps++;//plot
-
-            if (x0 == x1 && y0 == y1) break;
-            int e2 = 2 * error;
-            if (e2 >= dy) {
-                if (x0 == x1) break;
-                error = error + dy;
-                x0 = x0 + sx;
+        int i = 1;
+        var stars = starsInExpandedSpace(1L);
+        long sum = 0L;
+        while(stars.length >1) {
+            var others = stars.tail;
+            int j = i+1;
+            while(!others.isEmpty) {
+                final Geo.P a = stars.value, b = others.value;
+                //final long d = a.distance(b) - 1 + Math.min(Math.abs(a.x-b.x), Math.abs(a.y - b.y));
+                final long dx = Math.abs(a.x-b.x), dy = Math.abs(a.y-b.y);
+                final long d = dx+dy;
+                //Str.print("%2d -> %2d   =   %d\n", i, j, d);
+                sum += d;
+                others = others.tail;
+                j++;
             }
-            if (e2 <= dx) {
-                if (y0 == y1) break;
-                error = error + dx;
-                y0 = y0 + sy;
-            }
+            i++;
+            stars = stars.tail;
         }
-
-        return steps;
+        return sum;
     }
 
-    Seq<Grid.P> starsInExpandedSpace() {
+    Seq<Geo.P> starsInExpandedSpace(final long rate) {
         Seq<Integer> emptyRows = emptyRows().reverse();
-        int[] yMap = new int[grid.n];
-        int yOffset = 0;
+        long[] yMap = new long[grid.n];
+        long yOffset = 0;
         for (int i = 0; i < grid.n; i++) {
             if (!emptyRows.isEmpty && i == emptyRows.value) {
-                yOffset++;
+                yOffset += rate;
                 emptyRows = emptyRows.tail;
             }
             yMap[i] = i + yOffset;
         }
         Seq<Integer> emptyCols = emptyCols().reverse();
-        int[] xMap = new int[grid.m];
+        long[] xMap = new long[grid.m];
         int xOffset = 0;
         for (int i = 0; i < grid.m; i++) {
             if (!emptyCols.isEmpty && i == emptyCols.value) {
-                xOffset++;
+                xOffset += rate;
                 emptyCols = emptyCols.tail;
             }
             xMap[i] = i + xOffset;
         }
         return grid.where(it -> it.ch == '#')
+                //.print("\n", it-> it.x +","+it.y)
                 .map(it -> it.p)
-                .map(p -> new Grid.P(xMap[p.x], yMap[p.y]));
+                .map(p -> Geo.P.of(xMap[p.x], yMap[p.y]))
+                //.print("\n", p-> p.x+","+p.y)
+                ;
     }
 
     Seq<Integer> emptyRows() {
@@ -117,6 +106,27 @@ class D11 extends AoC {
     }
 
     long star2() {
-        return 0L;
+        int i = 1;
+        var stars = starsInExpandedSpace(1_000_000L - 1L);
+        long sum = 0L;
+        while(stars.length >1) {
+            var others = stars.tail;
+            int j = i+1;
+            while(!others.isEmpty) {
+                final Geo.P a = stars.value, b = others.value;
+                final long dx = Math.abs(a.x-b.x), dy = Math.abs(a.y-b.y);
+                final long d = dx+dy;
+                //Str.print("%2d -> %2d   =   %d\n", i, j, d);
+                sum += d;
+                if(sum<0) {
+                    throw new IllegalStateException("overflow");
+                }
+                others = others.tail;
+                j++;
+            }
+            i++;
+            stars = stars.tail;
+        }
+        return sum;
     }
 }

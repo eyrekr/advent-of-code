@@ -26,16 +26,16 @@ class TestD11 {
 
     @Test
     void sampleStar2() {
-        assertThat(new D11(SAMPLE).star2()).isEqualTo(0L);
+        assertThat(new D11(SAMPLE).star2()).isEqualTo(82000210L);
     }
 
     @Test
     void star1() {
-        assertThat(new D11(Str.testResource("D11.txt")).star1()).isEqualTo(0L);
+        assertThat(new D11(Str.testResource("D11.txt")).star1()).isEqualTo(9509330L);
     }
 
     @Test
     void star2() {
-        assertThat(new D11(Str.testResource("D11.txt")).star2()).isEqualTo(0L);
+        assertThat(new D11(Str.testResource("D11.txt")).star2()).isEqualTo(635832237682L);
     }
 }
