@@ -109,6 +109,10 @@ public final class Seq<E> implements Iterable<E> {
         return isEmpty ? empty() : new Seq<>(translate.apply(value), tail.map(translate));
     }
 
+    public <R> Seq<R> contextMap(final Function<Seq<E>, R> translate) {
+        return isEmpty ? empty() : new Seq<>(translate.apply(this), tail.contextMap(translate));
+    }
+
     public <C, R> Seq<R> carryMap(final C carry, final BiFunction<? super C, ? super E, R> translate) {
         return isEmpty ? empty() : new Seq<>(translate.apply(carry, value), tail.carryMap(carry, translate));
     }

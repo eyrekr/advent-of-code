@@ -16,7 +16,7 @@ public final class Grid implements Iterable<Grid.It> {
     public final int n;
     public final char[][] a;
 
-    private Grid(final int m, final int n, final char[][] a) {
+    public Grid(final int m, final int n, final char[][] a) {
         this.m = m;
         this.n = n;
         this.a = a;
@@ -213,7 +213,7 @@ public final class Grid implements Iterable<Grid.It> {
 
     public enum D {U, D, L, R}
 
-    public final class P {
+    public static final class P {
         public final int x;
         public final int y;
 
