@@ -10,6 +10,8 @@ import java.util.function.Predicate;
 
 /**
  * Sequence of objects.
+ * Small exercise in recursion and functional programming.
+ * Quite pointless, because Java cannot optimize tail recursion => for any practical use this structure is good for nothing.
  */
 public final class Seq<E> implements Iterable<E> {
     public final E value;
