@@ -4,7 +4,7 @@ import com.github.eyrekr.util.Grid;
 import com.github.eyrekr.util.Seq;
 
 /**
- * https://adventofcode.com/2023/day/10
+ * https://adventofcode.com/2023/day/11
  * 1) 9509330
  * 2) 635832237682
  */
