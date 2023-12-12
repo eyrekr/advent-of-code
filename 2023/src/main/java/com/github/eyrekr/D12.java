@@ -56,44 +56,26 @@ class D12 extends AoC {
         if (stencil.length() < runLength) {
             return result;
         } else {
-            final int indexOfLastPossiblePlacement = stencil.length() - runLength;
-            for (int i = 0; i <= indexOfLastPossiblePlacement; i++) {
+            final int lastI = stencil.length() - runLength;
+            for (int i = 0; i <= lastI; i++) {
                 final String prefix = StringUtils.substring(stencil, 0, i);
-                if(!skippable(prefix)){ // there are no fixed # in the prefix of the stencil
-                    return result;
-                }
-                final boolean isLastPlacement = (i == indexOfLastPossiblePlacement); // this is the end of the line,
-                if (!isLastPlacement) {
-                    // check the next character after the run, it must be ?
-                    if (stencil.charAt(i + runLength) == '#') {
-                        // bummer, we cannot put a . there, it is already taken by #
-                        // but that does not mean that we cannot continue, we can still try other placements, they might work
-                        continue; // continue with placing the run into the stencil
-                    }
+                if (!skippable(prefix)) return result; // there are fixed # in the prefix of the stencil
+
+                if (i < lastI && stencil.charAt(i + runLength) == '#') {
+                    continue; // after the placement there must be ? (translated to .) which separates the runs
                 }
 
-                // we have arrived here, which means that we can successfully place the run into the stencil;
-                // that means that we have to split the current stencil
-
-                // there are two cases in which the stencil does not need to be split - basically when we consume it all
-                // 1. when it is the last possible placement
-                // 2. when it is the second last possible placement (we need the last ? to be a .)
                 final Seq<String> remainingStencils;
-                if (isLastPlacement || (i == indexOfLastPossiblePlacement - 1)) { // the last or the 2nd last
-                    remainingStencils = stencils.tail;
+                if (i >= lastI - 1) { // the last or the 2nd last
+                    remainingStencils = stencils.tail; // nothing remains of the original stencil
                 } else {
-                    // here, we must split the stencil
                     final String substencil = StringUtils.substring(stencil, i + runLength + 1); // the +1 is for the .
-                    remainingStencils = stencils.tail.prepend(substencil);
+                    remainingStencils = stencils.tail.prepend(substencil); // the remainder of the stencil
                 }
 
-
-                // ok, so this is the last placement which means we will not be splitting the stencil,
-                // we have consumed the whole stencil
                 final var r = tryToArrange(remainingStencils, rle.tail, cache);
                 cache.put(key(remainingStencils, rle.tail), r);
 
-                // combine the result with what we have so far
                 result = result + r;
             }
             return result;
