@@ -28,58 +28,53 @@ class D12 extends AoC {
     }
 
     long star1() {
-        return rows.map(row -> tryToArrange(row.stencils, row.rle, new HashMap<>())).reduce(Long::sum);
+        return rows.map(row -> tryToArrange(row.stencils, row.runs, new HashMap<>())).reduce(Long::sum);
     }
 
     long star2() {
-        return unfoldedRows.map(row -> tryToArrange(row.stencils, row.rle, new HashMap<>())).reduce(Long::sum);
+        return unfoldedRows.map(row -> tryToArrange(row.stencils, row.runs, new HashMap<>())).reduce(Long::sum);
     }
 
-    static long tryToArrange(final Seq<String> stencils, final Seq<Long> rle, final Map<String, Long> cache) {
-        final Long valueFromCache = cache.get(key(stencils, rle));
+    static long tryToArrange(final Seq<String> stencils, final Seq<Long> runs, final Map<String, Long> cache) {
+        final Long valueFromCache = cache.get(key(stencils, runs));
         if (valueFromCache != null) {
             return valueFromCache;
         }
 
-        if (rle.isEmpty) return stencils.allAre(D12::skippable) ? 1 : 0;
+        if (runs.isEmpty) return stencils.allAre(D12::skippable) ? 1 : 0;
         if (stencils.isEmpty) return 0;
 
-        final int runLength = rle.value.intValue();
+        final int runLength = runs.value.intValue();
         final String stencil = stencils.value;
 
         long result = 0;
         if (skippable(stencil)) {
-            result = tryToArrange(stencils.tail, rle, cache);
-            cache.put(key(stencils.tail, rle), result);
+            result = tryToArrange(stencils.tail, runs, cache);
+            cache.put(key(stencils.tail, runs), result);
         }
+        final int lastI = stencil.length() - runLength;
+        for (int i = 0; i <= lastI; i++) {
+            final String prefix = StringUtils.substring(stencil, 0, i);
+            if (!skippable(prefix)) return result; // there are fixed # in the prefix of the stencil
 
-        if (stencil.length() < runLength) {
-            return result;
-        } else {
-            final int lastI = stencil.length() - runLength;
-            for (int i = 0; i <= lastI; i++) {
-                final String prefix = StringUtils.substring(stencil, 0, i);
-                if (!skippable(prefix)) return result; // there are fixed # in the prefix of the stencil
-
-                if (i < lastI && stencil.charAt(i + runLength) == '#') {
-                    continue; // after the placement there must be ? (translated to .) which separates the runs
-                }
-
-                final Seq<String> remainingStencils;
-                if (i >= lastI - 1) { // the last or the 2nd last
-                    remainingStencils = stencils.tail; // nothing remains of the original stencil
-                } else {
-                    final String substencil = StringUtils.substring(stencil, i + runLength + 1); // the +1 is for the .
-                    remainingStencils = stencils.tail.prepend(substencil); // the remainder of the stencil
-                }
-
-                final var r = tryToArrange(remainingStencils, rle.tail, cache);
-                cache.put(key(remainingStencils, rle.tail), r);
-
-                result = result + r;
+            if (i < lastI && stencil.charAt(i + runLength) == '#') {
+                continue; // after the placement there must be ? (translated to .) which separates the runs
             }
-            return result;
+
+            final Seq<String> remainingStencils;
+            if (i >= lastI - 1) { // the last or the 2nd last
+                remainingStencils = stencils.tail; // nothing remains of the original stencil
+            } else {
+                final String remainder = StringUtils.substring(stencil, i + runLength + 1);
+                remainingStencils = stencils.tail.prepend(remainder);
+            }
+
+            final var r = tryToArrange(remainingStencils, runs.tail, cache);
+            cache.put(key(remainingStencils, runs.tail), r);
+
+            result = result + r;
         }
+        return result;
     }
 
     static boolean skippable(final String stencil) {
@@ -97,7 +92,7 @@ class D12 extends AoC {
         return stencils.toString() + runs.toString();
     }
 
-    record Row(Seq<String> stencils, Seq<Long> rle) {
+    record Row(Seq<String> stencils, Seq<Long> runs) {
         static Row fromString(final String line) {
             return new Row(Seq.fromArray(StringUtils.split(StringUtils.substringBefore(line, ' '), '.')), Str.longs(StringUtils.substringAfter(line, ' ')));
         }
