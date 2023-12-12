@@ -4,6 +4,9 @@ import com.github.eyrekr.util.Seq;
 import com.github.eyrekr.util.Str;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * https://adventofcode.com/2023/day/12
  * 1) 6871
@@ -12,54 +15,53 @@ import org.apache.commons.lang3.StringUtils;
 class D12 extends AoC {
 
     final Seq<Row> rows;
+    final Seq<Row> unfoldedRows;
 
     D12(final String input) {
         super(input);
-        rows = lines.map(line -> new Row(
-                StringUtils.substringBefore(line, ' '),
-                Seq.fromArray(StringUtils.split(StringUtils.substringBefore(line, ' '), '.')),
-                Str.longs(StringUtils.substringAfter(line, ' '))));
+        rows = lines.map(Row::fromString);
+        unfoldedRows = lines.map(line -> {
+            final String[] ab = StringUtils.split(line);
+            return StringUtils.repeat(ab[0], "?", 5) + " " + StringUtils.repeat(ab[1], ",", 5);
+        }).map(Row::fromString);
     }
 
     long star1() {
-        //return rows.map(this::arrangements).reduce(Long::sum);
         return rows
                 .map(row -> {
-                    Str.print("**%s**  %s\n", row.theWholeStencil, row.rle);
-                    long sum = tryToArrange(row.stencils, row.rle, "  -").sum;
-                    Str.print("**%s**  %s  => %d\n", row.theWholeStencil, row.rle, sum);
+                    long sum = tryToArrange(row.stencils, row.rle, 0);
+                    long control = arrangements(row, true);
+                    Str.print("%s**%-40s**  %-40s  %10d %10d\n", control == sum ? "@g" : "@r", row.theWholeStencil, row.rle, sum, control);
                     return sum;
                 })
                 .reduce(Long::sum);
     }
 
-    record Result(long sum, boolean possible) {
-
-        static Result done(long sum) {
-            return new Result(sum, true);
-        }
-
-
-        static final Result IMPOSSIBLE = new Result(0L, false);
+    static long tryToArrange(final Seq<String> stencils, final Seq<Long> rle) {
+        return tryToArrange(stencils, rle, new HashMap<>());
     }
 
-    static Result tryToArrange(final Seq<String> stencils, final Seq<Long> rle, final String level) {
-        Str.print("%s %s  %s\n", level, stencils.value, rle.value);
+    static long tryToArrange(final Seq<String> stencils, final Seq<Long> rle, final Map<String, Long> cache) {
+        final Long valueFromCache = cache.get(key(stencils, rle));
+        if (valueFromCache != null) {
+            return valueFromCache;
+        }
+
         if (rle.isEmpty) {
             // several options here
             if (stencils.isEmpty) {
-                return Result.done(0);
-            } else if (stencils.length == 1 && stencils.value.matches("\\?+")) {
-                // only ???? remain in the last group,
+                return 1; // one way to satisfy it
+            } else if (stencils.allAre(D12::skippable)) {
+                // only ???? remain in the last groups!! (not just one group)!!!
                 // there is just one way to satisfy them when RLE is empty => all must be .
-                return Result.done(1L);
+                return 1;
             } else {
                 // there is a problem, bad guess above
-                return Result.IMPOSSIBLE;
+                return 0;
             }
         }
         if (stencils.isEmpty) {
-            return Result.IMPOSSIBLE;
+            return 0;
         }
 
         final int runLength = rle.value.intValue();
@@ -67,22 +69,34 @@ class D12 extends AoC {
         // - it must be satisfied by the first group
         // - but not necessarily byt the whole group
         final String stencil = stencils.value;
+
+        // number of ways to combine the runs into the stencils
+        long result = 0;
+        {
+            // try to go over skippable stencils
+            // meaning: those stencils that are all ???? we can make them vanish by converting the whole ???? to ....
+            // these cases must also be counted
+            if (skippable(stencil)) {
+                // this is now the baseline
+                result = tryToArrange(stencils.tail, rle, cache);
+            }
+        }
+
+
         if (stencil.length() == runLength) {
             // easy case - the whole group must satisfy the run
             // try to arrange the remaining stencils
-            final var r = tryToArrange(stencils.tail, rle.tail, "  " + level);
-            return r;
+            final var r = tryToArrange(stencils.tail, rle.tail, cache);
+            return result + r;
         } else if (stencil.length() < runLength) {
             // bad guess previously, the group is not big enough to satisfy the run
-            return Result.IMPOSSIBLE;
+            return result;
         } else {
             // the dreaded case where we must iterate over all the options
             // we know we have a run of length say 3, then we have a stencil of length say 6,
             // so there are (in theory) at most 4 ways to place the ### into the stencil
             // ###... .###.. ..###. ...###
             // that does not sound that dreadful
-
-            Result result = Result.IMPOSSIBLE;
 
             final int indexOfLastPossiblePlacement = stencil.length() - runLength;
             for (int i = 0; i <= indexOfLastPossiblePlacement; i++) { // i = all possible starting positions of the run in the stencil
@@ -135,23 +149,29 @@ class D12 extends AoC {
 
                 // ok, so this is the last placement which means we will not be splitting the stencil,
                 // we have consumed the whole stencil
-                final var r = tryToArrange(remainingStencils, rle.tail, "  " + level);
+                final var r = tryToArrange(remainingStencils, rle.tail, cache);
+
                 // combine the result with what we have so far
-                if (r.possible && !result.possible) {
-                    // we found the first way to do it
-                    result = r;
-                } else if (r.possible && result.possible) {
-                    // we already have functional solutions and now we have some more, good
-                    result = Result.done(result.sum + r.sum);
-                } else if (!r.possible) {
-                    // keep the results we have, it was not possible to satisfy the remaining runs/stencils
-                }
+                result = result + r;
             }
             return result;
         }
     }
 
-    long arrangements(final Row row) {
+    static boolean skippable(final String stencil) {
+        for (int i = 0; i < stencil.length(); i++) {
+            if (stencil.charAt(i) != '?') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static String key(final Seq<String> stencils, final Seq<Long> runs) {
+        return stencils.toString() + runs.toString();
+    }
+
+    long arrangements(final Row row, boolean show) {
         final int q = StringUtils.countMatches(row.theWholeStencil, '?');
         if (q == 0) {
             return 1L;
@@ -159,7 +179,6 @@ class D12 extends AoC {
         final long options = 1L << q;
         final char[] filledStencil = row.theWholeStencil.toCharArray();
         long sum = 0L;
-        Str.print("**ROW %s**  %s  %s\n", row.theWholeStencil, row.rle.toString(), row.stencils.toString());
         for (long option = 0L; option < options; option++) {
             long x = option;
             for (int i = 0; i < filledStencil.length; i++) {
@@ -176,9 +195,9 @@ class D12 extends AoC {
             final boolean matches = rle.equals(row.rle);
             if (matches) {
                 sum++;
-                //Str.print(" - @G%s %s\n", String.valueOf(filledStencil), rle.toString());
-            } else {
-                //Str.print("  -@R%s %s\n", String.valueOf(filledStencil), rle.toString());
+                if (show) {
+                    Str.print("@w%s\n", String.valueOf(filledStencil));
+                }
             }
         }
         return sum;
@@ -212,10 +231,18 @@ class D12 extends AoC {
     }
 
     long star2() {
-        return 0L;
+        return unfoldedRows
+                .map(row -> tryToArrange(row.stencils, row.rle, 0))
+                .reduce(Long::sum);
     }
 
 
     record Row(String theWholeStencil, Seq<String> stencils, Seq<Long> rle) {
+        static Row fromString(final String line) {
+            return new Row(
+                    StringUtils.substringBefore(line, ' '),
+                    Seq.fromArray(StringUtils.split(StringUtils.substringBefore(line, ' '), '.')),
+                    Str.longs(StringUtils.substringAfter(line, ' ')));
+        }
     }
 }
