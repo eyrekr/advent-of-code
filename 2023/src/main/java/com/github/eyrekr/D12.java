@@ -41,7 +41,6 @@ class D12 extends AoC {
         }
 
         if (rle.isEmpty) {
-            // several options here
             if (stencils.isEmpty) {
                 return 1; // one way to satisfy it
             } else if (stencils.allAre(D12::skippable)) {
@@ -58,22 +57,13 @@ class D12 extends AoC {
         }
 
         final int runLength = rle.value.intValue();
-        // find ways how to satisfy the first run
-        // - it must be satisfied by the first group
-        // - but not necessarily byt the whole group
         final String stencil = stencils.value;
 
         // number of ways to combine the runs into the stencils
         long result = 0;
-        {
-            // try to go over skippable stencils
-            // meaning: those stencils that are all ???? we can make them vanish by converting the whole ???? to ....
-            // these cases must also be counted
-            if (skippable(stencil)) {
-                // this is now the baseline
-                result = tryToArrange(stencils.tail, rle, cache);
-                cache.put(key(stencils.tail, rle), result);
-            }
+        if (skippable(stencil)) {
+            result = tryToArrange(stencils.tail, rle, cache);
+            cache.put(key(stencils.tail, rle), result);
         }
 
 
