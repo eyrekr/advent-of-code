@@ -56,7 +56,6 @@ class D12 extends AoC {
                 final Seq<String> remainingStencils = remainder.isBlank() ? stencils.tail : stencils.tail.prepend(remainder);
 
                 final var r = arrange(remainingStencils, runs.tail, cache);
-
                 result = result + r;
             }
             return result;
