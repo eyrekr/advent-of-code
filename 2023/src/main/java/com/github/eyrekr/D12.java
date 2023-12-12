@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * https://adventofcode.com/2023/day/12
  * 1) 6871
- * 2)
+ * 2) 2043098029844
  */
 class D12 extends AoC {
 
@@ -27,14 +27,7 @@ class D12 extends AoC {
     }
 
     long star1() {
-        return rows
-                .map(row -> {
-                    long sum = tryToArrange(row.stencils, row.rle);
-                    long control = arrangements(row, true);
-                    Str.print("%s**%-40s**  %-40s  %10d %10d\n", control == sum ? "@g" : "@r", row.theWholeStencil, row.rle, sum, control);
-                    return sum;
-                })
-                .reduce(Long::sum);
+        return rows.map(row -> tryToArrange(row.stencils, row.rle)).reduce(Long::sum);
     }
 
     static long tryToArrange(final Seq<String> stencils, final Seq<Long> rle) {
@@ -174,71 +167,10 @@ class D12 extends AoC {
         return stencils.toString() + runs.toString();
     }
 
-    long arrangements(final Row row, boolean show) {
-        final int q = StringUtils.countMatches(row.theWholeStencil, '?');
-        if (q == 0) {
-            return 1L;
-        }
-        final long options = 1L << q;
-        final char[] filledStencil = row.theWholeStencil.toCharArray();
-        long sum = 0L;
-        for (long option = 0L; option < options; option++) {
-            long x = option;
-            for (int i = 0; i < filledStencil.length; i++) {
-                switch (row.theWholeStencil.charAt(i)) {
-                    case '.' -> filledStencil[i] = '.';
-                    case '#' -> filledStencil[i] = '#';
-                    case '?' -> {
-                        filledStencil[i] = (x & 1L) > 0 ? '#' : '.';
-                        x = x >> 1;
-                    }
-                }
-            }
-            final Seq<Long> rle = rle(filledStencil);
-            final boolean matches = rle.equals(row.rle);
-            if (matches) {
-                sum++;
-                if (show) {
-                    Str.print("@w%s\n", String.valueOf(filledStencil));
-                }
-            }
-        }
-        return sum;
-    }
-
-    Seq<Long> rle(final char[] stencil) {
-        Seq<Long> seq = Seq.empty();
-        long run = 0L;
-        for (char ch : stencil) {
-            switch (ch) {
-                case '.': {
-                    if (run > 0L) {
-                        seq = seq.append(run);
-                        run = 0L;
-                    }
-                    break;
-                }
-                case '#': {
-                    run++;
-                    break;
-                }
-                case '?': {
-                    return null;
-                }
-            }
-        }
-        if (run > 0L) {
-            seq = seq.append(run);
-        }
-        return seq;
-    }
 
     long star2() {
-        return unfoldedRows
-                .map(row -> tryToArrange(row.stencils, row.rle))
-                .reduce(Long::sum);
+        return unfoldedRows.map(row -> tryToArrange(row.stencils, row.rle)).reduce(Long::sum);
     }
-
 
     record Row(String theWholeStencil, Seq<String> stencils, Seq<Long> rle) {
         static Row fromString(final String line) {
