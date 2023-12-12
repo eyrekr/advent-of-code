@@ -40,21 +40,8 @@ class D12 extends AoC {
             return valueFromCache;
         }
 
-        if (rle.isEmpty) {
-            if (stencils.isEmpty) {
-                return 1; // one way to satisfy it
-            } else if (stencils.allAre(D12::skippable)) {
-                // only ???? remain in the last groups!! (not just one group)!!!
-                // there is just one way to satisfy them when RLE is empty => all must be .
-                return 1;
-            } else {
-                // there is a problem, bad guess above
-                return 0;
-            }
-        }
-        if (stencils.isEmpty) {
-            return 0;
-        }
+        if (rle.isEmpty) return stencils.allAre(D12::skippable) ? 1 : 0;
+        if (stencils.isEmpty) return 0;
 
         final int runLength = rle.value.intValue();
         final String stencil = stencils.value;
@@ -162,12 +149,9 @@ class D12 extends AoC {
         return unfoldedRows.map(row -> tryToArrange(row.stencils, row.rle)).reduce(Long::sum);
     }
 
-    record Row(String theWholeStencil, Seq<String> stencils, Seq<Long> rle) {
+    record Row(Seq<String> stencils, Seq<Long> rle) {
         static Row fromString(final String line) {
-            return new Row(
-                    StringUtils.substringBefore(line, ' '),
-                    Seq.fromArray(StringUtils.split(StringUtils.substringBefore(line, ' '), '.')),
-                    Str.longs(StringUtils.substringAfter(line, ' ')));
+            return new Row(Seq.fromArray(StringUtils.split(StringUtils.substringBefore(line, ' '), '.')), Str.longs(StringUtils.substringAfter(line, ' ')));
         }
     }
 }
