@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * https://adventofcode.com/2023/day/12
@@ -28,46 +29,38 @@ class D12 extends AoC {
     }
 
     long star1() {
-        return rows.map(row -> arrange(row.stencils, row.runs, new HashMap<>())).reduce(Long::sum);
+        return rows.map(row -> arrange(row.stencils, row.runs, new Cache())).reduce(Long::sum);
     }
 
     long star2() {
-        return unfoldedRows.map(row -> arrange(row.stencils, row.runs, new HashMap<>())).reduce(Long::sum);
+        return unfoldedRows.map(row -> arrange(row.stencils, row.runs, new Cache())).reduce(Long::sum);
     }
 
-    static long arrange(final Seq<String> stencils, final Seq<Long> runs, final Map<String, Long> cache) {
-        final Long valueFromCache = cache.get(key(stencils, runs));
-        if (valueFromCache != null) {
-            return valueFromCache;
-        }
+    static long arrange(final Seq<String> stencils, final Seq<Long> runs, final Cache cache) {
+        return cache.get(stencils, runs, () -> {
+            if (runs.isEmpty) return stencils.allAre(D12::skippable) ? 1L : 0L;
+            if (stencils.isEmpty) return 0L;
 
-        if (runs.isEmpty) return stencils.allAre(D12::skippable) ? 1 : 0;
-        if (stencils.isEmpty) return 0;
+            final int runLength = runs.value.intValue();
+            final String stencil = stencils.value;
 
-        final int runLength = runs.value.intValue();
-        final String stencil = stencils.value;
+            long result = skippable(stencil) ? arrange(stencils.tail, runs, cache) : 0L;
+            final int lastI = stencil.length() - runLength;
+            for (int i = 0; i <= lastI; i++) {
+                final String prefix = StringUtils.substring(stencil, 0, i);
+                if (!skippable(prefix)) return result;
+                if (i < lastI && stencil.charAt(i + runLength) == '#')
+                    continue; // after the placement there must be ? (translated to .) which separates the runs
 
-        long result = 0;
-        if (skippable(stencil)) {
-            result = arrange(stencils.tail, runs, cache);
-            cache.put(key(stencils.tail, runs), result);
-        }
-        final int lastI = stencil.length() - runLength;
-        for (int i = 0; i <= lastI; i++) {
-            final String prefix = StringUtils.substring(stencil, 0, i);
-            if (!skippable(prefix)) return result;
-            if (i < lastI && stencil.charAt(i + runLength) == '#')
-                continue; // after the placement there must be ? (translated to .) which separates the runs
+                final String remainder = StringUtils.substring(stencil, i + runLength + 1);
+                final Seq<String> remainingStencils = remainder.isBlank() ? stencils.tail : stencils.tail.prepend(remainder);
 
-            final String remainder = StringUtils.substring(stencil, i + runLength + 1);
-            final Seq<String> remainingStencils = remainder.isBlank() ? stencils.tail : stencils.tail.prepend(remainder);
+                final var r = arrange(remainingStencils, runs.tail, cache);
 
-            final var r = arrange(remainingStencils, runs.tail, cache);
-            cache.put(key(remainingStencils, runs.tail), r);
-
-            result = result + r;
-        }
-        return result;
+                result = result + r;
+            }
+            return result;
+        });
     }
 
     static boolean skippable(final String stencil) {
@@ -81,13 +74,24 @@ class D12 extends AoC {
         return true;
     }
 
-    static String key(final Seq<String> stencils, final Seq<Long> runs) {
-        return stencils.toString() + runs.toString();
-    }
-
     record Row(Seq<String> stencils, Seq<Long> runs) {
         static Row fromString(final String line) {
             return new Row(Seq.fromArray(StringUtils.split(StringUtils.substringBefore(line, ' '), '.')), Str.longs(StringUtils.substringAfter(line, ' ')));
+        }
+    }
+
+    static class Cache {
+        final Map<String, Long> map = new HashMap<>();
+
+        long get(final Seq<String> stencils, final Seq<Long> runs, final Supplier<Long> compute) {
+            final String key = stencils.toString() + runs.toString();
+            final Long cachedValue = map.get(key);
+            if (cachedValue != null) {
+                return cachedValue;
+            }
+            final long value = compute.get();
+            map.put(key, value);
+            return value;
         }
     }
 }
