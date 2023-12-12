@@ -40,43 +40,43 @@ class TestD12 {
 
     @Test
     void t1() {
-        final var result = D12.tryToArrange(Seq.of("???", "###"), Seq.of(1L, 1L, 3L), new HashMap<>());
+        final var result = D12.arrange(Seq.of("???", "###"), Seq.of(1L, 1L, 3L), new HashMap<>());
         assertThat(result).isEqualTo(1);
     }
 
     @Test
     void t2() {
-        final var result = D12.tryToArrange(Seq.of("??", "??", "?##"), Seq.of(1L, 1L, 3L), new HashMap<>());
+        final var result = D12.arrange(Seq.of("??", "??", "?##"), Seq.of(1L, 1L, 3L), new HashMap<>());
         assertThat(result).isEqualTo(4);
     }
 
     @Test
     void t3() {
-        final var result = D12.tryToArrange(Seq.of("?#?#?#?#?#?#?#?"), Seq.of(1L, 3L, 1L, 6L), new HashMap<>());
+        final var result = D12.arrange(Seq.of("?#?#?#?#?#?#?#?"), Seq.of(1L, 3L, 1L, 6L), new HashMap<>());
         assertThat(result).isEqualTo(1);
     }
 
     @Test
     void t4() {
-        final var result = D12.tryToArrange(Seq.of("????", "#", "#"), Seq.of(4L, 1L, 1L), new HashMap<>());
+        final var result = D12.arrange(Seq.of("????", "#", "#"), Seq.of(4L, 1L, 1L), new HashMap<>());
         assertThat(result).isEqualTo(1);
     }
 
     @Test
     void t5() {
-        final var result = D12.tryToArrange(Seq.of("????", "######", "#####"), Seq.of(1L, 6L, 5L), new HashMap<>());
+        final var result = D12.arrange(Seq.of("????", "######", "#####"), Seq.of(1L, 6L, 5L), new HashMap<>());
         assertThat(result).isEqualTo(4);
     }
 
     @Test
     void t6() {
-        final var result = D12.tryToArrange(Seq.of("?###????????"), Seq.of(3L, 2L, 1L), new HashMap<>());
+        final var result = D12.arrange(Seq.of("?###????????"), Seq.of(3L, 2L, 1L), new HashMap<>());
         assertThat(result).isEqualTo(10);
     }
 
     @Test
     void t7() {
-        final var result = D12.tryToArrange(Seq.of("#????????", "???"), Seq.of(5L, 1L, 1L, 1L), new HashMap<>());
+        final var result = D12.arrange(Seq.of("#????????", "???"), Seq.of(5L, 1L, 1L, 1L), new HashMap<>());
         assertThat(result).isEqualTo(6);
     }
 
@@ -87,7 +87,7 @@ class TestD12 {
     */
     @Test
     void t8() {
-        final var result = D12.tryToArrange(Seq.of("#?", "?", "#??#???#", "?", "??"), Seq.of(2L, 1L, 1L, 2L, 2L), new HashMap<>());
+        final var result = D12.arrange(Seq.of("#?", "?", "#??#???#", "?", "??"), Seq.of(2L, 1L, 1L, 2L, 2L), new HashMap<>());
         assertThat(result).isEqualTo(3);
     }
 
@@ -104,7 +104,7 @@ class TestD12 {
     */
     @Test
     void t9() {
-        final var result = D12.tryToArrange(Seq.of("?#?", "??", "?????", "?"), Seq.of(3L, 1L), new HashMap<>());
+        final var result = D12.arrange(Seq.of("?#?", "??", "?????", "?"), Seq.of(3L, 1L), new HashMap<>());
         assertThat(result).isEqualTo(8);
     }
 
