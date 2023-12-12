@@ -29,7 +29,7 @@ class D12 extends AoC {
     long star1() {
         return rows
                 .map(row -> {
-                    long sum = tryToArrange(row.stencils, row.rle, 0);
+                    long sum = tryToArrange(row.stencils, row.rle);
                     long control = arrangements(row, true);
                     Str.print("%s**%-40s**  %-40s  %10d %10d\n", control == sum ? "@g" : "@r", row.theWholeStencil, row.rle, sum, control);
                     return sum;
@@ -79,6 +79,7 @@ class D12 extends AoC {
             if (skippable(stencil)) {
                 // this is now the baseline
                 result = tryToArrange(stencils.tail, rle, cache);
+                cache.put(key(stencils.tail, rle), result);
             }
         }
 
@@ -87,6 +88,7 @@ class D12 extends AoC {
             // easy case - the whole group must satisfy the run
             // try to arrange the remaining stencils
             final var r = tryToArrange(stencils.tail, rle.tail, cache);
+            cache.put(key(stencils.tail, rle.tail), r);
             return result + r;
         } else if (stencil.length() < runLength) {
             // bad guess previously, the group is not big enough to satisfy the run
@@ -150,6 +152,7 @@ class D12 extends AoC {
                 // ok, so this is the last placement which means we will not be splitting the stencil,
                 // we have consumed the whole stencil
                 final var r = tryToArrange(remainingStencils, rle.tail, cache);
+                cache.put(key(remainingStencils, rle.tail), r);
 
                 // combine the result with what we have so far
                 result = result + r;
@@ -232,7 +235,7 @@ class D12 extends AoC {
 
     long star2() {
         return unfoldedRows
-                .map(row -> tryToArrange(row.stencils, row.rle, 0))
+                .map(row -> tryToArrange(row.stencils, row.rle))
                 .reduce(Long::sum);
     }
 
