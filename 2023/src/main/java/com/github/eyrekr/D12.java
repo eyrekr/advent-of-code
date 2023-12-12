@@ -21,17 +21,18 @@ class D12 extends AoC {
         super(input);
         rows = lines.map(Row::fromString);
         unfoldedRows = lines.map(line -> {
-            final String[] ab = StringUtils.split(line);
-            return StringUtils.repeat(ab[0], "?", 5) + " " + StringUtils.repeat(ab[1], ",", 5);
-        }).map(Row::fromString);
+                    final String[] ab = StringUtils.split(line);
+                    return StringUtils.repeat(ab[0], "?", 5) + " " + StringUtils.repeat(ab[1], ",", 5);
+                })
+                .map(Row::fromString);
     }
 
     long star1() {
-        return rows.map(row -> tryToArrange(row.stencils, row.rle)).reduce(Long::sum);
+        return rows.map(row -> tryToArrange(row.stencils, row.rle, new HashMap<>())).reduce(Long::sum);
     }
 
-    static long tryToArrange(final Seq<String> stencils, final Seq<Long> rle) {
-        return tryToArrange(stencils, rle, new HashMap<>());
+    long star2() {
+        return unfoldedRows.map(row -> tryToArrange(row.stencils, row.rle, new HashMap<>())).reduce(Long::sum);
     }
 
     static long tryToArrange(final Seq<String> stencils, final Seq<Long> rle, final Map<String, Long> cache) {
@@ -46,53 +47,21 @@ class D12 extends AoC {
         final int runLength = rle.value.intValue();
         final String stencil = stencils.value;
 
-        // number of ways to combine the runs into the stencils
         long result = 0;
         if (skippable(stencil)) {
             result = tryToArrange(stencils.tail, rle, cache);
             cache.put(key(stencils.tail, rle), result);
         }
 
-
-        if (stencil.length() == runLength) {
-            // easy case - the whole group must satisfy the run
-            // try to arrange the remaining stencils
-            final var r = tryToArrange(stencils.tail, rle.tail, cache);
-            cache.put(key(stencils.tail, rle.tail), r);
-            return result + r;
-        } else if (stencil.length() < runLength) {
-            // bad guess previously, the group is not big enough to satisfy the run
+        if (stencil.length() < runLength) {
             return result;
         } else {
-            // the dreaded case where we must iterate over all the options
-            // we know we have a run of length say 3, then we have a stencil of length say 6,
-            // so there are (in theory) at most 4 ways to place the ### into the stencil
-            // ###... .###.. ..###. ...###
-            // that does not sound that dreadful
-
             final int indexOfLastPossiblePlacement = stencil.length() - runLength;
-            for (int i = 0; i <= indexOfLastPossiblePlacement; i++) { // i = all possible starting positions of the run in the stencil
-                // we must first verify that the stencil supports a run of this size
-                // the problem is that we can have multiple # predetermined!
-
-                // we are trying to put ###. or .###. or ..### or ...### into the stencil;
-                // be careful, because if it is not the terminating ...###, we must use one more . to terminate the run!
-
-                // REMEMBER: THE STENCIL ONLY HAS ? AND # IN THEM, NOTHING ELSE
-                // 1. all characters before the position i must be ? (we need to replace them with .)
-                for (int j = 0; j < i; j++) {
-                    if (stencil.charAt(j) == '#') {
-                        // this is not a valid state, we cannot put ..###. into a stencil ?#????
-                        // we can abandon all placement attempts because we will never fit any other run into the stencil
-                        return result;
-                    }
+            for (int i = 0; i <= indexOfLastPossiblePlacement; i++) {
+                final String prefix = StringUtils.substring(stencil, 0, i);
+                if(!skippable(prefix)){ // there are no fixed # in the prefix of the stencil
+                    return result;
                 }
-                // 2. the next runLength characters after the position i must be #
-                // but that is easily done - because the stencil is only # or ?, we can satisfy that simply by turning ? into #
-                // there is nothing we have to do about this here
-
-                // 3. the character after the run must be either <end> or ? which we need to turn into the .
-                // that means that the only thing that can kill it is # after the run
                 final boolean isLastPlacement = (i == indexOfLastPossiblePlacement); // this is the end of the line,
                 if (!isLastPlacement) {
                     // check the next character after the run, it must be ?
@@ -132,9 +101,11 @@ class D12 extends AoC {
     }
 
     static boolean skippable(final String stencil) {
-        for (int i = 0; i < stencil.length(); i++) {
-            if (stencil.charAt(i) != '?') {
-                return false;
+        if (stencil != null) {
+            for (int i = 0; i < stencil.length(); i++) {
+                if (stencil.charAt(i) != '?') {
+                    return false;
+                }
             }
         }
         return true;
@@ -142,11 +113,6 @@ class D12 extends AoC {
 
     static String key(final Seq<String> stencils, final Seq<Long> runs) {
         return stencils.toString() + runs.toString();
-    }
-
-
-    long star2() {
-        return unfoldedRows.map(row -> tryToArrange(row.stencils, row.rle)).reduce(Long::sum);
     }
 
     record Row(Seq<String> stencils, Seq<Long> rle) {
