@@ -1,5 +1,6 @@
 package com.github.eyrekr;
 
+import com.github.eyrekr.util.Seq;
 import com.github.eyrekr.util.Str;
 import org.junit.jupiter.api.Test;
 
@@ -33,5 +34,41 @@ class TestD12 {
     @Test
     void star2() {
         assertThat(new D12(Str.testResource("D12.txt")).star2()).isEqualTo(0L);
+    }
+
+    @Test
+    void t1() {
+        final var result = D12.tryToArrange(Seq.of("???", "###"), Seq.of(1L,1L,3L), "");
+        assertThat(result).isEqualTo(D12.Result.done(1));
+    }
+
+    @Test
+    void t2() {
+        final var result = D12.tryToArrange(Seq.of("??","??", "?##"), Seq.of(1L,1L,3L), "");
+        assertThat(result).isEqualTo(D12.Result.done(4));
+    }
+
+    @Test
+    void t3() {
+        final var result = D12.tryToArrange(Seq.of("?#?#?#?#?#?#?#?"), Seq.of(1L,3L, 1L,6L), "");
+        assertThat(result).isEqualTo(D12.Result.done(1));
+    }
+
+    @Test
+    void t4() {
+        final var result = D12.tryToArrange(Seq.of("????", "#", "#"), Seq.of(4L,1L, 1L), "");
+        assertThat(result).isEqualTo(D12.Result.done(1));
+    }
+
+    @Test
+    void t5() {
+        final var result = D12.tryToArrange(Seq.of("????", "######", "#####"), Seq.of(1L,6L, 5L), "");
+        assertThat(result).isEqualTo(D12.Result.done(4));
+    }
+
+    @Test
+    void t6() {
+        final var result = D12.tryToArrange(Seq.of("?###????????"), Seq.of(3L,2L, 1L), "");
+        assertThat(result).isEqualTo(D12.Result.done(10));
     }
 }
