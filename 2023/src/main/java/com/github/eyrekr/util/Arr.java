@@ -12,12 +12,14 @@ import java.util.Set;
 public final class Arr {
 
     private static final int MIN_CAPACITY = 16;
+    private static final int GROW_FACTOR = 2;
 
     public final int length;
     public final boolean isEmpty;
     private final long[] a;
     private final int start;
     private final boolean isFull;
+    private final boolean safeToGrow; // copy-on-write implementation
 
     private Arr() {
         this.a = new long[MIN_CAPACITY];
@@ -25,30 +27,33 @@ public final class Arr {
         this.isEmpty = true;
         this.start = 0;
         this.isFull = false;
+        this.safeToGrow = true;
     }
 
-    private Arr(final long[] a, final int start, final int length) {
+    private Arr(final long[] a, final int start, final int length, final boolean safeToGrow) {
         this.a = a;
-        this.start = start;
+        this.start = start % a.length;
         this.length = length;
         this.isEmpty = this.length == 0;
         this.isFull = this.length == a.length;
+        this.safeToGrow = safeToGrow;
     }
 
     private Arr grow() {
-        final long[] b = new long[a.length * 2];
+        final long[] b = new long[a.length * GROW_FACTOR];
         for (int i = 0; i < length; i++) {
-            b[i] = a[(start + i) % a.length];
+            b[i] = at(i);
         }
-        return new Arr(b, 0, length);
+        return new Arr(b, 0, length, true);
     }
 
-    public Arr deepCopy() {
+    @Override
+    public Arr clone() {
         final long[] b = new long[a.length];
         for (int i = 0; i < length; i++) {
             b[i] = at(i);
         }
-        return new Arr(b, 0, length);
+        return new Arr(b, 0, length, true);
     }
 
     public static Arr empty() {
@@ -56,7 +61,15 @@ public final class Arr {
     }
 
     public static Arr fromArray(final long[] array) {
-        return new Arr(Arrays.copyOf(array, Math.max(MIN_CAPACITY, array.length)), 0, array.length);
+        return new Arr(Arrays.copyOf(array, Math.max(MIN_CAPACITY, array.length)), 0, array.length, true);
+    }
+
+    public static Arr fromIntArray(final int[] array) {
+        final long[] b = new long[Math.max(MIN_CAPACITY, array.length)];
+        for (int i = 0; i < array.length; i++) {
+            b[i] = array[i];
+        }
+        return new Arr(b, 0, array.length, true);
     }
 
     public static Arr fromIterable(final Iterable<Long> iterable) {
@@ -74,7 +87,7 @@ public final class Arr {
 
     public static Arr range(final long startInclusive, final long endExclusive) {
         int n = (int) (endExclusive - startInclusive);
-        final Arr array = new Arr(new long[n], 0, 0);
+        final Arr array = new Arr(new long[n], 0, 0, true);
         for (long value = startInclusive; value < endExclusive; value++) {
             array.addLast(value);
         }
@@ -84,19 +97,33 @@ public final class Arr {
     public Arr addLast(final long value) {
         if (isFull) {
             return grow().addLast(value);
+        } else if (safeToGrow) {
+            final int i = (start + length) % a.length;
+            a[i] = value;
+            return new Arr(a, start, length + 1, true);
+        } else {
+            return clone().addLast(value);
         }
-        final int i = (start + length) % a.length;
-        a[i] = value;
-        return new Arr(a, start, length + 1);
+    }
+
+    public Arr removeLast() {
+        return isEmpty ? this : new Arr(a, start, length - 1, false);
     }
 
     public Arr addFirst(final long value) {
         if (isFull) {
             return grow().addFirst(value);
+        } else if (safeToGrow) {
+            final int i = (start - 1) % a.length;
+            a[i] = value;
+            return new Arr(a, i, length + 1, true);
+        } else {
+            return clone().addFirst(value);
         }
-        final int i = (start - 1) % a.length;
-        a[i] = value;
-        return new Arr(a, i, length + 1);
+    }
+
+    public Arr removeFirst() {
+        return isEmpty ? this : new Arr(a, start + 1, length - 1, false);
     }
 
     public long at(final int i) {
@@ -112,7 +139,7 @@ public final class Arr {
         return false;
     }
 
-    public boolean atLeastOneIs(final Predicate predicate) {
+    public boolean atLeastOneIs(final LongToBool predicate) {
         for (int i = 0; i < length; i++) {
             if (predicate.test(at(i))) {
                 return true;
@@ -121,7 +148,7 @@ public final class Arr {
         return false;
     }
 
-    public boolean atLeastOneIsNot(final Predicate predicate) {
+    public boolean atLeastOneIsNot(final LongToBool predicate) {
         return atLeastOneIs(predicate.negate());
     }
 
@@ -134,7 +161,7 @@ public final class Arr {
         return true;
     }
 
-    public boolean allAre(final Predicate predicate) {
+    public boolean allAre(final LongToBool predicate) {
         for (int i = 0; i < length; i++) {
             if (!predicate.test(at(i))) {
                 return false;
@@ -152,7 +179,7 @@ public final class Arr {
         return true;
     }
 
-    public boolean noneIs(final Predicate predicate) {
+    public boolean noneIs(final LongToBool predicate) {
         for (int i = 0; i < length; i++) {
             if (predicate.test(at(i))) {
                 return false;
@@ -161,14 +188,7 @@ public final class Arr {
         return true;
     }
 
-    public Arr each(final Consumer consumer) {
-        for (int i = 0; i < length; i++) {
-            consumer.accept(at(i), i, i == 0, i == length - 1);
-        }
-        return this;
-    }
-
-    public <R> R reduce(final R init, final Reducer<R> reducer) {
+    public <R> R reduce(final R init, final LongToR<R> reducer) {
         R acc = init;
         for (int i = 0; i < length; i++) {
             acc = reducer.reduce(acc, at(i));
@@ -208,7 +228,7 @@ public final class Arr {
         return max;
     }
 
-    public Arr where(final Predicate predicate) {
+    public Arr where(final LongToBool predicate) {
         Arr array = new Arr();
         for (int i = 0; i < length; i++) {
             final long value = at(i);
@@ -220,7 +240,7 @@ public final class Arr {
     }
 
     public Arr reverse() {
-        final Arr arr = deepCopy();
+        final Arr arr = clone();
         for (int i = 0; i < length / 2; i++) {
             arr.a[i] = arr.a[length - i];
         }
@@ -228,7 +248,7 @@ public final class Arr {
     }
 
     public Arr sorted() {
-        final Arr arr = deepCopy();
+        final Arr arr = clone();
         Arrays.sort(arr.a, 0, length);
         return arr;
     }
@@ -270,7 +290,7 @@ public final class Arr {
         return arr;
     }
 
-    public Arr takeWhile(final Predicate predicate) {
+    public Arr takeWhile(final LongToBool predicate) {
         Arr arr = new Arr();
         for (int i = 0; i < length; i++) {
             final long value = at(i);
@@ -298,7 +318,7 @@ public final class Arr {
 //    }
 
 
-    public Arr map(final Function transform) {
+    public Arr map(final LongToLong transform) {
         Arr arr = new Arr();
         for (int i = 0; i < length; i++) {
             arr = arr.addLast(transform.apply(at(i)));
@@ -306,55 +326,150 @@ public final class Arr {
         return arr;
     }
 
-    public Arr flatMap(final Function2 transform) {
+    public Arr mapWith(final Arr other, final LongLongToLong transform) {
+        Arr arr = new Arr();
+        for (int i = 0; i < Math.min(length, other.length); i++) {
+            arr = arr.addLast(transform.apply(at(i), other.at(i)));
+        }
+        return arr;
+    }
+
+    public Arr prodWith(final Arr other, final LongLongToLong transform) {
         Arr arr = new Arr();
         for (int i = 0; i < length; i++) {
-            final Arr xxx = transform.apply(at(i));
-            for(int j = 0; j < xxx.length; j++) {
-                arr = arr.addLast(xxx.at(j));
+            for (int j = 0; j < other.length; j++) {
+                arr = arr.addLast(transform.apply(at(i), other.at(j)));
             }
         }
         return arr;
     }
 
-    public Arr print(final String separator, final Formatter formatter) {
-        Str.print("[");
-        each((value, i, first, last) -> Str.print("%s%s", formatter.format(value, i, first, last), last ? "" : separator));
-        Str.print("]\n");
+    public Arr prodUpperTriangleWith(final Arr other, final LongLongToLong transform) {
+        Arr arr = new Arr();
+        for (int i = 0; i < length; i++) {
+            for (int j = i + 1; j < other.length; j++) {
+                arr = arr.addLast(transform.apply(at(i), other.at(j)));
+            }
+        }
+        return arr;
+    }
+
+    public Arr flatMap(final LongToArr transform) {
+        Arr arr = new Arr();
+        for (int i = 0; i < length; i++) {
+            final Arr sub = transform.apply(at(i));
+            for (int j = 0; j < sub.length; j++) {
+                arr = arr.addLast(sub.at(j));
+            }
+        }
+        return arr;
+    }
+
+    public Arr print() {
+        return print(" ");
+    }
+
+    public Arr print(final String separator) {
+        return print(separator, (value, i, first, last) -> String.valueOf(value));
+    }
+
+    public Arr print(final String separator, final LongToString formatter) {
+        for (int i = 0; i < length; i++) {
+            final boolean last = i == length - 1;
+            Str.print("%s%s", formatter.format(at(i), i, i == 0, last), last ? "\n" : separator);
+        }
         return this;
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            if (i > 0) {
+                builder.append(' ');
+            }
+            builder.append(at(i));
+        }
+        return builder.toString();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof Arr that && that.length == this.length) {
+            for (int i = 0; i < length; i++) {
+                if (this.at(i) != that.at(i)) return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        // FIXME probably very bad function with terrible distribution
+        return reduce(13, (acc, value) -> (int) (value >> 32) * (int) value + acc);
+    }
+
+    public long[] toArray() {
+        final long[] b = new long[length];
+        for (int i = 0; i < length; i++) {
+            b[i] = at(i);
+        }
+        return b;
+    }
+
+    public int[] toIntArray() {
+        final int[] b = new int[length];
+        for (int i = 0; i < length; i++) {
+            b[i] = (int) at(i);
+        }
+        return b;
+    }
+
+    public Set<Long> toSet() {
+        final Set<Long> set = new HashSet<>();
+        for (int i = 0; i < length; i++) {
+            set.add(at(i));
+        }
+        return set;
+    }
+
     @FunctionalInterface
-    public interface Consumer {
+    public interface LongToVoid {
         void accept(long value, int i, boolean first, boolean last);
     }
 
     @FunctionalInterface
-    public interface Formatter {
+    public interface LongToString {
         String format(long value, int i, boolean first, boolean last);
     }
 
     @FunctionalInterface
-    public interface Predicate {
+    public interface LongToBool {
         boolean test(long value);
 
-        default Predicate negate() {
+        default LongToBool negate() {
             return value -> !test(value);
         }
     }
 
     @FunctionalInterface
-    public interface Reducer<R> {
+    public interface LongToR<R> {
         R reduce(R accumulator, long value);
     }
 
     @FunctionalInterface
-    public interface Function {
+    public interface LongToLong {
         long apply(long value);
     }
 
     @FunctionalInterface
-    public interface Function2 {
+    public interface LongLongToLong {
+        long apply(long value, long other);
+    }
+
+    @FunctionalInterface
+    public interface LongToArr {
         Arr apply(long value);
     }
 }
