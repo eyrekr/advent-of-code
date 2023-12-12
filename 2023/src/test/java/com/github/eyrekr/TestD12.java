@@ -7,11 +7,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class TestD12 {
     final String SAMPLE = """
+            ???.### 1,1,3
+            .??..??...?##. 1,1,3
+            ?#?#?#?#?#?#?#? 1,3,1,6
+            ????.#...#... 4,1,1
+            ????.######..#####. 1,6,5
+            ?###???????? 3,2,1
             """;
 
     @Test
     void sampleStar1() {
-        assertThat(new D12(SAMPLE).star1()).isEqualTo(0L);
+        assertThat(new D12(SAMPLE).star1()).isEqualTo(21L);
     }
 
     @Test

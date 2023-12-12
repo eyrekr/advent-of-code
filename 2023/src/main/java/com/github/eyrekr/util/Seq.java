@@ -303,6 +303,17 @@ public final class Seq<E> implements Iterable<E> {
     }
 
     @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof Seq that) {
+            return that.isEmpty && this.isEmpty ||
+                    (that.length == this.length
+                            && Objects.equals(that.value, this.value)
+                            && that.tail.equals(this.tail));
+        }
+        return false;
+    }
+
+    @Override
     public It iterator() {
         return new It(false);
     }
@@ -353,5 +364,7 @@ public final class Seq<E> implements Iterable<E> {
                 Seq.of("m", "n", "o", "p").lastValue,
                 Seq.of("m").lastValue
         );
+
+        Str.print("%b", Seq.of(1,1,3).equals(Seq.of(1,1,3)));
     }
 }
