@@ -2,8 +2,7 @@ package com.github.eyrekr;
 
 import com.github.eyrekr.util.Seq;
 
-import java.util.Map;
-import java.util.Optional;
+import java.util.Comparator;
 
 /**
  * https://adventofcode.com/2023/day/13
@@ -20,51 +19,65 @@ class D13 extends AoC {
     }
 
     long star1() {
+        return solveWithExpectedDefects(0);
+    }
+
+    long star2() {
+        return solveWithExpectedDefects(1);
+    }
+
+    long solveWithExpectedDefects(final int expectedDefects) {
         long sum = 0L;
         for (final String grid : grids) {
-            final String[] pattern = grid.split("\n");
-            final long verticalMirror = mirror(pattern).orElse(0L);
-            final long horizontalMirror = mirror(transpose(pattern)).orElse(0L);
-
-            if(verticalMirror > horizontalMirror) {
-                sum += verticalMirror;
-            } else {
-                sum += 100* horizontalMirror;
-            }
+            final String[] pattern = grid.split("\n"), transposed = transpose(pattern);
+            final var horizontalMirror = solveWithExpectedDefects(pattern, expectedDefects);
+            final var verticalMirror = solveWithExpectedDefects(transposed, expectedDefects);
+            sum += verticalMirror.isEmpty ? 100L * horizontalMirror.value : verticalMirror.value;
         }
         return sum;
     }
 
-    long star2() {
-        return 0L;
+    Seq<Integer> solveWithExpectedDefects(final String[] pattern, final int expectedDefects) {
+        return seeds(pattern)
+                .where(seed -> seed.defects <= expectedDefects)
+                .where(seed -> defectsInMirror(pattern, seed.a, seed.b) == expectedDefects)
+                .map(seed -> seed.b)
+                .sortedBy(Comparator.comparingInt(a -> Math.abs(pattern.length / 2 - a)));
     }
 
-    Optional<Long> mirror(final String[] pattern) {
-        Seq<Long> candidates = Seq.empty();
-        for (int i = 0; i < pattern.length; i++) {
-            for (int j = i + 1; j < pattern.length; j++) {
-                if (pattern[i].equals(pattern[j])) {
-                    candidates = candidates.prepend((long) (i + j) / 2);
-                }
-            }
+    Seq<Seed> seeds(final String[] pattern) {
+        Seq<Seed> seeds = Seq.empty();
+        for (int i = 0; i < pattern.length - 1; i++) {
+            seeds = seeds.append(new Seed(i, i + 1, defects(pattern[i], pattern[i + 1])));
         }
-        return candidates.frequency().entrySet()
-                .stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey);
+        return seeds;
+    }
+
+    int defects(final String a, final String b) {
+        int defects = 0;
+        for (int i = 0; i < a.length(); i++) {
+            defects += a.charAt(i) == b.charAt(i) ? 0 : 1;
+        }
+        return defects;
+    }
+
+    int defectsInMirror(final String[] pattern, final int a, int b) {
+        return a < 0 || b >= pattern.length ? 0 : defectsInMirror(pattern, a - 1, b + 1) + defects(pattern[a], pattern[b]);
     }
 
     String[] transpose(final String[] pattern) {
         final int m = pattern[0].length();
-        final int n = pattern.length;
-        final String[] t = new String[m];
+        final String[] transposed = new String[m];
         for (int column = 0; column < m; column++) {
             final StringBuilder builder = new StringBuilder();
-            for (int row = 0; row < n; row++) {
-                builder.append(pattern[row].charAt(column));
+            for (final String row : pattern) {
+                builder.append(row.charAt(column));
             }
-            t[column] = builder.toString();
+            transposed[column] = builder.toString();
         }
-        return t;
+        return transposed;
+    }
+
+    record Seed(int a, int b, int defects) {
     }
 }

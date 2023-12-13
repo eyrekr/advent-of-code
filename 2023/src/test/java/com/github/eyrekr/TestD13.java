@@ -31,17 +31,17 @@ class TestD13 {
 
     @Test
     void sampleStar2() {
-        assertThat(new D13(SAMPLE).star2()).isEqualTo(0L);
+        assertThat(new D13(SAMPLE).star2()).isEqualTo(400L);
     }
 
     @Test
     void star1() {
-        assertThat(new D13(Str.testResource("D13.txt")).star1()).isEqualTo(0L);
+        assertThat(new D13(Str.testResource("D13.txt")).star1()).isEqualTo(30535L);
     }
 
     @Test
     void star2() {
-        assertThat(new D13(Str.testResource("D13.txt")).star2()).isEqualTo(0L);
+        assertThat(new D13(Str.testResource("D13.txt")).star2()).isEqualTo(30844L);
     }
 
 }
