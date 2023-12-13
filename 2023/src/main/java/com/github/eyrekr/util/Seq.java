@@ -302,6 +302,14 @@ public final class Seq<E> implements Iterable<E> {
         });
     }
 
+    public Map<E, Integer> frequency() {
+        return reduce(new HashMap<>(), (map, element) -> {
+            final int frequency = map.getOrDefault(element, 0);
+            map.put(element, frequency + 1);
+            return map;
+        });
+    }
+
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof Seq that) {
@@ -365,6 +373,6 @@ public final class Seq<E> implements Iterable<E> {
                 Seq.of("m").lastValue
         );
 
-        Str.print("%b", Seq.of(1,1,3).equals(Seq.of(1,1,3)));
+        Str.print("%b", Seq.of(1, 1, 3).equals(Seq.of(1, 1, 3)));
     }
 }

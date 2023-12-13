@@ -7,11 +7,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class TestD13 {
     final String SAMPLE = """
+            #.##..##.
+            ..#.##.#.
+            ##......#
+            ##......#
+            ..#.##.#.
+            ..##..##.
+            #.#.##.#.
+                        
+            #...##..#
+            #....#..#
+            ..##..###
+            #####.##.
+            #####.##.
+            ..##..###
+            #....#..#
             """;
 
     @Test
     void sampleStar1() {
-        assertThat(new D13(SAMPLE).star1()).isEqualTo(0L);
+        assertThat(new D13(SAMPLE).star1()).isEqualTo(405L);
     }
 
     @Test

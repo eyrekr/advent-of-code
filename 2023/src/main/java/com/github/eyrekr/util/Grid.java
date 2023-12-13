@@ -30,6 +30,10 @@ public final class Grid implements Iterable<Grid.It> {
         }
     }
 
+    public static Grid of(final String input) {
+        return Grid.of(Seq.ofLinesFromString(input));
+    }
+
     public static Grid of(final List<String> lines) {
         final int n = lines.size();
         final int m = lines.get(0).length();
