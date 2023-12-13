@@ -57,6 +57,17 @@ public final class Arr {
         return new Arr();
     }
 
+    public static Arr of(final long value, final long... values) {
+        Arr arr = new Arr();
+        arr = arr.addLast(value);
+        if (values != null) {
+            for (final long v : values) {
+                arr = arr.addLast(v);
+            }
+        }
+        return arr;
+    }
+
     /**
      * @return Deep clone of the supplied array. Operations with this array do not affect the supplied array and vice versa.
      */
@@ -99,9 +110,9 @@ public final class Arr {
      */
     public static Arr range(final long startInclusive, final long endExclusive) {
         int n = (int) (endExclusive - startInclusive);
-        final Arr array = new Arr(new long[n], 0, 0, true);
+        Arr array = new Arr(new long[n], 0, 0, true);
         for (long value = startInclusive; value < endExclusive; value++) {
-            array.addLast(value);
+            array = array.addLast(value);
         }
         return array;
     }
@@ -135,7 +146,7 @@ public final class Arr {
         if (isFull) {
             return clone(2).addFirst(value);
         } else if (safeToAdd) {
-            final int i = (start - 1) % a.length;
+            final int i = (a.length + start - 1) % a.length;
             a[i] = value;
             return new Arr(a, i, length + 1, true);
         } else {
@@ -156,7 +167,9 @@ public final class Arr {
      * If the array is empty, 0 is returned.
      */
     public long at(final int i) {
-        return isEmpty ? 0 : a[(start + i) % a.length];
+        if (isEmpty) return 0L;
+        if (i >= 0) return a[(start + i % length) % a.length];
+        else return a[(a.length + start + length + i % length) % a.length];
     }
 
     /**
@@ -315,8 +328,8 @@ public final class Arr {
      */
     public Arr reverse() {
         final Arr arr = clone(1);
-        for (int i = 0; i < length / 2; i++) {
-            arr.a[i] = arr.a[length - i];
+        for (int i = 0; i < length; i++) {
+            arr.a[i] = at(length - i - 1);
         }
         return arr;
     }
@@ -429,7 +442,7 @@ public final class Arr {
                 skip = false;
             }
             if (!skip) {
-                arr.addLast(value);
+                arr = arr.addLast(value);
             }
         }
         return arr;
@@ -630,4 +643,5 @@ public final class Arr {
     public interface RichLongToArr {
         Arr apply(long value, int i, boolean first, boolean last);
     }
+
 }
