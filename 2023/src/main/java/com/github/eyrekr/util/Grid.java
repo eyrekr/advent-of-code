@@ -3,8 +3,10 @@ package com.github.eyrekr.util;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -195,14 +197,14 @@ public final class Grid implements Iterable<Grid.It> {
     public boolean equals(final Object obj) {
         if (obj instanceof final Grid that) {
             if (this.m != that.m && this.n != that.n) return false;
-            for (int x = 0; x < m; x++) {
-                for (int y = 0; y < n; y++) {
-                    if (this.a[x][y] != that.a[x][y]) return false;
-                }
-            }
-            return true;
+            return Arrays.deepEquals(this.a, that.a);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * Objects.hash(m, n) + Arrays.deepHashCode(a);
     }
 
     public final class It {

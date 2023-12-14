@@ -27,22 +27,23 @@ class D14 extends AoC {
         final int n = 1_000_000_000;
         Grid grid = Grid.of(input);
 
-        final Map<BitSet, State> memory = new HashMap<>();
-        memory.put(encode(grid), new State(0, score(grid)));
+        final Map<BitSet, Integer> memory = new HashMap<>();
+        memory.put(encode(grid), 0);
 
         for (int iteration = 1; iteration <= n; iteration++) {
             grid = cycle(grid);
             final var key = encode(grid);
-            final State firstState = memory.get(key);
-            if (firstState != null) {
-                final int cycleLength = iteration - firstState.iteration;
-                final int remainingCycles = (n - iteration) % cycleLength;
-                return memory.values().stream()
-                        .filter(st -> st.iteration == firstState.iteration + remainingCycles)
-                        .findFirst().orElseThrow()
-                        .score;
+            final Integer firstIteration = memory.get(key);
+            if (firstIteration != null) {
+                final int cycleLength = iteration - firstIteration;
+                int remainingCycles = (n - iteration) % cycleLength;
+                while (remainingCycles > 0) {
+                    grid = cycle(grid);
+                    remainingCycles--;
+                }
+                break;
             }
-            memory.put(key, new State(iteration, score(grid)));
+            memory.put(key, iteration);
         }
         return score(grid);
     }
@@ -87,8 +88,5 @@ class D14 extends AoC {
             }
             return bits;
         });
-    }
-
-    record State(int iteration, long score) {
     }
 }
