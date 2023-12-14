@@ -1,7 +1,6 @@
 package com.github.eyrekr;
 
 import com.github.eyrekr.util.Grid;
-import com.github.eyrekr.util.Str;
 
 import java.util.BitSet;
 import java.util.HashMap;
@@ -62,9 +61,6 @@ class D14 extends AoC {
             int firstEmptyRow = 0;
             for (int row = 0; row < grid.n; row++) {
                 switch (grid.at(column, row)) {
-                    case '.' -> {
-                        // do nothing
-                    }
                     case 'O' -> {
                         if (firstEmptyRow < row) {
                             grid.a[column][firstEmptyRow] = 'O';
