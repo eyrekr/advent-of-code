@@ -4,9 +4,7 @@ import com.github.eyrekr.util.Grid;
 import com.github.eyrekr.util.Str;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * https://adventofcode.com/2023/day/14
@@ -29,35 +27,32 @@ class D14 extends AoC {
     long star2() {
         final int n = 1_000_000_000;
         Grid grid = Grid.of(input);
-        // idea is that at one point the configurations start to repeat
-        // we just need to know the length of the cycle + length of the path that lead to the cycle
-        Map<String, Integer> memory = new HashMap<>();
-        memory.put(encode(grid), 0);
+
+        Map<String, State> memory = new HashMap<>();
+        final State initialState = State.from(grid, 0);
+        memory.put(initialState.key, initialState);
         for (int iteration = 1; iteration <= n; iteration++) {
             grid = cycle(grid);
-            final String key = encode(grid);
-            final Integer firstIteration = memory.get(key);
-            if (firstIteration != null) {
+            final State state = State.from(grid, iteration);
+            final State firstState = memory.get(state.key);
+            if (firstState != null) {
                 // cycle detected!
-                final int cycleLength = iteration - firstIteration;
-                int remainingCycles = (n - iteration) % cycleLength;
-                Str.print("@RCYCLE DETECTED@@   first=@c%d@@    iteration=@c%d@@   cycleLength=@c%d@@   remainingCycles=@c%d@@\n", firstIteration, iteration, cycleLength, remainingCycles);
-//                while (remainingCycles >= 0) {
-//                    grid = cycle(grid);
-//                    remainingCycles--;
-//                }
-
-                Set<Long> uniqueScores = new HashSet<>();
-                for(int q=0;q<cycleLength;q++) {
-                    var s=score(grid);
-                    uniqueScores.add(s);
-                    Str.print("AFTER ITERATION @c%2d@@ ~~ @C%3d@@ SCORE = %s%d\n", q, iteration +q, s>106373&&s<106396 ?"@g" : "@r", s);
-                    grid= cycle(grid);
-                }
-                uniqueScores.stream().sorted().forEach(s-> Str.print("%7d", s));
-                break;
+                final int cycleLength = iteration - firstState.iteration;
+                final int remainingCycles = (n - iteration) % cycleLength;
+                final State terminalState = memory.values().stream()
+                        .filter(st -> st.iteration == firstState.iteration + remainingCycles)
+                        .findFirst().orElseThrow();
+                Str.print(
+                        "**CYCLE DETECTED**\n first=@c%d@@\n iteration=@c%d@@\n cycleLength=@c%d@@\n remainingCycles=@c%d@@\n terminalState=@G%d@@\n score=@G%s@@\n",
+                        firstState.iteration,
+                        iteration,
+                        cycleLength,
+                        remainingCycles,
+                        terminalState.iteration,
+                        terminalState.score);
+                return terminalState.score;
             } else {
-                memory.put(key, iteration);
+                memory.put(state.key, state);
             }
         }
         // 106373 too low
@@ -66,15 +61,7 @@ class D14 extends AoC {
         return score(grid);
     }
 
-    String encode(final Grid grid) {
-        final StringBuilder b = new StringBuilder();
-        for (final var it : grid) {
-            b.append(it.ch);
-        }
-        return b.toString();
-    }
-
-    Grid cycle(final Grid grid) {
+    static Grid cycle(final Grid grid) {
         Grid tilted = grid;
         for (int t = 0; t < 4; t++) {
             north(tilted);
@@ -83,7 +70,7 @@ class D14 extends AoC {
         return tilted;
     }
 
-    void north(final Grid grid) {
+    static void north(final Grid grid) {
         for (int column = 0; column < grid.m; column++) {
             int firstEmptyRow = 0;
             for (int row = 0; row < grid.n; row++) {
@@ -106,7 +93,7 @@ class D14 extends AoC {
         }
     }
 
-    long score(final Grid grid) {
+    static long score(final Grid grid) {
         long score = 0L;
         for (final Grid.It it : grid) {
             if (it.ch == 'O') {
@@ -114,5 +101,15 @@ class D14 extends AoC {
             }
         }
         return score;
+    }
+
+    record State(Grid grid, int iteration, long score, String key) {
+        static State from(Grid grid, int iteration) {
+            final StringBuilder serialized = new StringBuilder();
+            for (final var it : grid) {
+                serialized.append(it.ch);
+            }
+            return new State(grid, iteration, D14.score(grid), serialized.toString());
+        }
     }
 }

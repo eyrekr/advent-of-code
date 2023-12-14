@@ -134,7 +134,7 @@ public final class Grid implements Iterable<Grid.It> {
         final char[][] rotated = new char[n][m];
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < m; x++) {
-                rotated[m-1-y][x] = a[x][y];
+                rotated[m - 1 - y][x] = a[x][y];
             }
         }
         return new Grid(n, m, rotated);
@@ -178,6 +178,20 @@ public final class Grid implements Iterable<Grid.It> {
         public It next() {
             return it(i++);
         }
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof final Grid that) {
+            if (this.m != that.m && this.n != that.n) return false;
+            for (int x = 0; x < m; x++) {
+                for (int y = 0; y < n; y++) {
+                    if (this.a[x][y] != that.a[x][y]) return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     public final class It {
