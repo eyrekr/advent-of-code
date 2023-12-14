@@ -2,7 +2,6 @@ package com.github.eyrekr;
 
 import com.github.eyrekr.util.Grid;
 
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,13 +26,12 @@ class D14 extends AoC {
         final int n = 1_000_000_000;
         Grid grid = Grid.of(input);
 
-        final Map<BitSet, Integer> memory = new HashMap<>();
-        memory.put(encode(grid), 0);
+        final Map<String, Integer> memory = new HashMap<>();
+        memory.put(grid.toString(), 0);
 
         for (int iteration = 1; iteration <= n; iteration++) {
             grid = cycle(grid);
-            final var key = encode(grid);
-            final Integer firstIteration = memory.get(key);
+            final Integer firstIteration = memory.get(grid.toString());
             if (firstIteration != null) {
                 final int cycleLength = iteration - firstIteration;
                 int remainingCycles = (n - iteration) % cycleLength;
@@ -43,7 +41,7 @@ class D14 extends AoC {
                 }
                 break;
             }
-            memory.put(key, iteration);
+            memory.put(grid.toString(), iteration);
         }
         return score(grid);
     }
@@ -79,14 +77,5 @@ class D14 extends AoC {
 
     static long score(final Grid grid) {
         return grid.reduce(0L, (score, it) -> it.ch == 'O' ? score + it.n - it.y : score);
-    }
-
-    static BitSet encode(final Grid grid) {
-        return grid.reduce(new BitSet(grid.m * grid.n / 2), (bits, it) -> {
-            if (it.ch == 'O') {
-                bits.set(it.i);
-            }
-            return bits;
-        });
     }
 }

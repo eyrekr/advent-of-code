@@ -207,6 +207,11 @@ public final class Grid implements Iterable<Grid.It> {
         return 31 * Objects.hash(m, n) + Arrays.deepHashCode(a);
     }
 
+    @Override
+    public String toString() {
+        return reduce(new StringBuilder(), (builder, it) -> it.lastOnLine ? builder.append(it.ch).append('\n') : builder.append(it.ch)).toString();
+    }
+
     public final class It {
         public final int i;
         public final int x;
