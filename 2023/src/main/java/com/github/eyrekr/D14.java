@@ -4,7 +4,9 @@ import com.github.eyrekr.util.Grid;
 import com.github.eyrekr.util.Str;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * https://adventofcode.com/2023/day/14
@@ -33,8 +35,6 @@ class D14 extends AoC {
         memory.put(encode(grid), 0);
         for (int iteration = 1; iteration <= n; iteration++) {
             grid = cycle(grid);
-            //Str.print("AFTER @b%d@@ CYCLES\n", iteration + 1);
-            //grid.print();
             final String key = encode(grid);
             final Integer firstIteration = memory.get(key);
             if (firstIteration != null) {
@@ -42,16 +42,26 @@ class D14 extends AoC {
                 final int cycleLength = iteration - firstIteration;
                 int remainingCycles = (n - iteration) % cycleLength;
                 Str.print("@RCYCLE DETECTED@@   first=@c%d@@    iteration=@c%d@@   cycleLength=@c%d@@   remainingCycles=@c%d@@\n", firstIteration, iteration, cycleLength, remainingCycles);
-                while (remainingCycles >= 0) {
-                    grid = cycle(grid);
-                    remainingCycles--;
+//                while (remainingCycles >= 0) {
+//                    grid = cycle(grid);
+//                    remainingCycles--;
+//                }
+
+                Set<Long> uniqueScores = new HashSet<>();
+                for(int q=0;q<cycleLength;q++) {
+                    var s=score(grid);
+                    uniqueScores.add(s);
+                    Str.print("AFTER ITERATION @c%2d@@ ~~ @C%3d@@ SCORE = %s%d\n", q, iteration +q, s>106373&&s<106396 ?"@g" : "@r", s);
+                    grid= cycle(grid);
                 }
+                uniqueScores.stream().sorted().forEach(s-> Str.print("%7d", s));
                 break;
             } else {
                 memory.put(key, iteration);
             }
         }
         // 106373 too low
+        // incorrect: 106374,106388,106389
         // 106396 too high
         return score(grid);
     }
