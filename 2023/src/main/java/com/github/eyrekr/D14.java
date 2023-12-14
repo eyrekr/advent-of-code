@@ -30,9 +30,8 @@ class D14 extends AoC {
         // idea is that at one point the configurations start to repeat
         // we just need to know the length of the cycle + length of the path that lead to the cycle
         Map<String, Integer> memory = new HashMap<>();
-        Str.print("@GSTART\n");
-        grid.print();
-        for (int iteration = 0; iteration < n; iteration++) {
+        memory.put(encode(grid), 0);
+        for (int iteration = 1; iteration <= n; iteration++) {
             grid = cycle(grid);
             //Str.print("AFTER @b%d@@ CYCLES\n", iteration + 1);
             //grid.print();
@@ -41,9 +40,9 @@ class D14 extends AoC {
             if (firstIteration != null) {
                 // cycle detected!
                 final int cycleLength = iteration - firstIteration;
-                int remainingCycles = (n - firstIteration) % cycleLength;
+                int remainingCycles = (n - iteration) % cycleLength;
                 Str.print("@RCYCLE DETECTED@@   first=@c%d@@    iteration=@c%d@@   cycleLength=@c%d@@   remainingCycles=@c%d@@\n", firstIteration, iteration, cycleLength, remainingCycles);
-                while (remainingCycles > 0) {
+                while (remainingCycles >= 0) {
                     grid = cycle(grid);
                     remainingCycles--;
                 }
@@ -52,9 +51,8 @@ class D14 extends AoC {
                 memory.put(key, iteration);
             }
         }
-
-        Str.print("@GFINISH\n");
-        grid.print();
+        // 106373 too low
+        // 106396 too high
         return score(grid);
     }
 
