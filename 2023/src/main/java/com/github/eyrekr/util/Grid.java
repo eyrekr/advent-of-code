@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -151,6 +152,16 @@ public final class Grid implements Iterable<Grid.It> {
         return grid;
     }
 
+    public <R> R reduce(final R init, final BiFunction<? super R, It, ? extends R> reduce) {
+        R acc = init;
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < m; x++) {
+                acc = reduce.apply(acc, it(x, y));
+            }
+        }
+        return acc;
+    }
+
     public Grid print() {
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < m; x++) {
@@ -259,4 +270,5 @@ public final class Grid implements Iterable<Grid.It> {
             };
         }
     }
+
 }

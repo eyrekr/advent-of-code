@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * https://adventofcode.com/2023/day/14
  * 1) 106186
- * 2)
+ * 2) 106390
  */
 class D14 extends AoC {
 
@@ -28,15 +28,16 @@ class D14 extends AoC {
         final int n = 1_000_000_000;
         Grid grid = Grid.of(input);
 
-        Map<String, State> memory = new HashMap<>();
-        final State initialState = State.from(grid, 0);
-        memory.put(initialState.key, initialState);
+        final Map<String, State> memory = new HashMap<>();
+        {// initial state
+            final State initialState = State.from(grid, 0);
+            memory.put(initialState.key, initialState);
+        }
         for (int iteration = 1; iteration <= n; iteration++) {
             grid = cycle(grid);
             final State state = State.from(grid, iteration);
             final State firstState = memory.get(state.key);
             if (firstState != null) {
-                // cycle detected!
                 final int cycleLength = iteration - firstState.iteration;
                 final int remainingCycles = (n - iteration) % cycleLength;
                 final State terminalState = memory.values().stream()
@@ -51,13 +52,9 @@ class D14 extends AoC {
                         terminalState.iteration,
                         terminalState.score);
                 return terminalState.score;
-            } else {
-                memory.put(state.key, state);
             }
+            memory.put(state.key, state);
         }
-        // 106373 too low
-        // incorrect: 106374,106388,106389
-        // 106396 too high
         return score(grid);
     }
 
@@ -94,24 +91,13 @@ class D14 extends AoC {
     }
 
     static long score(final Grid grid) {
-        long score = 0L;
-        for (int y = 0; y < grid.n; y++) {
-            for (int x = 0; x < grid.m; x++) {
-                if (grid.at(x, y) == 'O') {
-                    score += grid.n - y;
-                }
-            }
-        }
-        return score;
+        return grid.reduce(0L, (score, it) -> it.ch == 'O' ? score + it.n - it.y : score);
     }
 
     record State(Grid grid, int iteration, long score, String key) {
         static State from(Grid grid, int iteration) {
-            final StringBuilder serialized = new StringBuilder();
-            for (final var it : grid) {
-                serialized.append(it.ch);
-            }
-            return new State(grid, iteration, D14.score(grid), serialized.toString());
+            final String key = grid.reduce(new StringBuilder(), (builder, it) -> builder.append(it.ch)).toString();
+            return new State(grid, iteration, D14.score(grid), key);
         }
     }
 }
