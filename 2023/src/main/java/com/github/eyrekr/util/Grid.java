@@ -171,7 +171,7 @@ public final class Grid implements Iterable<Grid.It> {
 
         @Override
         public boolean hasNext() {
-            return i < m * n - 1;
+            return i < m * n;
         }
 
         @Override

@@ -54,7 +54,9 @@ class TestD14 {
                 #...O###..
                 #..OO#....
                 """);
-        assertThat(afterCycles(Grid.of(SAMPLE), 1)).isEqualTo(expected);
+        final Grid actual = afterCycles(Grid.of(SAMPLE), 1);
+        assertThat(actual).isEqualTo(expected);
+        assertThat(D14.score(actual)).isEqualTo(87);
     }
 
     @Test
@@ -71,7 +73,9 @@ class TestD14 {
                 #..OO###..
                 #.OOO#...O
                 """);
-        assertThat(afterCycles(Grid.of(SAMPLE), 2)).isEqualTo(expected);
+        final Grid actual = afterCycles(Grid.of(SAMPLE), 2);
+        assertThat(actual).isEqualTo(expected);
+        assertThat(D14.score(actual)).isEqualTo(69);
     }
 
     @Test
@@ -88,7 +92,9 @@ class TestD14 {
                 #...O###.O
                 #.OOO#...O
                 """);
-        assertThat(afterCycles(Grid.of(SAMPLE), 3)).isEqualTo(expected);
+        final Grid actual = afterCycles(Grid.of(SAMPLE), 3);
+        assertThat(actual).isEqualTo(expected);
+        assertThat(D14.score(actual)).isEqualTo(69);
     }
 
     private Grid afterCycles(final Grid grid, final int n) {
@@ -97,5 +103,22 @@ class TestD14 {
             result = D14.cycle(result);
         }
         return result;
+    }
+
+    @Test
+    void testScore() {
+        final Grid grid = Grid.of("""
+                OOOO.#.O..
+                OO..#....#
+                OO..O##..O
+                O..#.OO...
+                ........#.
+                ..#....#.#
+                ..O..#.O.O
+                ..O.......
+                #....###..
+                #....#....
+                """);
+        assertThat(D14.score(grid)).isEqualTo(136L);
     }
 }

@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  * https://adventofcode.com/2023/day/14
- * 1)
+ * 1) 106186
  * 2)
  */
 class D14 extends AoC {
@@ -95,9 +95,11 @@ class D14 extends AoC {
 
     static long score(final Grid grid) {
         long score = 0L;
-        for (final Grid.It it : grid) {
-            if (it.ch == 'O') {
-                score += it.n - it.y;
+        for (int y = 0; y < grid.n; y++) {
+            for (int x = 0; x < grid.m; x++) {
+                if (grid.at(x, y) == 'O') {
+                    score += grid.n - y;
+                }
             }
         }
         return score;
