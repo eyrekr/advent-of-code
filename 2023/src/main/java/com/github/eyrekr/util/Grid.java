@@ -3,10 +3,8 @@ package com.github.eyrekr.util;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -98,11 +96,35 @@ public final class Grid implements Iterable<Grid.It> {
         return null;
     }
 
+    public It chFirst(final Predicate<Character> predicate) {
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < m; x++) {
+                final char ch = a[x][y];
+                if (predicate.test(ch)) {
+                    return it(x, y);
+                }
+            }
+        }
+        return null;
+    }
+
     public It last(final Predicate<It> predicate) {
         for (int i = m * n - 1; i >= 0; i--) {
             final It it = it(i);
             if (predicate.test(it)) {
                 return it;
+            }
+        }
+        return null;
+    }
+
+    public It chLast(final Predicate<Character> predicate) {
+        for (int y = n - 1; y >= 0; y--) {
+            for (int x = m - 1; x >= 0; x--) {
+                final char ch = a[x][y];
+                if (predicate.test(ch)) {
+                    return it(x, y);
+                }
             }
         }
         return null;
@@ -148,6 +170,16 @@ public final class Grid implements Iterable<Grid.It> {
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < m; x++) {
                 rotated[m - 1 - y][x] = a[x][y];
+            }
+        }
+        return new Grid(n, m, rotated);
+    }
+
+    public Grid rotateCCW() { //counter-clockwise
+        final char[][] rotated = new char[n][m];
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < m; x++) {
+                rotated[y][n - 1 - x] = a[x][y];
             }
         }
         return new Grid(n, m, rotated);
@@ -232,15 +264,20 @@ public final class Grid implements Iterable<Grid.It> {
     public boolean equals(final Object obj) {
         if (obj instanceof final Grid that) {
             if (this.m != that.m && this.n != that.n) return false;
-            return Arrays.deepEquals(this.a, that.a);
+            for (int y = 0; y < n; y++) {
+                for (int x = 0; x < m; x++) {
+                    if (this.a[x][y] != that.a[x][y]) return false;
+                }
+            }
+            return true;
         }
         return false;
     }
 
-//    @Override
-//    public int hashCode() {
-//        return 31 * Objects.hash(m, n) + Arrays.deepHashCode(a);
-//    }
+    @Override
+    public int hashCode() {
+        return 31 * m * n * chReduce(-1, (acc, ch) -> acc * ch);
+    }
 
     @Override
     public String toString() {
