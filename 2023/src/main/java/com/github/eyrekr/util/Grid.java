@@ -74,11 +74,7 @@ public final class Grid implements Iterable<Grid.It> {
         final char[] ch4 = new char[]{at(x, y - 1), at(x - 1, y), at(x + 1, y), at(x, y + 1)};
         final char[] ch8 = new char[]{at(x - 1, y - 1), at(x, y - 1), at(x + 1, y - 1), at(x - 1, y), at(x + 1, y), at(x - 1, y + 1), at(x, y + 1), at(x + 1, y + 1)};
         final int digit = Character.isDigit(ch) ? Character.digit(ch, 10) : -1;
-        return new It(
-                i, x, y, m, n,
-                ch, ch4, ch8,
-                digit,
-                x == 0 && y == 0, x == m - 1 && y == n - 1, x == 0, x == m - 1);
+        return new It(i, x, y, m, n, ch, ch4, ch8, digit, x == 0 && y == 0, x == m - 1 && y == n - 1, x == 0, x == m - 1);
     }
 
     public It it(final int x, final int y) {
@@ -123,6 +119,20 @@ public final class Grid implements Iterable<Grid.It> {
         return seq;
     }
 
+    public Seq<It> chWhere(final Predicate<Character> predicate) {
+        Seq<It> seq = Seq.empty();
+        for (int y = n - 1; y >= 0; y--) {
+            final char[] row = a[y];
+            for (int x = m - 1; x >= 0; x--) {
+                final char ch = row[x];
+                if (predicate.test(ch)) {
+                    seq = seq.prepend(it(x, y));
+                }
+            }
+        }
+        return seq;
+    }
+
     public Grid transpose() {
         final char[][] transposed = new char[n][m];
         for (int y = 0; y < n; y++) {
@@ -154,6 +164,17 @@ public final class Grid implements Iterable<Grid.It> {
         return grid;
     }
 
+    public Grid chMap(final Function<Character, Character> transform) {
+        final Grid grid = new Grid(m, n, new char[m][n]);
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < m; x++) {
+                final Character ch = transform.apply(a[x][y]);
+                grid.a[x][y] = ch == null ? C0 : ch;
+            }
+        }
+        return grid;
+    }
+
     public <R> R reduce(final R init, final BiFunction<? super R, It, ? extends R> reduce) {
         R acc = init;
         for (int y = 0; y < n; y++) {
@@ -162,6 +183,20 @@ public final class Grid implements Iterable<Grid.It> {
             }
         }
         return acc;
+    }
+
+    public <R> R chReduce(final R init, final BiFunction<? super R, Character, ? extends R> reduce) {
+        R acc = init;
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < m; x++) {
+                acc = reduce.apply(acc, a[x][y]);
+            }
+        }
+        return acc;
+    }
+
+    public int sum(final Function<It, Integer> transform) {
+        return reduce(0, (acc, it) -> acc + transform.apply(it));
     }
 
     public Grid print() {
@@ -202,10 +237,10 @@ public final class Grid implements Iterable<Grid.It> {
         return false;
     }
 
-    @Override
-    public int hashCode() {
-        return 31 * Objects.hash(m, n) + Arrays.deepHashCode(a);
-    }
+//    @Override
+//    public int hashCode() {
+//        return 31 * Objects.hash(m, n) + Arrays.deepHashCode(a);
+//    }
 
     @Override
     public String toString() {
@@ -228,9 +263,7 @@ public final class Grid implements Iterable<Grid.It> {
         public final boolean firstOnLine;
         public final boolean lastOnLine;
 
-        private It(final int i, final int x, final int y, final int m, final int n, final char ch,
-                   final char[] neighbours4, final char[] neighbours8, final int digit,
-                   final boolean first, final boolean last, final boolean firstOnLine, final boolean lastOnLine) {
+        private It(final int i, final int x, final int y, final int m, final int n, final char ch, final char[] neighbours4, final char[] neighbours8, final int digit, final boolean first, final boolean last, final boolean firstOnLine, final boolean lastOnLine) {
             this.i = i;
             this.x = x;
             this.p = new P(x, y);
