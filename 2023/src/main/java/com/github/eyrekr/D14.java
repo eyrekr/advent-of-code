@@ -3,6 +3,7 @@ package com.github.eyrekr;
 import com.github.eyrekr.util.Grid;
 import com.github.eyrekr.util.Str;
 
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +16,6 @@ class D14 extends AoC {
 
     D14(final String input) {
         super(input);
-
     }
 
     long star1() {
@@ -28,15 +28,13 @@ class D14 extends AoC {
         final int n = 1_000_000_000;
         Grid grid = Grid.of(input);
 
-        final Map<String, State> memory = new HashMap<>();
-        {// initial state
-            final State initialState = State.from(grid, 0);
-            memory.put(initialState.key, initialState);
-        }
+        final Map<BitSet, State> memory = new HashMap<>();
+        memory.put(encode(grid), new State(0, score(grid)));
+
         for (int iteration = 1; iteration <= n; iteration++) {
             grid = cycle(grid);
-            final State state = State.from(grid, iteration);
-            final State firstState = memory.get(state.key);
+            final var key = encode(grid);
+            final State firstState = memory.get(key);
             if (firstState != null) {
                 final int cycleLength = iteration - firstState.iteration;
                 final int remainingCycles = (n - iteration) % cycleLength;
@@ -53,7 +51,7 @@ class D14 extends AoC {
                         terminalState.score);
                 return terminalState.score;
             }
-            memory.put(state.key, state);
+            memory.put(key, new State(iteration, score(grid)));
         }
         return score(grid);
     }
@@ -94,10 +92,15 @@ class D14 extends AoC {
         return grid.reduce(0L, (score, it) -> it.ch == 'O' ? score + it.n - it.y : score);
     }
 
-    record State(Grid grid, int iteration, long score, String key) {
-        static State from(Grid grid, int iteration) {
-            final String key = grid.reduce(new StringBuilder(), (builder, it) -> builder.append(it.ch)).toString();
-            return new State(grid, iteration, D14.score(grid), key);
-        }
+    static BitSet encode(final Grid grid) {
+        return grid.reduce(new BitSet(grid.m * grid.n / 2), (bits, it) -> {
+            if (it.ch == 'O') {
+                bits.set(it.i);
+            }
+            return bits;
+        });
+    }
+
+    record State(int iteration, long score) {
     }
 }
