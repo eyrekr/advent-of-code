@@ -130,6 +130,16 @@ public final class Grid implements Iterable<Grid.It> {
         return new Grid(n, m, transposed);
     }
 
+    public Grid rotateClockwise() {
+        final char[][] rotated = new char[n][m];
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < m; x++) {
+                rotated[m-1-y][x] = a[x][y];
+            }
+        }
+        return new Grid(n, m, rotated);
+    }
+
     public Grid map(final Function<It, Character> transform) {
         final Grid grid = new Grid(m, n, new char[m][n]);
         for (int y = 0; y < n; y++) {
