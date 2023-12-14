@@ -38,18 +38,10 @@ class D14 extends AoC {
             if (firstState != null) {
                 final int cycleLength = iteration - firstState.iteration;
                 final int remainingCycles = (n - iteration) % cycleLength;
-                final State terminalState = memory.values().stream()
+                return memory.values().stream()
                         .filter(st -> st.iteration == firstState.iteration + remainingCycles)
-                        .findFirst().orElseThrow();
-                Str.print(
-                        "**CYCLE DETECTED**\n first=@c%d@@\n iteration=@c%d@@\n cycleLength=@c%d@@\n remainingCycles=@c%d@@\n terminalState=@G%d@@\n score=@G%s@@\n",
-                        firstState.iteration,
-                        iteration,
-                        cycleLength,
-                        remainingCycles,
-                        terminalState.iteration,
-                        terminalState.score);
-                return terminalState.score;
+                        .findFirst().orElseThrow()
+                        .score;
             }
             memory.put(key, new State(iteration, score(grid)));
         }
