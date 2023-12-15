@@ -1,17 +1,13 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.util.Arr;
 import com.github.eyrekr.util.Seq;
-import com.google.common.collect.LinkedListMultimap;
+import com.github.eyrekr.util.Str;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * https://adventofcode.com/2023/day/15
  * 1) 515495
- * 2)
+ * 2) 229349
  */
 class D15 extends AoC {
 
@@ -29,29 +25,22 @@ class D15 extends AoC {
     }
 
     long star2() {
-        final List<Lens>[] map = new List[256];
-        for (int i = 0; i < 256; i++) map[i] = new LinkedList<>();
-        for (final var lens : lenses) {
+        final Seq<Lens>[] map = new Seq[256];
+        for (int i = 0; i < 256; i++) map[i] = Seq.empty();
+        lenses.each(lens -> {
+            final int i = lens.hash;
             switch (lens.operation) {
                 case '=' -> {
-                    final int i = map[lens.hash].indexOf(lens);
-                    if (i < 0) {
-                        map[lens.hash].add(lens);
-                    } else {
-                        map[lens.hash].get(i).focalLength = lens.focalLength;
-                    }
+                    if (map[i].has(lens)) map[i] = map[i].replaceFirst(lens, lens);
+                    else map[i] = map[i].addLast(lens);
                 }
-                case '-' -> map[lens.hash].remove(lens);
+                case '-' -> map[i] = map[i].removeFirst(lens);
             }
-        }
+        });
 
-        long sum = 0L;
-        for (int i = 0; i < 256; i++) {
-            for (int l = 0; l < map[i].size(); l++) {
-                sum += (i+1) * (l+1) * map[i].get(l).focalLength;
-            }
-        }
-        return sum;
+        return Seq.range(0, 256)
+                .flatMap(box -> map[box].mapWith(Seq.range(0, map[box].length), (lens, position) ->  (box + 1) * (position + 1) * lens.focalLength))
+                .reduce(Long::sum);
     }
 
     static int hash(final String word) {
@@ -62,7 +51,7 @@ class D15 extends AoC {
         final String name;
         final int hash;
         final char operation;
-        long focalLength;
+        final long focalLength;
 
         private Lens(String name, char operation, long focalLength) {
             this.name = name;
@@ -90,8 +79,8 @@ class D15 extends AoC {
         }
 
         @Override
-        public int hashCode() {
-            return hash;
+        public String toString() {
+            return name + " " + focalLength;
         }
     }
 }

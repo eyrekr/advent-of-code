@@ -59,7 +59,7 @@ public final class Seq<E> implements Iterable<E> {
         return fromArray(string.split("\n"));
     }
 
-    public static Seq<Long> range(final long startInclusive, final long endExclusive) {
+    public static Seq<Integer> range(final int startInclusive, final int endExclusive) {
         return startInclusive >= endExclusive ? empty() : new Seq<>(startInclusive, range(startInclusive + 1, endExclusive));
     }
 
@@ -84,11 +84,17 @@ public final class Seq<E> implements Iterable<E> {
     }
 
     public boolean has(final E value) {
-        return !isEmpty && (this.value == value || tail.has(value));
+        return !isEmpty && (Objects.equals(this.value, value) || tail.has(value));
     }
 
-    public int indexOf(final E value) {
-        return isEmpty ? -1 : Objects.equals(this.value, value) ? 0 : tail.indexOf(value) + 1;
+    public int indexOfFirst(final E value) {
+        if(isEmpty) {
+            return -1;
+        } else if(Objects.equals(this.value, value)) {
+            return 0;
+        }
+        final int index = tail.indexOfFirst(value);
+        return index < 0 ? index : index +1;
     }
 
     public boolean atLeastOneIs(final Predicate<? super E> predicate) {
@@ -411,5 +417,10 @@ public final class Seq<E> implements Iterable<E> {
         Seq.of("A", "B", "C", "D", "E", "F").replaceAt(3, "X").print();
         Seq.of("A", "B", "C", "D", "C", "F").replaceFirst("C", "X").print();
         Seq.of("A", "B", "C", "D", "C", "F").replaceAll("C", "X").print();
+
+        Str.print("%d\n", Seq.of("A", "B", "C", "D", "C", "F").indexOfFirst("C"));
+        Str.print("%d\n", Seq.of("A", "B", "C", "D", "C", "F").indexOfFirst("F"));
+        Str.print("%d\n", Seq.of("A", "B", "C", "D", "C", "F").indexOfFirst("A"));
+        Str.print("%d\n", Seq.of("A", "B", "C", "D", "C", "F").indexOfFirst("X"));
     }
 }

@@ -83,7 +83,7 @@ class D07 {
             return new Card(Type.from(hand), hand, Long.parseLong(raw[1]), compareBy, 0L);
         }
 
-        Card changeOrder(final long order) {
+        Card changeOrder(final int order) {
             return new Card(this.type, this.hand, this.bid, this.compareBy, order);
         }
 
