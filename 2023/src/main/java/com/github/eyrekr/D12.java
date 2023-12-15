@@ -53,7 +53,7 @@ class D12 extends AoC {
                     continue; // after the placement there must be ? (translated to .) which separates the runs
 
                 final String remainder = StringUtils.substring(stencil, i + runLength + 1);
-                final Seq<String> remainingStencils = remainder.isBlank() ? stencils.tail : stencils.tail.prepend(remainder);
+                final Seq<String> remainingStencils = remainder.isBlank() ? stencils.tail : stencils.tail.addFirst(remainder);
 
                 final var r = arrange(remainingStencils, runs.tail, cache);
                 result = result + r;

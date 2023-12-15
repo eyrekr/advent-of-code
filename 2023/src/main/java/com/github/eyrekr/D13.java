@@ -48,7 +48,7 @@ class D13 extends AoC {
     Seq<Seed> seeds(final String[] pattern) {
         Seq<Seed> seeds = Seq.empty();
         for (int i = 0; i < pattern.length - 1; i++) {
-            seeds = seeds.append(new Seed(i, i + 1, defects(pattern[i], pattern[i + 1])));
+            seeds = seeds.addLast(new Seed(i, i + 1, defects(pattern[i], pattern[i + 1])));
         }
         return seeds;
     }

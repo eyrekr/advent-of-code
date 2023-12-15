@@ -44,7 +44,7 @@ class D05 {
             var completeIntervals = intervals.sortedBy(Comparator.comparing(Interval::a));
             var a = completeIntervals.value.a;
             if(a != 0) {
-                completeIntervals = completeIntervals.prepend(new Interval(0, a - 1, 0));
+                completeIntervals = completeIntervals.addFirst(new Interval(0, a - 1, 0));
             }
 //            completeIntervals = completeIntervals.mapWithNext((interval, next) -> {
 //                        Seq<Interval> acc = Seq.empty();
@@ -70,17 +70,17 @@ class D05 {
             var merged = Seq.<Interval>empty();
             while (!src.isEmpty && !dst.isEmpty) {
                 if (src.value.b == dst.value.b) {
-                    merged = merged.prepend(new Interval(src.value.a, src.value.b, src.value.delta + dst.value.delta));
+                    merged = merged.addFirst(new Interval(src.value.a, src.value.b, src.value.delta + dst.value.delta));
                     src = src.tail;
                     dst = dst.tail;
                 } else if (src.value.b < dst.value.b) {
-                    merged = merged.prepend(new Interval(src.value.a, src.value.b, src.value.delta + dst.value.delta));
+                    merged = merged.addFirst(new Interval(src.value.a, src.value.b, src.value.delta + dst.value.delta));
                     src = src.tail;
-                    dst = dst.tail.prepend(new Interval(src.value.a, dst.value.b, dst.value.delta));
+                    dst = dst.tail.addFirst(new Interval(src.value.a, dst.value.b, dst.value.delta));
                 } else if (src.value.b > dst.value.b) {
-                    merged = merged.prepend(new Interval(dst.value.a, dst.value.b, src.value.delta + dst.value.delta));
+                    merged = merged.addFirst(new Interval(dst.value.a, dst.value.b, src.value.delta + dst.value.delta));
                     dst = dst.tail;
-                    src = src.tail.prepend(new Interval(dst.value.a, src.value.b, src.value.delta));
+                    src = src.tail.addFirst(new Interval(dst.value.a, src.value.b, src.value.delta));
                 }
             }
             return new Layer(merged.sortedBy(Comparator.comparing(Interval::a)));

@@ -36,7 +36,7 @@ public final class Seq<E> implements Iterable<E> {
 
     @SafeVarargs
     public static <T> Seq<T> of(final T first, final T... rest) {
-        return rest != null ? fromArray(rest).prepend(first) : new Seq<>(first, empty());
+        return rest != null ? fromArray(rest).addFirst(first) : new Seq<>(first, empty());
     }
 
     public static <T> Seq<T> fromArray(final T[] array) {
@@ -63,12 +63,12 @@ public final class Seq<E> implements Iterable<E> {
         return startInclusive >= endExclusive ? empty() : new Seq<>(startInclusive, range(startInclusive + 1, endExclusive));
     }
 
-    public Seq<E> prepend(final E value) {
+    public Seq<E> addFirst(final E value) {
         return new Seq<>(value, this);
     }
 
-    public Seq<E> append(final E value) {
-        return isEmpty ? Seq.of(value) : new Seq<>(this.value, tail.append(value));
+    public Seq<E> addLast(final E value) {
+        return isEmpty ? Seq.of(value) : new Seq<>(this.value, tail.addLast(value));
     }
 
     public Seq<E> addSeq(final Seq<E> seq) {
@@ -85,6 +85,10 @@ public final class Seq<E> implements Iterable<E> {
 
     public boolean has(final E value) {
         return !isEmpty && (this.value == value || tail.has(value));
+    }
+
+    public int indexOf(final E value) {
+        return isEmpty ? -1 : Objects.equals(this.value, value) ? 0 : tail.indexOf(value) + 1;
     }
 
     public boolean atLeastOneIs(final Predicate<? super E> predicate) {
@@ -136,7 +140,7 @@ public final class Seq<E> implements Iterable<E> {
     }
 
     public <R> Seq<R> mapWithPrev(final BiFunction<? super E, ? super E, R> translate) {
-        return mapWith(prepend(null), translate);
+        return mapWith(addFirst(null), translate);
     }
 
     public <R> R reduceR(final R init, final BiFunction<? super R, ? super E, ? extends R> combine) { // left-to-right
@@ -171,7 +175,7 @@ public final class Seq<E> implements Iterable<E> {
         }
         final Seq<E> lower = tail.where(element -> comparator.compare(value, element) <= 0).sortedBy(comparator);
         final Seq<E> upper = tail.where(element -> comparator.compare(value, element) > 0).sortedBy(comparator);
-        return lower.prepend(value).addSeq(upper);
+        return lower.addFirst(value).addSeq(upper);
     }
 
     public Seq<E> sorted() {
@@ -209,8 +213,8 @@ public final class Seq<E> implements Iterable<E> {
         return reduceR(
                 Seq.of(empty(), empty()),
                 (acc, element) -> predicate.test(element)
-                        ? Seq.of(acc.value, acc.tail.value.prepend(element))
-                        : Seq.of(acc.value.prepend(element), acc.tail.value));
+                        ? Seq.of(acc.value, acc.tail.value.addFirst(element))
+                        : Seq.of(acc.value.addFirst(element), acc.tail.value));
     }
 
     public Seq<E> first(final int n) {
@@ -245,9 +249,9 @@ public final class Seq<E> implements Iterable<E> {
         final Accumulator<E> acc = reduceR(
                 new Accumulator<>(empty(), empty()),
                 (accumulator, element) -> accumulator.batch.length < size
-                        ? new Accumulator<>(accumulator.all, accumulator.batch.prepend(element))
-                        : new Accumulator<>(accumulator.all.prepend(accumulator.batch), Seq.of(element)));
-        return acc.batch.isEmpty ? acc.all : acc.all.prepend(acc.batch);
+                        ? new Accumulator<>(accumulator.all, accumulator.batch.addFirst(element))
+                        : new Accumulator<>(accumulator.all.addFirst(accumulator.batch), Seq.of(element)));
+        return acc.batch.isEmpty ? acc.all : acc.all.addFirst(acc.batch);
     }
 
     public <K, V> Map<K, V> toMap(final Function<? super E, K> key, final Function<? super E, V> value) {
@@ -270,6 +274,32 @@ public final class Seq<E> implements Iterable<E> {
 
     public <F, R> Seq<R> prodMap(final Seq<F> seq, final BiFunction<? super E, ? super F, R> transform) {
         return flatMap(left -> seq.map(right -> transform.apply(left, right)));
+    }
+
+    public Seq<E> replaceAt(final int i, final E replacement) {
+        return isEmpty || i > length || i < 0 ? this : i == 0 ? new Seq<>(replacement, tail) : new Seq<>(value, tail.replaceAt(i - 1, replacement));
+    }
+
+    public Seq<E> replaceFirst(final E value, final E replacement) {
+        return isEmpty ? this : Objects.equals(this.value, value) ? new Seq<>(replacement, tail) : new Seq<>(this.value, tail.replaceFirst(value, replacement));
+    }
+
+    public Seq<E> replaceAll(final E value, final E replacement) {
+        return isEmpty ? this : Objects.equals(this.value, value)
+                ? new Seq<>(replacement, tail.replaceAll(value, replacement))
+                : new Seq<>(this.value, tail.replaceAll(value, replacement));
+    }
+
+    public Seq<E> removeAt(final int i) {
+        return isEmpty || i > length || i < 0 ? this : i == 0 ? tail : new Seq<>(value, tail.removeAt(i - 1));
+    }
+
+    public Seq<E> removeFirst(final E value) {
+        return isEmpty ? this : Objects.equals(this.value, value) ? tail : new Seq<>(this.value, tail.removeFirst(value));
+    }
+
+    public Seq<E> removeAll(final E value) {
+        return isEmpty ? this : Objects.equals(this.value, value) ? tail.removeAll(value) : new Seq<>(this.value, tail.removeAll(value));
     }
 
     public Seq<E> print() {
@@ -367,12 +397,19 @@ public final class Seq<E> implements Iterable<E> {
         Seq.fromIterable(List.of("x", "y", "z")).print();
         Seq.of("a", "b", "c", "d", "e").mapWithPrev((value, prev) -> prev + "=>" + value).print();
         Seq.of("a", "b", "c", "d", "e").mapWithNext((value, next) -> value + "=>" + next).print();
-        Seq.of("m", "n", "o", "p").append("Q").print();
+        Seq.of("m", "n", "o", "p").addLast("Q").print();
         Str.print("%s - %s\n",
                 Seq.of("m", "n", "o", "p").lastValue,
                 Seq.of("m").lastValue
         );
 
-        Str.print("%b", Seq.of(1, 1, 3).equals(Seq.of(1, 1, 3)));
+        Str.print("%b\n", Seq.of(1, 1, 3).equals(Seq.of(1, 1, 3)));
+        Seq.of("A", "B", "C", "D", "E", "F").removeAt(3).print();
+        Seq.of("A", "B", "C", "D", "C", "F").removeFirst("C").print();
+        Seq.of("A", "B", "C", "D", "C", "F").removeAll("C").print();
+
+        Seq.of("A", "B", "C", "D", "E", "F").replaceAt(3, "X").print();
+        Seq.of("A", "B", "C", "D", "C", "F").replaceFirst("C", "X").print();
+        Seq.of("A", "B", "C", "D", "C", "F").replaceAll("C", "X").print();
     }
 }

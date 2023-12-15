@@ -135,7 +135,7 @@ public final class Grid implements Iterable<Grid.It> {
         for (int i = m * n - 1; i >= 0; i--) {
             final It it = it(i);
             if (predicate.test(it)) {
-                seq = seq.prepend(it);
+                seq = seq.addFirst(it);
             }
         }
         return seq;
@@ -148,7 +148,7 @@ public final class Grid implements Iterable<Grid.It> {
             for (int x = m - 1; x >= 0; x--) {
                 final char ch = row[x];
                 if (predicate.test(ch)) {
-                    seq = seq.prepend(it(x, y));
+                    seq = seq.addFirst(it(x, y));
                 }
             }
         }
@@ -238,7 +238,7 @@ public final class Grid implements Iterable<Grid.It> {
     public Seq<Column> columns() {
         Seq<Column> columns = Seq.empty();
         for (int x = m - 1; x >= 0; x--) {
-            columns = columns.append(new Column(x, m, a[x]));
+            columns = columns.addLast(new Column(x, m, a[x]));
         }
         return columns;
     }

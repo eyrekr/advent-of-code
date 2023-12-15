@@ -29,7 +29,7 @@ class D09 extends AoC {
         var seq = numbers;
         var lastValues = Seq.<Long>empty();
         while (!seq.allMatch(0L)) {
-            lastValues = lastValues.prepend(seq.lastValue);
+            lastValues = lastValues.addFirst(seq.lastValue);
             seq = seq.mapWithPrev((value, previous) -> previous == null ? null : value - previous).tail;
             seq.print();
         }
@@ -40,7 +40,7 @@ class D09 extends AoC {
         var seq = numbers;
         var firstValues = Seq.<Long>empty();
         while (!seq.allMatch(0L)) {
-            firstValues = firstValues.prepend(seq.value);
+            firstValues = firstValues.addFirst(seq.value);
             seq = seq.mapWithPrev((value, previous) -> previous == null ? null : value - previous).tail;
             seq.print();
         }

@@ -50,7 +50,7 @@ public final class Str {
         final var matcher = NUMBERS.matcher(input);
         Seq<Long> seq = Seq.empty();
         while (matcher.find()) {
-            seq = seq.prepend(Long.parseLong(matcher.group()));
+            seq = seq.addFirst(Long.parseLong(matcher.group()));
         }
         return seq.reverse();
     }
