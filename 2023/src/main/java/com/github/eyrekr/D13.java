@@ -6,8 +6,8 @@ import java.util.Comparator;
 
 /**
  * https://adventofcode.com/2023/day/13
- * 1)
- * 2)
+ * 1) 30535
+ * 2) 30844
  */
 class D13 extends AoC {
 

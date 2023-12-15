@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.util.stream.Stream;
 
 /**
- * https://adventofcode.com/2023/day/3
+ * https://adventofcode.com/2023/day/2
  * 1) 514969
  * 2) 78915902
  */
