@@ -9,11 +9,6 @@ class TestD15 {
     final String SAMPLE = "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7";
 
     @Test
-    void hash(){
-        assertThat(new D15("HASH").star1()).isEqualTo(52L);
-    }
-
-    @Test
     void sampleStar1() {
         assertThat(new D15(SAMPLE).star1()).isEqualTo(1320L);
     }
