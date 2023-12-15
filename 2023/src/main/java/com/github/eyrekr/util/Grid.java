@@ -165,7 +165,7 @@ public final class Grid implements Iterable<Grid.It> {
         return new Grid(n, m, transposed);
     }
 
-    public Grid rotateClockwise() {
+    public Grid rotateCW() { //clockwise
         final char[][] rotated = new char[n][m];
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < m; x++) {
@@ -231,6 +231,18 @@ public final class Grid implements Iterable<Grid.It> {
         return reduce(0, (acc, it) -> acc + transform.apply(it));
     }
 
+    public int chSum(final Function<Character, Integer> transform) {
+        return chReduce(0, (acc, ch) -> acc + transform.apply(ch));
+    }
+
+    public Seq<Column> columns() {
+        Seq<Column> columns = Seq.empty();
+        for (int x = m - 1; x >= 0; x--) {
+            columns = columns.append(new Column(x, m, a[x]));
+        }
+        return columns;
+    }
+
     public Grid print() {
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < m; x++) {
@@ -282,6 +294,22 @@ public final class Grid implements Iterable<Grid.It> {
     @Override
     public String toString() {
         return reduce(new StringBuilder(), (builder, it) -> it.lastOnLine ? builder.append(it.ch).append('\n') : builder.append(it.ch)).toString();
+    }
+
+    public final class Column {
+        public final int x;
+        public final int m;
+        public final char[] a;
+        public final boolean first;
+        public final boolean last;
+
+        private Column(final int x, final int m, final char[] a) {
+            this.x = x;
+            this.m = m;
+            this.a = a;
+            this.first = x == 0;
+            this.last = x == m - 1;
+        }
     }
 
     public final class It {

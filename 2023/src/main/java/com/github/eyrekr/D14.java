@@ -50,7 +50,7 @@ class D14 extends AoC {
         Grid tilted = grid;
         for (int t = 0; t < 4; t++) {
             north(tilted);
-            tilted = tilted.rotateClockwise();
+            tilted = tilted.rotateCW();
         }
         return tilted;
     }
@@ -76,6 +76,6 @@ class D14 extends AoC {
     }
 
     static long score(final Grid grid) {
-        return grid.reduce(0L, (score, it) -> it.ch == 'O' ? score + it.n - it.y : score);
+        return grid.sum(it -> it.ch == 'O' ? it.n - it.y : 0);
     }
 }
