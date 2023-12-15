@@ -77,10 +77,5 @@ class D15 extends AoC {
             }
             return false;
         }
-
-        @Override
-        public String toString() {
-            return name + " " + focalLength;
-        }
     }
 }

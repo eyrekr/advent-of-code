@@ -88,13 +88,10 @@ public final class Seq<E> implements Iterable<E> {
     }
 
     public int indexOfFirst(final E value) {
-        if(isEmpty) {
-            return -1;
-        } else if(Objects.equals(this.value, value)) {
-            return 0;
-        }
+        if (isEmpty) return -1;
+        if (Objects.equals(this.value, value)) return 0;
         final int index = tail.indexOfFirst(value);
-        return index < 0 ? index : index +1;
+        return index < 0 ? index : index + 1;
     }
 
     public boolean atLeastOneIs(final Predicate<? super E> predicate) {
@@ -174,11 +171,9 @@ public final class Seq<E> implements Iterable<E> {
     }
 
     public Seq<E> sortedBy(final Comparator<? super E> comparator) {
-        if (length <= 1) {
-            return this;
-        } else if (length == 2) {
-            return comparator.compare(value, tail.value) <= 0 ? this : Seq.of(tail.value, value);
-        }
+        if (length <= 1) return this;
+        if (length == 2) return comparator.compare(value, tail.value) <= 0 ? this : Seq.of(tail.value, value);
+
         final Seq<E> lower = tail.where(element -> comparator.compare(value, element) <= 0).sortedBy(comparator);
         final Seq<E> upper = tail.where(element -> comparator.compare(value, element) > 0).sortedBy(comparator);
         return lower.addFirst(value).addSeq(upper);
@@ -189,14 +184,14 @@ public final class Seq<E> implements Iterable<E> {
     }
 
     public Seq<E> unique() {
-        final Set<E> visited = new HashSet<>();
-        return reduce(Seq.empty(), (seq, element) -> {
-            if (!visited.contains(element)) {
-                visited.add(element);
-                return new Seq<>(element, seq);
-            }
-            return seq;
-        });
+        return unique(new HashSet<>());
+    }
+
+    private Seq<E> unique(final Set<E> visited) {
+        if (isEmpty) return this;
+        if (visited.contains(value)) return tail.unique(visited);
+        visited.add(value);
+        return new Seq<>(value, tail.unique(visited));
     }
 
     public E min(final Comparator<? super E> comparator) {
@@ -422,5 +417,7 @@ public final class Seq<E> implements Iterable<E> {
         Str.print("%d\n", Seq.of("A", "B", "C", "D", "C", "F").indexOfFirst("F"));
         Str.print("%d\n", Seq.of("A", "B", "C", "D", "C", "F").indexOfFirst("A"));
         Str.print("%d\n", Seq.of("A", "B", "C", "D", "C", "F").indexOfFirst("X"));
+
+        Seq.of("A", "B", "C", "D", "E", "D", "F", "D", "G").unique().print();
     }
 }
