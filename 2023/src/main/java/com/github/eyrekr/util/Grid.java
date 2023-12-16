@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -17,10 +18,14 @@ public final class Grid implements Iterable<Grid.It> {
     public final int n;
     public final char[][] a;
 
-    public Grid(final int m, final int n, final char[][] a) {
+    private Grid(final int m, final int n, final char[][] a) {
         this.m = m;
         this.n = n;
         this.a = a;
+    }
+
+    public static Grid of(final int m, final int n) {
+        return new Grid(m, n, new char[m][n]);
     }
 
     public static Grid from(final Path path) {
@@ -351,6 +356,15 @@ public final class Grid implements Iterable<Grid.It> {
                 case D -> it(x, y + 1);
                 case L -> it(x - 1, y);
                 case R -> it(x + 1, y);
+            };
+        }
+
+        public Optional<It> constrainedTo(final D d) { // no passing through walls
+            return switch (d) {
+                case U -> y > 0 ? Optional.of(it(x, y - 1)) : Optional.empty();
+                case D -> y < n - 1 ? Optional.of(it(x, y + 1)) : Optional.empty();
+                case L -> x > 0 ? Optional.of(it(x - 1, y)) : Optional.empty();
+                case R -> x < m - 1 ? Optional.of(it(x + 1, y)) : Optional.empty();
             };
         }
     }
