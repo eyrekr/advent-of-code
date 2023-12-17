@@ -4,7 +4,9 @@ import com.github.eyrekr.util.Grid;
 import com.github.eyrekr.util.Seq;
 import com.github.eyrekr.util.Str;
 
-import java.util.LinkedList;
+import java.util.Objects;
+
+import static com.github.eyrekr.D17.Direction.*;
 
 /**
  * https://adventofcode.com/2023/day/17
@@ -34,68 +36,80 @@ class D17 extends AoC {
         final Seq<Direction>[][] path = new Seq[m][n];
         path[0][0] = Seq.empty();
 
-        final var buffer = new LinkedList<S>();
-        buffer.addLast(S.of(Direction.Right));
-        buffer.addLast(S.of(Direction.Down));
+        final boolean[][] visited = new boolean[m][n];
+        final int[][][] prev = new int[m][n][];
 
-        while (!buffer.isEmpty()) {
-            final var s = buffer.removeFirst();
-            // we are standing at [s.x, s.y] and we should explore the tile in the direction d
-            // can we improve what we see at the next tile?
-            final var p = path[s.x][s.y].addFirst(s.d);
-            if (acceptable(p)) {// is the path acceptable?
-                final var t = s.next();
-                if (t.x >= 0 && t.x < m && t.y >= 0 && t.y < n) { // are we inside the map?
-                    if (score[t.x][t.y] > score[s.x][s.y] + a[t.x][t.y]) { // can we improve the score?
-                        // yes!
-                        score[t.x][t.y] = score[s.x][s.y] + a[t.x][t.y];
-                        path[t.x][t.y] = p;
-                        // update neighbours
-                        for (final var d : Direction.values()) {
-                            if (d != s.d) { // do not go back
-                                buffer.addLast(t.to(d));
-                            }
+        while (true) {
+            int remaining = 0;
+            int x0 = 0, y0 = 0; // the closest unvisited point so far
+            int d0 = Integer.MAX_VALUE;
+            for (int x = 0; x < m; x++) {
+                for (int y = 0; y < n; y++) {
+                    if (!visited[x][y]) {
+                        remaining++;
+                        int d = score[x][y];
+                        if (d < d0) {
+                            x0 = x;
+                            y0 = y;
+                            d0 = d;
                         }
                     }
                 }
             }
+            if (remaining == 0) break;
+            visited[x0][y0] = true;
+            final var p = path[x0][y0];
+            final var nogo = Direction.forbidden(p);
+            // update score of all unvisited nodes connected with x0,y0; d0 is the best score so far
+            if (Up != nogo && y0 > 0 && !visited[x0][y0 - 1]) {
+                score[x0][y0 - 1] = d0 + a[x0][y0 - 1];
+                path[x0][y0 - 1] = p.addFirst(Up);
+                prev[x0][y0 - 1] = new int[]{x0, y0};
+            }
+            if (Down != nogo && y0 + 1 < n && !visited[x0][y0 + 1]) {
+                score[x0][y0 + 1] = d0 + a[x0][y0 + 1];
+                path[x0][y0 + 1] = p.addFirst(Down);
+                prev[x0][y0 + 1] = new int[]{x0, y0};
+            }
+            if (Left != nogo && x0 > 0 && !visited[x0 - 1][y0]) {
+                score[x0 - 1][y0] = d0 + a[x0 - 1][y0];
+                path[x0 - 1][y0] = p.addFirst(Left);
+                prev[x0 - 1][y0] = new int[]{x0, y0};
+            }
+            if (Right != nogo && x0 + 1 < m && !visited[x0 + 1][y0]) {
+                score[x0 + 1][y0] = d0 + a[x0 + 1][y0];
+                path[x0 + 1][y0] = p.addFirst(Right);
+                prev[x0 + 1][y0] = new int[]{x0, y0};
+            }
 
 
             {// print state
-                Str.print("@y----------------------------------------------------------------- @c%d\n", buffer.size());
-                final var q = new String[m][n];
-                for (int x = 0; x < m; x++)
-                    for (int y = 0; y < n; y++)
-                        q[x][y] = score[x][y] < Integer.MAX_VALUE ? "@gX@@" : " ";
-                for (final var b : buffer) if (b.x >= 0 && b.y >= 0 && b.x < m && b.y < n) q[b.x][b.y] = "@RX@@";
+                Str.print(
+                        "@y----------------------------------------------------------------- @c%d @r%d\n",
+                        remaining,
+                        d0);
                 for (int x = 0; x < m; x++) {
                     for (int y = 0; y < n; y++)
-                        Str.print(q[x][y]);
-                    System.out.println();
+                        Str.print(visited[x][y] ? "@b*@@" : " ");
+                    Str.print("\n");
                 }
             }
         }
 
-        {// print path
-            Str.print("@y-----------------------------------------------------------------\n");
-            final var q = new String[m][n];
-            for (int x = 0; x < m; x++) for (int y = 0; y < n; y++) q[x][y] = " ";
-            final var p = path[m - 1][n - 1].reverse();
-            {
-                var s = S.of(Direction.Right);
-                q[0][0] = "#";
-                for (var d : p) {
-                    s = s.to(d);
-                    s=s.next();
-                    q[s.x][s.y] = "#";
-                }
+        {//print path
+            final boolean[][] Q = new boolean[m][n];
+            int[] P = prev[m - 1][n - 1];
+            while (P[0] != 0 && P[1] != 0) {
+                Q[P[0]][P[1]] = true;
             }
+
             for (int x = 0; x < m; x++) {
                 for (int y = 0; y < n; y++)
-                    Str.print(q[x][y]);
-                System.out.println();
+                    Str.print(Q[x][y] ? "@r*@@" : " ");
+                Str.print("@r%d\n", score[m - 1][n - 1]);
             }
         }
+
         return score[m - 1][n - 1];
     }
 
@@ -103,30 +117,14 @@ class D17 extends AoC {
         return 0L;
     }
 
-    static boolean acceptable(final Seq<Direction> path) {
-        final var last4 = path.first(4);
-        final var illegal = last4.length == 4 && last4.allMatch(last4.value); // all 4 values are the same as the first
-        return !illegal;
-    }
+    enum Direction {
+        Left, Right, Up, Down;
 
-    record S(int x, int y, Direction d) {
-        static S of(final Direction d) {
-            return new S(0, 0, d);
-        }
-
-        S next() {
-            return switch (d) {
-                case Left -> new S(x - 1, y, d);
-                case Right -> new S(x + 1, y, d);
-                case Up -> new S(x, y - 1, d);
-                case Down -> new S(x, y + 1, d);
-            };
-        }
-
-        S to(final Direction d) {
-            return new S(x, y, d);
+        static Direction forbidden(final Seq<Direction> path) {
+            final var last3 = path.first(3);
+            return (last3.length == 3 && Objects.equals(last3.value, last3.tail.value) && Objects.equals(last3.value, last3.tail.tail.value))
+                    ? last3.value
+                    : null;
         }
     }
-
-    enum Direction {Left, Right, Up, Down}
 }
