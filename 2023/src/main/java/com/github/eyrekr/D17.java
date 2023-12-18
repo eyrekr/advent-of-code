@@ -3,7 +3,10 @@ package com.github.eyrekr;
 import com.github.eyrekr.util.Grid;
 import com.github.eyrekr.util.Seq;
 import com.github.eyrekr.util.Str;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
+import java.util.List;
 import java.util.Objects;
 
 import static com.github.eyrekr.D17.Direction.*;
@@ -29,18 +32,12 @@ class D17 extends AoC {
     }
 
     long star1() {
-        final var score = new int[m][n];
-        for (int i = 0; i < m * n; i++) score[i % m][i / m] = Integer.MAX_VALUE;
-        score[0][0] = 0;
-
-        final Seq<Direction>[][] path = new Seq[m][n];
-        path[0][0] = Seq.empty();
+        final var distance = new int[m][n];
+        for (int i = 0; i < m * n; i++) distance[i % m][i / m] = Integer.MAX_VALUE;
+        distance[0][0] = 0;
 
         final boolean[][] visited = new boolean[m][n];
-        record Bod(int x, int y) {
-        }
-        final Bod[][] prev = new Bod[m][n];
-        prev[0][0] = new Bod(0, 0);
+        final Multimap<P, P> predecessors = HashMultimap.create(); // predecessors with the same distance
 
         while (true) {
             int remaining = 0;
@@ -50,7 +47,7 @@ class D17 extends AoC {
                 for (int y = 0; y < n; y++) {
                     if (!visited[x][y]) {
                         remaining++;
-                        int d = score[x][y];
+                        int d = distance[x][y];
                         if (d < d0) {
                             x0 = x;
                             y0 = y;
@@ -61,60 +58,39 @@ class D17 extends AoC {
             }
             if (remaining == 0) break;
             visited[x0][y0] = true;
-            final var p = path[x0][y0];
-            final var nogo = Direction.forbidden(p);
-            // update score of all unvisited nodes connected with x0,y0; d0 is the best score so far
-            if (Up != nogo && y0 > 0 && !visited[x0][y0 - 1]) {
-                score[x0][y0 - 1] = d0 + a[x0][y0 - 1];
-                path[x0][y0 - 1] = p.addFirst(Up);
-                prev[x0][y0 - 1] = new Bod(x0, y0);
-            }
-            if (Down != nogo && y0 + 1 < n && !visited[x0][y0 + 1]) {
-                score[x0][y0 + 1] = d0 + a[x0][y0 + 1];
-                path[x0][y0 + 1] = p.addFirst(Down);
-                prev[x0][y0 + 1] = new Bod(x0, y0);
-            }
-            if (Left != nogo && x0 > 0 && !visited[x0 - 1][y0]) {
-                score[x0 - 1][y0] = d0 + a[x0 - 1][y0];
-                path[x0 - 1][y0] = p.addFirst(Left);
-                prev[x0 - 1][y0] = new Bod(x0, y0);
-            }
-            if (Right != nogo && x0 + 1 < m && !visited[x0 + 1][y0]) {
-                score[x0 + 1][y0] = d0 + a[x0 + 1][y0];
-                path[x0 + 1][y0] = p.addFirst(Right);
-                prev[x0 + 1][y0] = new Bod(x0, y0);
+            final var p0 = new P(x0, y0);
+            // update distances of all unvisited nodes connected with p0 = [x0,y0]; d0 is the best score so far
+            // update only when there is an improvement!
+            for (final var direction : Direction.values()) {
+                // direction is forbidden if pred(p0) + pred(pred(p0)) + pred(pred(pred(p0))) = 3 and all of them are in the same direction
+                final var p1 = p0.go(direction);
+                if (p1.valid(m, n) && !visited[p1.x][p1.y]) {
+                    final var d1 = distance[p1.x][p1.y];
+                    if (d1 >= d0 + a[p1.x][p1.y]) { // distance can be improved
+                        distance[p1.x][p1.y] = d0 + a[p1.x][p1.y];
+                        predecessors.put(p1, p0);
+                    }
+                }
             }
 
 
-//            {// print state
-//                Str.print(
-//                        "@y----------------------------------------------------------------- @c%d @r%d\n",
-//                        remaining,
-//                        d0);
-//                for (int y = 0; y < n; y++) {
-//                    for (int x = 0; x < m; x++)
-//                        Str.print(visited[x][y] ? "@b*@@" : " ");
-//                    Str.print("\n");
-//                }
-//            }
+            {// print distances
+                Str.print(
+                        "@y----------------------------------------------------------------- @c%d @r%d\n",
+                        remaining,
+                        d0);
+                for (int y = 0; y < n; y++) {
+                    for (int x = 0; x < m; x++) {
+                        final String color = (x0 == x && y0 == y) ? "@r" : visited[x][y] ? "@g" : "@w";
+                        final String value = distance[x][y] == Integer.MAX_VALUE ? "." : Integer.toString(distance[x][y]);
+                        Str.print("%s%4s@@ ", color, value);
+                    }
+                    Str.print("\n");
+                }
+            }
         }
 
-        {//print path
-            final boolean[][] Q = new boolean[m][n];
-            Bod b = prev[m - 1][n - 1];
-            while (!(b.x == 0 && b.y == 0)) {
-                Q[b.x][b.y] = true;
-                b = prev[b.x][b.y];
-            }
-            for (int y = 0; y < n; y++) {
-                for (int x = 0; x < m; x++)
-                    Str.print(Q[x][y] ? "@r*@@" : "@w.@@");
-                Str.print("\n");
-            }
-            Str.print("@g%d\n", score[m - 1][n - 1]);
-        }
-
-        return score[m - 1][n - 1];
+        return distance[m - 1][n - 1];
     }
 
     long star2() {
@@ -122,13 +98,22 @@ class D17 extends AoC {
     }
 
     enum Direction {
-        Left, Right, Up, Down;
+        Left(-1, 0), Right(+1, 0), Up(0, -1), Down(0, +1);
+        final int dx, dy;
 
-        static Direction forbidden(final Seq<Direction> path) {
-            final var last3 = path.first(3);
-            return (last3.length == 3 && Objects.equals(last3.value, last3.tail.value) && Objects.equals(last3.value, last3.tail.tail.value))
-                    ? last3.value
-                    : null;
+        Direction(final int dx, final int dy) {
+            this.dx = dx;
+            this.dy = dy;
+        }
+    }
+
+    record P(int x, int y) {
+        P go(final Direction d) {
+            return new P(x + d.dx, y + d.dy);
+        }
+
+        boolean valid(final int m, final int n) {
+            return x >= 0 && x < m && y >= 0 && y < n;
         }
     }
 }
