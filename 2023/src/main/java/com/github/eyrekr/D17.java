@@ -37,7 +37,10 @@ class D17 extends AoC {
         path[0][0] = Seq.empty();
 
         final boolean[][] visited = new boolean[m][n];
-        final int[][][] prev = new int[m][n][];
+        record Bod(int x, int y) {
+        }
+        final Bod[][] prev = new Bod[m][n];
+        prev[0][0] = new Bod(0, 0);
 
         while (true) {
             int remaining = 0;
@@ -64,50 +67,51 @@ class D17 extends AoC {
             if (Up != nogo && y0 > 0 && !visited[x0][y0 - 1]) {
                 score[x0][y0 - 1] = d0 + a[x0][y0 - 1];
                 path[x0][y0 - 1] = p.addFirst(Up);
-                prev[x0][y0 - 1] = new int[]{x0, y0};
+                prev[x0][y0 - 1] = new Bod(x0, y0);
             }
             if (Down != nogo && y0 + 1 < n && !visited[x0][y0 + 1]) {
                 score[x0][y0 + 1] = d0 + a[x0][y0 + 1];
                 path[x0][y0 + 1] = p.addFirst(Down);
-                prev[x0][y0 + 1] = new int[]{x0, y0};
+                prev[x0][y0 + 1] = new Bod(x0, y0);
             }
             if (Left != nogo && x0 > 0 && !visited[x0 - 1][y0]) {
                 score[x0 - 1][y0] = d0 + a[x0 - 1][y0];
                 path[x0 - 1][y0] = p.addFirst(Left);
-                prev[x0 - 1][y0] = new int[]{x0, y0};
+                prev[x0 - 1][y0] = new Bod(x0, y0);
             }
             if (Right != nogo && x0 + 1 < m && !visited[x0 + 1][y0]) {
                 score[x0 + 1][y0] = d0 + a[x0 + 1][y0];
                 path[x0 + 1][y0] = p.addFirst(Right);
-                prev[x0 + 1][y0] = new int[]{x0, y0};
+                prev[x0 + 1][y0] = new Bod(x0, y0);
             }
 
 
-            {// print state
-                Str.print(
-                        "@y----------------------------------------------------------------- @c%d @r%d\n",
-                        remaining,
-                        d0);
-                for (int x = 0; x < m; x++) {
-                    for (int y = 0; y < n; y++)
-                        Str.print(visited[x][y] ? "@b*@@" : " ");
-                    Str.print("\n");
-                }
-            }
+//            {// print state
+//                Str.print(
+//                        "@y----------------------------------------------------------------- @c%d @r%d\n",
+//                        remaining,
+//                        d0);
+//                for (int y = 0; y < n; y++) {
+//                    for (int x = 0; x < m; x++)
+//                        Str.print(visited[x][y] ? "@b*@@" : " ");
+//                    Str.print("\n");
+//                }
+//            }
         }
 
         {//print path
             final boolean[][] Q = new boolean[m][n];
-            int[] P = prev[m - 1][n - 1];
-            while (P[0] != 0 && P[1] != 0) {
-                Q[P[0]][P[1]] = true;
+            Bod b = prev[m - 1][n - 1];
+            while (!(b.x == 0 && b.y == 0)) {
+                Q[b.x][b.y] = true;
+                b = prev[b.x][b.y];
             }
-
-            for (int x = 0; x < m; x++) {
-                for (int y = 0; y < n; y++)
-                    Str.print(Q[x][y] ? "@r*@@" : " ");
-                Str.print("@r%d\n", score[m - 1][n - 1]);
+            for (int y = 0; y < n; y++) {
+                for (int x = 0; x < m; x++)
+                    Str.print(Q[x][y] ? "@r*@@" : "@w.@@");
+                Str.print("\n");
             }
+            Str.print("@g%d\n", score[m - 1][n - 1]);
         }
 
         return score[m - 1][n - 1];
