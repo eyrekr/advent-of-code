@@ -10,57 +10,57 @@ import org.apache.commons.lang3.StringUtils;
  */
 class D18 extends AoC {
 
-    final Seq<I> instructions;
+    final Seq<Step> steps;
 
     D18(final String input) {
         super(input);
-        this.instructions = lines.map(I::of);
+        this.steps = lines.map(Step::of);
     }
 
     long star1() {
-        return area(instructions);
+        return area(steps);
     }
 
     long star2() {
-        return area(instructions.map(I::convert));
+        return area(steps.map(Step::convert));
     }
 
-    long area(final Seq<I> instructions) {
+    long area(final Seq<Step> steps) {
         var p = new P(0, 0);
         long area = 0;
         long circumference = 0;
-        for (final var i : instructions) {
-            switch (i.d) {
+        for (final var step : steps) {
+            switch (step.direction) {
                 case 'U' -> {
-                    p = new P(p.x, p.y - i.l);
+                    p = new P(p.x, p.y - step.distance);
                 }
                 case 'D' -> {
-                    circumference += i.l;
-                    p = new P(p.x, p.y + i.l);
+                    circumference += step.distance;
+                    p = new P(p.x, p.y + step.distance);
                 }
                 case 'R' -> {
-                    area -= p.y * i.l;
-                    p = new P(p.x + i.l, p.y);
+                    area -= p.y * step.distance;
+                    p = new P(p.x + step.distance, p.y);
                 }
                 case 'L' -> {
-                    area += p.y * i.l;
-                    circumference += i.l;
-                    p = new P(p.x - i.l, p.y);
+                    area += p.y * step.distance;
+                    circumference += step.distance;
+                    p = new P(p.x - step.distance, p.y);
                 }
             }
         }
         return area + circumference + 1;
     }
 
-    record I(char d, long l, String color) {
-        static I of(final String input) {
+    record Step(char direction, long distance, String color) {
+        static Step of(final String input) {
             final var data = StringUtils.split(input, " ()#");
-            return new I(data[0].charAt(0), Long.parseLong(data[1]), data[2]);
+            return new Step(data[0].charAt(0), Long.parseLong(data[1]), data[2]);
         }
 
-        I convert() {
+        Step convert() {
             // 0 means R, 1 means D, 2 means L, and 3 means U.
-            return new I(
+            return new Step(
                     switch (color.charAt(5)) {
                         case '0' -> 'R';
                         case '1' -> 'D';
