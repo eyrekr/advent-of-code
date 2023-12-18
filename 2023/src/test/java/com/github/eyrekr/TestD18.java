@@ -30,7 +30,7 @@ class TestD18 {
 
     @Test
     void sampleStar2() {
-        assertThat(new D18(SAMPLE).star2()).isEqualTo(0L);
+        assertThat(new D18(SAMPLE).star2()).isEqualTo(952_408_144_115L);
     }
 
     @Test
