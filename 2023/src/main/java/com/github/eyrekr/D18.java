@@ -8,7 +8,7 @@ import java.util.LinkedList;
 
 /**
  * https://adventofcode.com/2023/day/18
- * 1)
+ * 1) 28911
  * 2)
  */
 class D18 extends AoC {
