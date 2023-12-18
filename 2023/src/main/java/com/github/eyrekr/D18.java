@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * https://adventofcode.com/2023/day/18
  * 1) 28911
- * 2)
+ * 2) 77366737561114
  */
 class D18 extends AoC {
 
