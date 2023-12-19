@@ -2,8 +2,10 @@ package com.github.eyrekr;
 
 import com.github.eyrekr.util.Seq;
 import com.github.eyrekr.util.Str;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -13,6 +15,14 @@ import java.util.Map;
  * 2) 124831893423809
  */
 class D19 extends AoC {
+
+    static final int MIN = 1;
+    static final int MAX = 4_000;
+    static final String ACCEPT = "A";
+    static final String REJECT = "R";
+    static final char TERMINAL = '*';
+    static final String INITIAL_WORKFLOW_NAME = "in";
+
 
     final Map<String, Workflow> workflows;
     final Seq<XMAS> xmas;
@@ -30,124 +40,53 @@ class D19 extends AoC {
 
     long star2() {
         final LinkedList<State> queue = new LinkedList<>();
-        queue.addFirst(new State(Interval.whole(), Interval.whole(), Interval.whole(), Interval.whole(), "in"));
+        queue.addFirst(new State(
+                ImmutableMap.of(
+                        'x', Interval.whole(),
+                        'm', Interval.whole(),
+                        'a', Interval.whole(),
+                        's', Interval.whole()),
+                "in"));
         Seq<State> accepted = Seq.empty();
+
         while (!queue.isEmpty()) {
             State state = queue.remove();
-            if ("A".equals(state.workflowName)) {
+            if (ACCEPT.equalsIgnoreCase(state.workflowName)) {
                 accepted = accepted.addFirst(state);
-            } else if ("R".equals(state.workflowName)) {
+            } else if (REJECT.equalsIgnoreCase(state.workflowName)) {
                 // do nothing, the whole state is rejected
             } else {
                 final Workflow workflow = workflows.get(state.workflowName);
                 for (final Rule rule : workflow.rules) {
                     if (state == null) break;
                     switch (rule.comparator) {
-                        case '*' -> { // this is the last state that applies to everything:    pqr | A | R
-                            queue.addLast(new State(state.x, state.m, state.a, state.s, rule.nextWorkflowName));
+                        case TERMINAL -> { // this is the last state that applies to everything:    pqr | A | R
+                            queue.addLast(state.withWorkflow(rule.nextWorkflowName));
                         }
                         case '<' -> { // s<100:pqr
-                            switch (rule.property) {
-                                case 'x' -> {
-                                    final Interval below = state.x.intersect(1, rule.value - 1);
-                                    if (below != null) {
-                                        queue.addLast(new State(below, state.m, state.a, state.s, rule.nextWorkflowName));
-                                    }
-                                    final Interval above = state.x.intersect(rule.value, 4000);
-                                    if (above != null) {
-                                        state = new State(above, state.m, state.a, state.s, state.workflowName);
-                                    } else {
-                                        state = null;
-                                    }
-                                }
-                                case 'm' -> {
-                                    final Interval below = state.m.intersect(1, rule.value - 1);
-                                    if (below != null) {
-                                        queue.addLast(new State(state.x, below, state.a, state.s, rule.nextWorkflowName));
-                                    }
-                                    final Interval above = state.m.intersect(rule.value, 4000);
-                                    if (above != null) {
-                                        state = new State(state.x, above, state.a, state.s, state.workflowName);
-                                    } else {
-                                        state = null;
-                                    }
-                                }
-                                case 'a' -> {
-                                    final Interval below = state.a.intersect(1, rule.value - 1);
-                                    if (below != null) {
-                                        queue.addLast(new State(state.x, state.m, below, state.s, rule.nextWorkflowName));
-                                    }
-                                    final Interval above = state.a.intersect(rule.value, 4000);
-                                    if (above != null) {
-                                        state = new State(state.x, state.m, above, state.s, state.workflowName);
-                                    } else {
-                                        state = null;
-                                    }
-                                }
-                                case 's' -> {
-                                    final Interval below = state.s.intersect(1, rule.value - 1);
-                                    if (below != null) {
-                                        queue.addLast(new State(state.x, state.m, state.a, below, rule.nextWorkflowName));
-                                    }
-                                    final Interval above = state.s.intersect(rule.value, 4000);
-                                    if (above != null) {
-                                        state = new State(state.x, state.m, state.a, above, state.workflowName);
-                                    } else {
-                                        state = null;
-                                    }
-                                }
+                            final Interval interval = state.intervals.get(rule.property);
+                            final Interval below = interval.intersect(MIN, rule.value - 1);
+                            if (below != null) {
+                                queue.addLast(state.withInterval(rule.property, below).withWorkflow(rule.nextWorkflowName));
+                            }
+                            final Interval aboveOrEqual = interval.intersect(rule.value, MAX);
+                            if (aboveOrEqual != null) {
+                                state = state.withInterval(rule.property, aboveOrEqual);
+                            } else {
+                                state = null;
                             }
                         }
                         case '>' -> { // s>100:pqr
-                            switch (rule.property) {
-                                case 'x' -> {
-                                    final Interval below = state.x.intersect(rule.value + 1, 4000);
-                                    if (below != null) {
-                                        queue.addLast(new State(below, state.m, state.a, state.s, rule.nextWorkflowName));
-                                    }
-                                    final Interval above = state.x.intersect(1, rule.value);
-                                    if (above != null) {
-                                        state = new State(above, state.m, state.a, state.s, state.workflowName);
-                                    } else {
-                                        state = null;
-                                    }
-                                }
-                                case 'm' -> {
-                                    final Interval below = state.m.intersect(rule.value + 1, 4000);
-                                    if (below != null) {
-                                        queue.addLast(new State(state.x, below, state.a, state.s, rule.nextWorkflowName));
-                                    }
-                                    final Interval above = state.m.intersect(0, rule.value);
-                                    if (above != null) {
-                                        state = new State(state.x, above, state.a, state.s, state.workflowName);
-                                    } else {
-                                        state = null;
-                                    }
-                                }
-                                case 'a' -> {
-                                    final Interval below = state.a.intersect(rule.value + 1, 4000);
-                                    if (below != null) {
-                                        queue.addLast(new State(state.x, state.m, below, state.s, rule.nextWorkflowName));
-                                    }
-                                    final Interval above = state.a.intersect(1, rule.value);
-                                    if (above != null) {
-                                        state = new State(state.x, state.m, above, state.s, state.workflowName);
-                                    } else {
-                                        state = null;
-                                    }
-                                }
-                                case 's' -> {
-                                    final Interval below = state.s.intersect(rule.value + 1, 4000);
-                                    if (below != null) {
-                                        queue.addLast(new State(state.x, state.m, state.a, below, rule.nextWorkflowName));
-                                    }
-                                    final Interval above = state.s.intersect(1, rule.value);
-                                    if (above != null) {
-                                        state = new State(state.x, state.m, state.a, above, state.workflowName);
-                                    } else {
-                                        state = null;
-                                    }
-                                }
+                            final Interval interval = state.intervals.get(rule.property);
+                            final Interval above = interval.intersect(rule.value + 1, MAX);
+                            if (above != null) {
+                                queue.addLast(state.withInterval(rule.property, above).withWorkflow(rule.nextWorkflowName));
+                            }
+                            final Interval belowOrEqual = interval.intersect(MIN, rule.value);
+                            if (belowOrEqual != null) {
+                                state = state.withInterval(rule.property, belowOrEqual);
+                            } else {
+                                state = null;
                             }
                         }
                     }
@@ -158,12 +97,12 @@ class D19 extends AoC {
     }
 
     boolean runThrough(final Map<String, Workflow> workflows, final XMAS xmas) {
-        String nextWorkflowName = "in";
+        String nextWorkflowName = INITIAL_WORKFLOW_NAME;
         while (true) {
             final Workflow workflow = workflows.get(nextWorkflowName);
             final Rule rule = workflow.apply(xmas);
-            if (rule.accept) return true;
-            if (rule.reject) return false;
+            if (ACCEPT.equalsIgnoreCase(rule.nextWorkflowName)) return true;
+            if (REJECT.equalsIgnoreCase(rule.nextWorkflowName)) return false;
             nextWorkflowName = rule.nextWorkflowName;
         }
     }
@@ -180,19 +119,19 @@ class D19 extends AoC {
         }
     }
 
-    record Rule(char property, char comparator, int value, String nextWorkflowName, boolean accept, boolean reject) {
+    record Rule(char property, char comparator, int value, String nextWorkflowName) {
         static Rule from(final String line) { //s<537:gd  |  x>2440:R  |  A
             final var l = StringUtils.split(line, ":");
             if (l.length == 1) { // last on the line, no conditions
-                return new Rule('*', '*', 0, l[0], "A".equals(l[0]), "R".equals(l[0]));
+                return new Rule(TERMINAL, TERMINAL, 0, l[0]);
             } else {
                 final int value = Str.longs(l[0]).value.intValue();
-                return new Rule(l[0].charAt(0), l[0].charAt(1), value, l[1], "A".equals(l[1]), "R".equals(l[1]));
+                return new Rule(l[0].charAt(0), l[0].charAt(1), value, l[1]);
             }
         }
 
         boolean applicable(final XMAS xmas) {
-            if (comparator == '*') return true;
+            if (comparator == TERMINAL) return true;
             final long lo, hi;
             if (comparator == '<') {
                 lo = 0;
@@ -222,15 +161,25 @@ class D19 extends AoC {
         }
     }
 
-    record State(Interval x, Interval m, Interval a, Interval s, String workflowName) {
+    record State(ImmutableMap<Character, Interval> intervals, String workflowName) {
         long combinations() {
-            return x.size() * m.size() * a.size() * s.size();
+            return intervals.values().stream().mapToLong(Interval::size).reduce(1L, (a, b) -> a * b);
+        }
+
+        State withWorkflow(final String nextWorkflowName) {
+            return new State(intervals, nextWorkflowName);
+        }
+
+        State withInterval(final char property, final Interval interval) {
+            final Map<Character, Interval> map = new HashMap<>(intervals);
+            map.put(property, interval);
+            return new State(ImmutableMap.copyOf(map), workflowName);
         }
     }
 
     record Interval(int a, int b) {
         static Interval whole() {
-            return new Interval(1, 4000);
+            return new Interval(MIN, MAX);
         }
 
         Interval intersect(final int a, final int b) {
@@ -238,8 +187,8 @@ class D19 extends AoC {
             return overlap ? new Interval(Math.max(this.a, a), Math.min(this.b, b)) : null;
         }
 
-        long size() {
-            return b - a + 1; // interval 1--4 has size 4
+        int size() {
+            return b - a + 1;
         }
     }
 }
