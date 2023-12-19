@@ -28,22 +28,22 @@ class TestD19 {
 
     @Test
     void sampleStar1() {
-        assertThat(new D19(SAMPLE).star1()).isEqualTo(19114L);
+        assertThat(new D19(SAMPLE).star1()).isEqualTo(19_114L);
     }
 
     @Test
     void sampleStar2() {
-        assertThat(new D19(SAMPLE).star2()).isEqualTo(0L);
+        assertThat(new D19(SAMPLE).star2()).isEqualTo(167409079868000L);
     }
 
     @Test
     void star1() {
-        assertThat(new D19(Str.testResource("D19.txt")).star1()).isEqualTo(0L);
+        assertThat(new D19(Str.testResource("D19.txt")).star1()).isEqualTo(350_678L);
     }
 
     @Test
     void star2() {
-        assertThat(new D19(Str.testResource("D19.txt")).star2()).isEqualTo(0L);
+        assertThat(new D19(Str.testResource("D19.txt")).star2()).isEqualTo(124831893423809L);
     }
 
 }
