@@ -37,7 +37,7 @@ class D17 extends AoC {
         distance[0][0] = 0;
 
         final boolean[][] visited = new boolean[m][n];
-        final Multimap<P, P> predecessors = HashMultimap.create(); // predecessors with the same distance
+        final Seq<Seq<Direction>>[][] paths = new Seq[m][n];
 
         while (true) {
             int remaining = 0;
@@ -59,16 +59,27 @@ class D17 extends AoC {
             if (remaining == 0) break;
             visited[x0][y0] = true;
             final var p0 = new P(x0, y0);
+
+
+
+
             // update distances of all unvisited nodes connected with p0 = [x0,y0]; d0 is the best score so far
             // update only when there is an improvement!
             for (final var direction : Direction.values()) {
-                // direction is forbidden if pred(p0) + pred(pred(p0)) + pred(pred(pred(p0))) = 3 and all of them are in the same direction
+                // direction is forbidden if it is the 4th step in the same direction
+
+
+
                 final var p1 = p0.go(direction);
                 if (p1.valid(m, n) && !visited[p1.x][p1.y]) {
                     final var d1 = distance[p1.x][p1.y];
-                    if (d1 >= d0 + a[p1.x][p1.y]) { // distance can be improved
-                        distance[p1.x][p1.y] = d0 + a[p1.x][p1.y];
-                        predecessors.put(p1, p0);
+                    final var candidate = d0 + a[p1.x][p1.y];
+                    if (d1 > candidate) { // distance can be improved
+                        distance[p1.x][p1.y] = candidate;
+                        //predecessors.removeAll(p1);
+                        //predecessors.put(p1, p0);
+                    } else if (d1 == candidate) { // same distance
+                        //predecessors.put(p1, p0);
                     }
                 }
             }
@@ -92,6 +103,8 @@ class D17 extends AoC {
 
         return distance[m - 1][n - 1];
     }
+
+
 
     long star2() {
         return 0L;

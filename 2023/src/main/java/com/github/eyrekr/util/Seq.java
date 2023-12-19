@@ -166,6 +166,10 @@ public final class Seq<E> implements Iterable<E> {
         return isEmpty ? this : predicate.test(value) ? new Seq<>(value, tail.where(predicate)) : tail.where(predicate);
     }
 
+    public E firstWhere(final Predicate<? super E> predicate) {
+        return isEmpty ? null : predicate.test(value) ? value : tail.firstWhere(predicate);
+    }
+
     public Seq<E> reverse() {
         return reduce(empty(), (acc, element) -> new Seq<>(element, acc));
     }
