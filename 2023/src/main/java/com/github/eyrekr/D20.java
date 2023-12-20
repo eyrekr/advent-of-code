@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 /**
  * https://adventofcode.com/2023/day/20
  * 1) 899848294
- * 2)
+ * 2) 247454898168563
  */
 class D20 extends AoC {
 
@@ -96,18 +96,7 @@ class D20 extends AoC {
     }
 
 
-//    String encodeStateOfModules(final Seq<Module> modules) {
-//        final long flips = modules.where(module -> module.type == Type.FlipFlop)
-//                .reduce(0L, (acc, module) -> module.state != 0 ? (acc | (1L << module.id)) : acc);
-//        final String cons = modules.where(module -> module.type == Type.Conjunction)
-//                .map(module -> module.state)
-//                .map(Long::toHexString)
-//                .reduce("", (acc, state) -> acc + "." + state);
-//        return Long.toHexString(flips) + cons;
-//    }
-
     long star2() {
-
         final Module secondLast = modules.firstWhere(module -> module.out.has(TERMINAL));
         final Seq<Module> modulesWhoseCyclesWeWatch = modules.where(module -> module.out.has(secondLast.name));
         modulesWhoseCyclesWeWatch.print(" ", module -> module.name);
@@ -201,9 +190,7 @@ class D20 extends AoC {
                     }
                 }
                 case Conjunction -> {
-                    state = (pulse.value == 0)
-                            ? state & ~(1L << pulse.source.id)
-                            : state | (1L << pulse.source.id);
+                    state = (pulse.value == 0) ? state & ~(1L << pulse.source.id) : state | (1L << pulse.source.id);
                 }
                 default -> throw new IllegalStateException("Cannot update " + type);
             }
@@ -222,11 +209,6 @@ class D20 extends AoC {
                         case Broadcaster, Output -> block[0];
                     },
                     Seq.fromArray(StringUtils.split(block[1], ", ")));
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%3d %-12s %-20s %x|%x -> %s", id, type, name, state, activation, out);
         }
     }
 

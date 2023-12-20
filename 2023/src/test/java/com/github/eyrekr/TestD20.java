@@ -38,7 +38,7 @@ class TestD20 {
 
     @Test
     void star2() {
-        assertThat(new D20(Str.testResource("D20.txt")).star2()).isEqualTo(0L);
+        assertThat(new D20(Str.testResource("D20.txt")).star2()).isEqualTo(247454898168563L);
     }
 
 }
