@@ -86,11 +86,9 @@ class D20 extends AoC {
     long star2() {
         final Module secondLast = modules.firstWhere(module -> module.out.has(TERMINAL));
         final Seq<Module> modulesWhoseCyclesWeWatch = modules.where(module -> module.out.has(secondLast.name));
-        modulesWhoseCyclesWeWatch.print(" ", module -> module.name);
         final Map<Module, Long> cycleLength = new HashMap<>();
 
         for (long buttonPressCount = 1; ; buttonPressCount++) {
-
 
             final LinkedList<Pulse> pulsesToProcess = new LinkedList<>();
             pulsesToProcess.addFirst(new Pulse(null, broadcaster, 0));
@@ -101,13 +99,13 @@ class D20 extends AoC {
                 final boolean low = pulse.value == 0;
                 final boolean high = !low;
 
-                if (modulesWhoseCyclesWeWatch.has(pulse.source) && high) { // sending HIGH to 2ND LAST = CYCLE WE WATCH
-                    Str.print("@g%s@@ emits @rHIGH@@ at button press @c%d@@\n", pulse.source.name, buttonPressCount);
+                if (high && module == secondLast) { // SENDING HIGH TO THE 2ND LAST => WATCH THE CYCLE
                     if (!cycleLength.containsKey(pulse.source)) {
+                        Str.print("@c%s@@ --high-> @c%s@@ during button press @r#%d@@\n", pulse.source.name, module.name, buttonPressCount);
                         cycleLength.put(pulse.source, buttonPressCount);
                     }
                     if (cycleLength.size() == modulesWhoseCyclesWeWatch.length) {
-                        // all cycles collected => cycles will fire up when LCM
+                        // all cycles collected => cycles will fire up 1st time together when LCM
                         return Seq.fromIterable(cycleLength.values()).reduce(Mth::lcm);
                     }
                 }
