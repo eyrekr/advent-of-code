@@ -2,6 +2,8 @@ package com.github.eyrekr;
 
 import com.github.eyrekr.util.Seq;
 import com.github.eyrekr.util.Str;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.LinkedList;
@@ -11,12 +13,13 @@ import java.util.function.Consumer;
 
 /**
  * https://adventofcode.com/2023/day/20
- * 1)
+ * 1) 899848294
  * 2)
  */
 class D20 extends AoC {
 
     static final String BROADCASTER = "broadcaster";
+    static final String TERMINAL = "rx";
 
     final Seq<Module> modules;
     final Map<String, Module> map;
@@ -40,9 +43,9 @@ class D20 extends AoC {
     }
 
     long star1() {
-        modules.print("\n");
-        run();
-        return 0L;
+        Pulses pulses = new Pulses(0, 0);
+        for (int i = 0; i < 1000; i++) pulses = pulses.plus(run());
+        return pulses.low * pulses.high;
     }
 
     Pulses run() {
@@ -50,12 +53,12 @@ class D20 extends AoC {
         final LinkedList<Pulse> pulsesToProcess = new LinkedList<>();
         pulsesToProcess.addFirst(new Pulse(null, broadcaster, 0));
 
+        final Module secondLast = modules.firstWhere(module -> module.out.has(TERMINAL));
+        Str.print("Second last = %s\n", secondLast);
+
+
         while (!pulsesToProcess.isEmpty()) {
             final Pulse pulse = pulsesToProcess.removeFirst();
-            Str.print("%-20s ---%s---> %s\n",
-                    pulse.source != null ? pulse.source.name : "button",
-                    pulse.value ==0 ? "low" : "high",
-                    pulse.target.name);
             final Module module = pulse.target;
             final boolean low = pulse.value == 0;
             final boolean high = !low;
@@ -86,19 +89,73 @@ class D20 extends AoC {
         return new Pulses(numberOfLowPulses, numerOfHighPulses);
     }
 
-    String encodeStateOfModules(final Seq<Module> modules) {
-        final long flips = modules.where(module -> module.type == Type.FlipFlop)
-                .reduce(0L, (acc, module) -> module.state > 0 ? acc |= 1L << module.id : acc);
-        final String cons = modules.where(module -> module.type == Type.Conjunction)
-                .map(module -> module.state)
-                .map(Long::toHexString)
-                .reduce("", (acc, state) -> acc + "." + state);
-        return Long.toHexString(flips) + cons;
+    record Pulses(long low, long high) {
+        Pulses plus(final Pulses that) {
+            return new Pulses(low + that.low, high + that.high);
+        }
     }
 
+
+//    String encodeStateOfModules(final Seq<Module> modules) {
+//        final long flips = modules.where(module -> module.type == Type.FlipFlop)
+//                .reduce(0L, (acc, module) -> module.state != 0 ? (acc | (1L << module.id)) : acc);
+//        final String cons = modules.where(module -> module.type == Type.Conjunction)
+//                .map(module -> module.state)
+//                .map(Long::toHexString)
+//                .reduce("", (acc, state) -> acc + "." + state);
+//        return Long.toHexString(flips) + cons;
+//    }
+
     long star2() {
-        return 0L;
+        long buttonPressCount = 0;
+        while (true) {
+            run(buttonPressCount);
+            buttonPressCount++;
+        }
+        return buttonPressCount;
     }
+
+    Pulses run(final long buttonPressCount) {
+        long numberOfLowPulses = 0, numerOfHighPulses = 0;
+        final LinkedList<Pulse> pulsesToProcess = new LinkedList<>();
+        pulsesToProcess.addFirst(new Pulse(null, broadcaster, 0));
+
+        final Module secondLast = modules.firstWhere(module -> module.out.has(TERMINAL));
+        Str.print("Second last = %s\n", secondLast);
+
+
+        while (!pulsesToProcess.isEmpty()) {
+            final Pulse pulse = pulsesToProcess.removeFirst();
+            final Module module = pulse.target;
+            final boolean low = pulse.value == 0;
+            final boolean high = !low;
+
+            if (low) numberOfLowPulses++;
+            if (high) numerOfHighPulses++;
+
+            final Consumer<Integer> emit = value -> module.out
+                    .map(map::get)
+                    .map(nextTarget -> new Pulse(module, nextTarget, value))
+                    .each(pulsesToProcess::addLast);
+
+            switch (module.type) { // SIGNAL LOGIC
+                case Broadcaster -> emit.accept(0);
+                case FlipFlop -> {
+                    if (low) {
+                        emit.accept(module.isActivated() ? 0 : 1);
+                        module.update(pulse);
+                    }
+                }
+                case Conjunction -> {
+                    module.update(pulse);
+                    emit.accept(module.isActivated() ? 0 : 1);
+                }
+            }
+        }
+
+        return new Pulses(numberOfLowPulses, numerOfHighPulses);
+    }
+
 
     enum Type {
         FlipFlop, Conjunction, Broadcaster, Output;
@@ -172,9 +229,6 @@ class D20 extends AoC {
     }
 
     record Pulse(Module source, Module target, int value) {
-    }
-
-    record Pulses(long low, long high) {
     }
 
 }
