@@ -68,17 +68,17 @@ class D20 extends AoC {
                     .map(nextTarget -> new Pulse(module, nextTarget, value))
                     .each(pulsesToProcess::addLast);
 
-            switch (pulse.target.type) { // SIGNAL LOGIC
+            switch (module.type) { // SIGNAL LOGIC
                 case Broadcaster -> emit.accept(0);
                 case FlipFlop -> {
                     if (low) {
-                        emit.accept(pulse.target.isActivated() ? 0 : 1);
+                        emit.accept(module.isActivated() ? 0 : 1);
                         module.update(pulse);
                     }
                 }
                 case Conjunction -> {
                     module.update(pulse);
-                    emit.accept(pulse.target.isActivated() ? 0 : 1);
+                    emit.accept(module.isActivated() ? 0 : 1);
                 }
             }
         }
@@ -137,7 +137,7 @@ class D20 extends AoC {
         Module update(final Pulse pulse) {
             switch (type) {
                 case FlipFlop -> {
-                    if (pulse.value != 0) {
+                    if (pulse.value == 0) {
                         state = state != 0 ? 0 : 1;
                     }
                 }
