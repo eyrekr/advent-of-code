@@ -1,11 +1,11 @@
 package com.github.eyrekr;
 
+import com.github.eyrekr.util.Mth;
 import com.github.eyrekr.util.Seq;
 import com.github.eyrekr.util.Str;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
@@ -107,53 +107,55 @@ class D20 extends AoC {
 //    }
 
     long star2() {
-        long buttonPressCount = 0;
-        while (true) {
-            run(buttonPressCount);
-            buttonPressCount++;
-        }
-        return buttonPressCount;
-    }
-
-    Pulses run(final long buttonPressCount) {
-        long numberOfLowPulses = 0, numerOfHighPulses = 0;
-        final LinkedList<Pulse> pulsesToProcess = new LinkedList<>();
-        pulsesToProcess.addFirst(new Pulse(null, broadcaster, 0));
 
         final Module secondLast = modules.firstWhere(module -> module.out.has(TERMINAL));
-        Str.print("Second last = %s\n", secondLast);
+        final Seq<Module> modulesWhoseCyclesWeWatch = modules.where(module -> module.out.has(secondLast.name));
+        modulesWhoseCyclesWeWatch.print(" ", module -> module.name);
+        final Map<Module, Long> cycleLength = new HashMap<>();
+
+        for (long buttonPressCount = 1; ; buttonPressCount++) {
 
 
-        while (!pulsesToProcess.isEmpty()) {
-            final Pulse pulse = pulsesToProcess.removeFirst();
-            final Module module = pulse.target;
-            final boolean low = pulse.value == 0;
-            final boolean high = !low;
+            final LinkedList<Pulse> pulsesToProcess = new LinkedList<>();
+            pulsesToProcess.addFirst(new Pulse(null, broadcaster, 0));
 
-            if (low) numberOfLowPulses++;
-            if (high) numerOfHighPulses++;
+            while (!pulsesToProcess.isEmpty()) {
+                final Pulse pulse = pulsesToProcess.removeFirst();
+                final Module module = pulse.target;
+                final boolean low = pulse.value == 0;
+                final boolean high = !low;
 
-            final Consumer<Integer> emit = value -> module.out
-                    .map(map::get)
-                    .map(nextTarget -> new Pulse(module, nextTarget, value))
-                    .each(pulsesToProcess::addLast);
-
-            switch (module.type) { // SIGNAL LOGIC
-                case Broadcaster -> emit.accept(0);
-                case FlipFlop -> {
-                    if (low) {
-                        emit.accept(module.isActivated() ? 0 : 1);
-                        module.update(pulse);
+                if (modulesWhoseCyclesWeWatch.has(pulse.source) && high) { // sending HIGH to 2ND LAST = CYCLE WE WATCH
+                    Str.print("@g%s@@ emits @rHIGH@@ at button press @c%d@@\n", pulse.source.name, buttonPressCount);
+                    if (!cycleLength.containsKey(pulse.source)) {
+                        cycleLength.put(pulse.source, buttonPressCount);
+                    }
+                    if (cycleLength.size() == modulesWhoseCyclesWeWatch.length) {
+                        // all cycles collected => cycles will fire up when LCM
+                        return Seq.fromIterable(cycleLength.values()).reduce(Mth::lcm);
                     }
                 }
-                case Conjunction -> {
-                    module.update(pulse);
-                    emit.accept(module.isActivated() ? 0 : 1);
+
+                final Consumer<Integer> emit = value -> module.out
+                        .map(map::get)
+                        .map(nextTarget -> new Pulse(module, nextTarget, value))
+                        .each(pulsesToProcess::addLast);
+
+                switch (module.type) { // SIGNAL LOGIC
+                    case Broadcaster -> emit.accept(0);
+                    case FlipFlop -> {
+                        if (low) {
+                            emit.accept(module.isActivated() ? 0 : 1);
+                            module.update(pulse);
+                        }
+                    }
+                    case Conjunction -> {
+                        module.update(pulse);
+                        emit.accept(module.isActivated() ? 0 : 1);
+                    }
                 }
             }
         }
-
-        return new Pulses(numberOfLowPulses, numerOfHighPulses);
     }
 
 
