@@ -243,8 +243,10 @@ public final class Seq<E> implements Iterable<E> {
     }
 
     public Seq<E> each(final Consumer<? super E> consumer) {
-        consumer.accept(value);
-        if (!isEmpty) tail.forEach(consumer);
+        if (!isEmpty) {
+            consumer.accept(value);
+            tail.forEach(consumer);
+        }
         return this;
     }
 
