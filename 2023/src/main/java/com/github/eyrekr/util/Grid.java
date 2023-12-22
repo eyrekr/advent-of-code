@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -11,23 +12,31 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+
 public final class Grid implements Iterable<Grid.It> {
+    private static final Seq<D> ALL_DIRECTIONS = Seq.of(D.U, D.D, D.L, D.R);
     public static final char C0 = '\0';
 
     public final int m;
     public final int n;
     public final char[][] a;
+    public final int[][] d; // distances, e.g. for Dijkstra traversal
+    public final boolean[][] b; // flags, e.g. for visited/unvisited nodes
 
     private Grid(final int m, final int n, final char[][] a) {
         this.m = m;
         this.n = n;
         this.a = a;
+        this.d = new int[m][n];
+        this.b = new boolean[m][n];
     }
 
     public static Grid of(final int m, final int n) {
         return new Grid(m, n, new char[m][n]);
     }
 
+    @Deprecated // use the Grid.of(String) version
     public static Grid from(final Path path) {
         try {
             return Grid.of(Files.readAllLines(path));
@@ -77,11 +86,40 @@ public final class Grid implements Iterable<Grid.It> {
         final char[] ch4 = new char[]{at(x, y - 1), at(x - 1, y), at(x + 1, y), at(x, y + 1)};
         final char[] ch8 = new char[]{at(x - 1, y - 1), at(x, y - 1), at(x + 1, y - 1), at(x - 1, y), at(x + 1, y), at(x - 1, y + 1), at(x, y + 1), at(x + 1, y + 1)};
         final int digit = Character.isDigit(ch) ? Character.digit(ch, 10) : -1;
-        return new It(i, x, y, m, n, ch, ch4, ch8, digit, x == 0 && y == 0, x == m - 1 && y == n - 1, x == 0, x == m - 1);
+        return new It(i, x, y, m, n, ch, d[x][y], b[x][y], ch4, ch8, digit, x == 0 && y == 0, x == m - 1 && y == n - 1, x == 0, x == m - 1);
     }
 
     public It it(final int x, final int y) {
         return it(y * m + x);
+    }
+
+    public Grid dijkstra(final int x0, final int y0, final XYPredicate forbidden) {
+        final boolean[][] f = new boolean[m][n];
+        forEachXY((x, y) -> f[x][y] = forbidden.test(x, y));
+        return dijkstra(x0, y0, f);
+    }
+
+    public Grid dijkstra(final int x0, final int y0, final boolean[][] forbidden) {
+        forEachXY((x, y) -> {
+            d[x][y] = Integer.MAX_VALUE;
+            b[x][y] = false; // represents: visited
+        });
+        final LinkedList<P> pointsToVisit = new LinkedList<>();
+        pointsToVisit.addFirst(new P(x0, y0));
+        d[x0][y0] = 0;
+
+        while (isNotEmpty(pointsToVisit)) {
+            final P p0 = pointsToVisit.removeFirst();
+            b[p0.x][p0.y] = true;
+            final int d0 = d[p0.x][p0.y];
+
+            p0.n4() // all four neighbours that are still inside the grid
+                    .where(p -> !forbidden[p.x][p.y]) // and are not forbidden
+                    .where(p -> !b[p.x][p.y]) // and were not visited
+                    .where(p -> d[p.x][p.y] > d0 + 1) // and can be improved
+                    .each(p -> d[p.x][p.y] = d0 + 1); // shall be improved
+        }
+        return this;
     }
 
     public Grid each(final Consumer<It> consumer) {
@@ -301,6 +339,21 @@ public final class Grid implements Iterable<Grid.It> {
         return reduce(new StringBuilder(), (builder, it) -> it.lastOnLine ? builder.append(it.ch).append('\n') : builder.append(it.ch)).toString();
     }
 
+    private Grid forEachXY(final XYConsumer consumer) {
+        for (int y = 0; y < n; y++)
+            for (int x = 0; x < m; x++)
+                consumer.consume(x, y);
+        return this;
+    }
+
+    public interface XYConsumer {
+        void consume(int x, int y);
+    }
+
+    public interface XYPredicate {
+        boolean test(int x, int y);
+    }
+
     public final class Column {
         public final int x;
         public final int m;
@@ -325,6 +378,8 @@ public final class Grid implements Iterable<Grid.It> {
         public final int m;
         public final int n;
         public final char ch;
+        public final int d;
+        public final boolean b;
         public final char[] neighbours4;
         public final char[] neighbours8;
         public final int digit;
@@ -333,7 +388,11 @@ public final class Grid implements Iterable<Grid.It> {
         public final boolean firstOnLine;
         public final boolean lastOnLine;
 
-        private It(final int i, final int x, final int y, final int m, final int n, final char ch, final char[] neighbours4, final char[] neighbours8, final int digit, final boolean first, final boolean last, final boolean firstOnLine, final boolean lastOnLine) {
+        private It(final int i, final int x, final int y, final int m, final int n,
+                   final char ch, final int d, final boolean b,
+                   final char[] neighbours4, final char[] neighbours8,
+                   final int digit,
+                   final boolean first, final boolean last, final boolean firstOnLine, final boolean lastOnLine) {
             this.i = i;
             this.x = x;
             this.p = new P(x, y);
@@ -341,6 +400,8 @@ public final class Grid implements Iterable<Grid.It> {
             this.m = m;
             this.n = n;
             this.ch = ch;
+            this.d = d;
+            this.b = b;
             this.neighbours4 = neighbours4;
             this.neighbours8 = neighbours8;
             this.digit = digit;
@@ -348,6 +409,18 @@ public final class Grid implements Iterable<Grid.It> {
             this.last = last;
             this.firstOnLine = firstOnLine;
             this.lastOnLine = lastOnLine;
+        }
+
+        public It set(final char ch) {
+            a[x][y] = ch;
+            return it(x, y);
+        }
+
+        public It set(final char ch, final int d, final boolean b) {
+            Grid.this.a[x][y] = ch;
+            Grid.this.d[x][y] = d;
+            Grid.this.b[x][y] = b;
+            return it(x, y);
         }
 
         public It to(final D d) {
@@ -369,24 +442,33 @@ public final class Grid implements Iterable<Grid.It> {
         }
     }
 
-    public enum D {U, D, L, R}
+    public enum D {
+        U(0, -1), D(0, +1), L(-1, 0), R(+1, 0);
+        final int dx, dy;
 
-    public static final class P {
+        D(int dx, int dy) {
+            this.dx = dx;
+            this.dy = dy;
+        }
+    }
+
+    public final class P {
         public final int x;
         public final int y;
+        public final boolean inside;
 
         public P(final int x, final int y) {
             this.x = x;
             this.y = y;
+            this.inside = x >= 0 && x < m && y >= 0 && y < n;
         }
 
         public P to(final D d) {
-            return switch (d) {
-                case U -> new P(x, y - 1);
-                case D -> new P(x, y + 1);
-                case L -> new P(x - 1, y);
-                case R -> new P(x + 1, y);
-            };
+            return new P(x + d.dx, y + d.dy);
+        }
+
+        public Seq<P> n4() {
+            return ALL_DIRECTIONS.map(this::to).where(p -> p.inside);
         }
     }
 
