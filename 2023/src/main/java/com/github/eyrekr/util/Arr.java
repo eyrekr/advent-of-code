@@ -339,17 +339,18 @@ public final class Arr {
      */
     public Arr sort() {
         final Arr arr = clone(1);
+        arr.print();
         Arrays.sort(arr.a, 0, length);
         return arr;
     }
 
     public Arr sortBy(final Comparator<Long> comparator) {
         final Arr arr = clone(1);
-        quicksort(arr.a, 0, length, comparator);
+        quicksort(arr.a, 0, length - 1, comparator);
         return arr;
     }
 
-    private static void quicksort(final long[] a, final int begin, final int end, final Comparator<Long> comparator) {
+    public static void quicksort(final long[] a, final int begin, final int end, final Comparator<Long> comparator) {
         final long pivot = a[begin + end / 2];
         int l = begin, r = end;
         do {

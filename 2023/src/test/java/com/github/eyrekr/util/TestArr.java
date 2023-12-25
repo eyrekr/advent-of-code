@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class TestArr {
 
-    static final Arr arr = Arr.of(-1, 0, 1)
+    static final Arr ARR = Arr.of(-1, 0, 1)
             .addFirst(-2)
             .addLast(2)
             .addFirst(-3)
@@ -49,7 +49,7 @@ class TestArr {
 
     @Test
     void arr_arrLast() {
-        assertThat(arr.addLast(99)).isEqualTo(Arr.of(-3, -2, -1, 0, 1, 2, 3, 99));
+        assertThat(ARR.addLast(99)).isEqualTo(Arr.of(-3, -2, -1, 0, 1, 2, 3, 99));
     }
 
     @Test
@@ -59,7 +59,7 @@ class TestArr {
 
     @Test
     void arr_removeLast() {
-        assertThat(arr.removeLast()).isEqualTo(Arr.of(-3, -2, -1, 0, 1, 2));
+        assertThat(ARR.removeLast()).isEqualTo(Arr.of(-3, -2, -1, 0, 1, 2));
     }
 
     @Test
@@ -69,7 +69,7 @@ class TestArr {
 
     @Test
     void arr_addFirst() {
-        assertThat(arr.addFirst(99)).isEqualTo(Arr.of(99, -3, -2, -1, 0, 1, 2, 3));
+        assertThat(ARR.addFirst(99)).isEqualTo(Arr.of(99, -3, -2, -1, 0, 1, 2, 3));
     }
 
     @Test
@@ -84,7 +84,7 @@ class TestArr {
 
     @Test
     void arr_removeFirst() {
-        assertThat(arr.removeFirst()).isEqualTo(Arr.of(-2, -1, 0, 1, 2, 3));
+        assertThat(ARR.removeFirst()).isEqualTo(Arr.of(-2, -1, 0, 1, 2, 3));
     }
 
     @Test
@@ -94,7 +94,7 @@ class TestArr {
 
     @Test
     void arr_at_0() {
-        assertThat(arr.at(0)).isEqualTo(-3);
+        assertThat(ARR.at(0)).isEqualTo(-3);
     }
 
     @Test
@@ -104,7 +104,7 @@ class TestArr {
 
     @Test
     void arr_at_1() {
-        assertThat(arr.at(1)).isEqualTo(-2);
+        assertThat(ARR.at(1)).isEqualTo(-2);
     }
 
     @Test
@@ -114,7 +114,7 @@ class TestArr {
 
     @Test
     void arr_at_N() {
-        assertThat(arr.at(arr.length)).isEqualTo(-3);
+        assertThat(ARR.at(ARR.length)).isEqualTo(-3);
     }
 
     @Test
@@ -124,7 +124,7 @@ class TestArr {
 
     @Test
     void arr_at_Minus1() {
-        assertThat(arr.at(-1)).isEqualTo(3);
+        assertThat(ARR.at(-1)).isEqualTo(3);
     }
 
     @Test
@@ -134,7 +134,7 @@ class TestArr {
 
     @Test
     void arr_at_Minus2() {
-        assertThat(arr.at(-2)).isEqualTo(2);
+        assertThat(ARR.at(-2)).isEqualTo(2);
     }
 
     @Test
@@ -149,7 +149,7 @@ class TestArr {
 
     @Test
     void arr_has() {
-        assertThat(arr.has(0)).isTrue();
+        assertThat(ARR.has(0)).isTrue();
     }
 
     @Test
@@ -174,7 +174,7 @@ class TestArr {
 
     @Test
     void arr_atLeastOneIs() {
-        assertThat(arr.atLeastOneIs(l -> l == 0)).isTrue();
+        assertThat(ARR.atLeastOneIs(l -> l == 0)).isTrue();
     }
 
 
@@ -190,7 +190,7 @@ class TestArr {
 
     @Test
     void arr_atLeastOneIsNot() {
-        assertThat(arr.atLeastOneIsNot(l -> l == 0)).isTrue();
+        assertThat(ARR.atLeastOneIsNot(l -> l == 0)).isTrue();
     }
 
     @Test
@@ -215,7 +215,7 @@ class TestArr {
 
     @Test
     void arr_allMatch() {
-        assertThat(arr.allMatch(0)).isFalse();
+        assertThat(ARR.allMatch(0)).isFalse();
     }
 
     @Test
@@ -235,7 +235,7 @@ class TestArr {
 
     @Test
     void arr_allAre() {
-        assertThat(arr.allAre(l -> l < 99)).isTrue();
+        assertThat(ARR.allAre(l -> l < 99)).isTrue();
     }
 
     @Test
@@ -255,7 +255,7 @@ class TestArr {
 
     @Test
     void arr_noneMatch() {
-        assertThat(arr.noneMatch(99)).isTrue();
+        assertThat(ARR.noneMatch(99)).isTrue();
     }
 
     @Test
@@ -275,7 +275,7 @@ class TestArr {
 
     @Test
     void arr_noneIs() {
-        assertThat(arr.noneIs(l -> l > 99)).isTrue();
+        assertThat(ARR.noneIs(l -> l > 99)).isTrue();
     }
 
 
@@ -296,7 +296,7 @@ class TestArr {
 
     @Test
     void arr_reduce() {
-        assertThat(arr.reduce(0L, Long::sum)).isZero();
+        assertThat(ARR.reduce(0L, Long::sum)).isZero();
     }
 
     @Test
@@ -311,7 +311,7 @@ class TestArr {
 
     @Test
     void arr_sum() {
-        assertThat(arr.sum()).isZero();
+        assertThat(ARR.sum()).isZero();
     }
 
     @Test
@@ -326,7 +326,7 @@ class TestArr {
 
     @Test
     void arr_prod() {
-        assertThat(arr.prod()).isEqualTo(0);
+        assertThat(ARR.prod()).isEqualTo(0);
     }
 
     @Test
@@ -341,7 +341,7 @@ class TestArr {
 
     @Test
     void arr_min() {
-        assertThat(arr.min()).isEqualTo(-3);
+        assertThat(ARR.min()).isEqualTo(-3);
     }
 
 
@@ -357,7 +357,7 @@ class TestArr {
 
     @Test
     void arr_max() {
-        assertThat(arr.max()).isEqualTo(3);
+        assertThat(ARR.max()).isEqualTo(3);
     }
 
     @Test
@@ -372,7 +372,7 @@ class TestArr {
 
     @Test
     void arr_where() {
-        assertThat(arr.where(l -> l % 2 == 0)).isEqualTo(Arr.of(-2, 0, 2));
+        assertThat(ARR.where(l -> l % 2 == 0)).isEqualTo(Arr.of(-2, 0, 2));
     }
 
     @Test
@@ -382,7 +382,7 @@ class TestArr {
 
     @Test
     void arr_reverse() {
-        assertThat(arr.reverse()).isEqualTo(Arr.of(3, 2, 1, 0, -1, -2, -3));
+        assertThat(ARR.reverse()).isEqualTo(Arr.of(3, 2, 1, 0, -1, -2, -3));
     }
 
     @Test
@@ -392,7 +392,7 @@ class TestArr {
 
     @Test
     void arr_sort() {
-        assertThat(arr.sort()).isEqualTo(arr);
+        assertThat(ARR.sort()).isEqualTo(ARR);
     }
 
     @Test
@@ -403,7 +403,7 @@ class TestArr {
 
     @Test
     void arr_sortBy() {
-        assertThat(arr.sortBy(Comparator.comparingLong(Math::abs))).isEqualTo(Arr.of(0,-1,1,-2,2,-3,3));
+        assertThat(ARR.sortBy(Comparator.comparingLong(Math::abs))).isEqualTo(Arr.of(0, 1, -1, 2, -2, 3, -3));
     }
 
     @Test
@@ -418,7 +418,7 @@ class TestArr {
 
     @Test
     void arr_unique() {
-        assertThat(arr.unique()).isEqualTo(arr);
+        assertThat(ARR.unique()).isEqualTo(ARR);
     }
 
     @Test
