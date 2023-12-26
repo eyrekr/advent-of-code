@@ -7,17 +7,23 @@ import com.github.eyrekr.util.Seq;
  * 1) 281600
  * 2) 33875953
  */
-class D06 {
+class D06 extends AoC {
 
-    static final Seq<Input> SAMPLE = Seq.of(new Input(7, 9), new Input(15, 40), new Input(30, 200));
-    static final Seq<Input> STAR1 = Seq.of(new Input(47, 282), new Input(70, 1079), new Input(75, 1147), new Input(66, 1062));
-    static final Seq<Input> STAR2 = Seq.of(new Input(47707566, 282107911471062L));
+    final Seq<Input> input;
 
-    record Input(long time, long distance) {
+    public D06(final Seq<Input> input) {
+        super("");
+        this.input = input;
     }
 
-    public static void main(String[] args) {
-        System.out.println(STAR2.map(input -> waysToWin(input.time, input.distance)).reduce(1L, (acc, l) -> acc * l));
+    @Override
+    long star1() {
+        return input.map(input -> waysToWin(input.time, input.distance)).reduce(1L, (acc, l) -> acc * l);
+    }
+
+    @Override
+    long star2() {
+        return star1();
     }
 
     static long waysToWin(final long T, final long R) {
@@ -31,5 +37,8 @@ class D06 {
             b--;
         }
         return b - a + 1;
+    }
+
+    record Input(long time, long distance) {
     }
 }
