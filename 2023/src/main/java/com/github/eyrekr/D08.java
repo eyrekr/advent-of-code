@@ -13,8 +13,8 @@ import java.util.Map;
  */
 class D08 extends AoC {
 
-    private final Seq<Character> directions;
-    private final Map<String, Step> map;
+    final Seq<Character> directions;
+    final Map<String, Step> map;
 
     D08(final String input) {
         super(input);
@@ -22,9 +22,6 @@ class D08 extends AoC {
         this.map = lines.tail.tail
                 .map(line -> StringUtils.split(line, " =(),"))
                 .toMap(array -> array[0], array -> new Step(array[1], array[2]));
-    }
-
-    record Step(String left, String right) {
     }
 
     long star1() {
@@ -44,4 +41,6 @@ class D08 extends AoC {
         return direction.steps;
     }
 
+    record Step(String left, String right) {
+    }
 }
