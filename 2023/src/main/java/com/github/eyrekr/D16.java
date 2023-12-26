@@ -70,11 +70,11 @@ class D16 extends AoC {
             boolean justPass = true;
             for (final var instr : INSTRUCTIONS) {
                 if (instr.ch == it.ch && instr.in == step.direction) {
-                    it.constrainedTo(instr.out).ifPresent(next -> buffer.addLast(new Step(next.x, next.y, instr.out)));
+                    it.tryToGo(instr.out).ifPresent(next -> buffer.addLast(new Step(next.x, next.y, instr.out)));
                     justPass = false;
                 }
             }
-            if (justPass) it.constrainedTo(step.direction).ifPresent(next -> buffer.addLast(new Step(next.x, next.y, step.direction)));
+            if (justPass) it.tryToGo(step.direction).ifPresent(next -> buffer.addLast(new Step(next.x, next.y, step.direction)));
         }
         return mask.chWhere(ch -> ch == '#').length;
     }

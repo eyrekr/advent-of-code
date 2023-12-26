@@ -4,15 +4,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 public final class Grid implements Iterable<Grid.It> {
     private static final Seq<Direction> ALL_DIRECTIONS = Seq.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right);
@@ -80,41 +77,16 @@ public final class Grid implements Iterable<Grid.It> {
     }
 
     public It it(final int i) {
-        final int x = i % m;
-        final int y = (i / m) % n;
+        return it(i % m, (i / m) % n);
+    }
+
+    public It it(final int x, final int y) {
+        if (x < 0 || y < 0 || x >= m || y >= n) throw new IllegalStateException();
         final char ch = a[x][y];
         final char[] ch4 = new char[]{at(x, y - 1), at(x - 1, y), at(x + 1, y), at(x, y + 1)};
         final char[] ch8 = new char[]{at(x - 1, y - 1), at(x, y - 1), at(x + 1, y - 1), at(x - 1, y), at(x + 1, y), at(x - 1, y + 1), at(x, y + 1), at(x + 1, y + 1)};
         final int digit = Character.isDigit(ch) ? Character.digit(ch, 10) : -1;
-        return new It(i, x, y, m, n, ch, d[x][y], b[x][y], ch4, ch8, digit, x == 0 && y == 0, x == m - 1 && y == n - 1, x == 0, x == m - 1);
-    }
-
-    public It it(final int x, final int y) {
-        return it(y * m + x);
-    }
-
-    public Grid dijkstra(final int x0, final int y0, final boolean[][] forbidden) {
-        for (int y = 0; y < n; y++)
-            for (int x = 0; x < m; x++) {
-                d[x][y] = Integer.MAX_VALUE;
-                b[x][y] = !forbidden[x][y]; // represents: visited
-            }
-        final LinkedList<P> pointsToVisit = new LinkedList<>();
-        pointsToVisit.addFirst(new P(x0, y0));
-        d[x0][y0] = 0;
-
-        while (isNotEmpty(pointsToVisit)) {
-            final P p0 = pointsToVisit.removeFirst();
-            b[p0.x][p0.y] = true;
-            final int d0 = d[p0.x][p0.y];
-
-            p0.n4() // all four neighbours that are still inside the grid
-                    .where(p -> !forbidden[p.x][p.y]) // and are not forbidden
-                    .where(p -> !b[p.x][p.y]) // and were not visited
-                    .where(p -> d[p.x][p.y] > d0 + 1) // and can be improved
-                    .each(p -> d[p.x][p.y] = d0 + 1); // shall be improved
-        }
-        return this;
+        return new It(y * m + x, x, y, m, n, ch, d[x][y], b[x][y], ch4, ch8, digit, x == 0 && y == 0, x == m - 1 && y == n - 1, x == 0, x == m - 1);
     }
 
     public Grid repeat(final int factor) {
@@ -362,7 +334,6 @@ public final class Grid implements Iterable<Grid.It> {
         public final int i;
         public final int x;
         public final int y;
-        public final P p;
         public final int m;
         public final int n;
         public final char ch;
@@ -383,7 +354,6 @@ public final class Grid implements Iterable<Grid.It> {
                    final boolean first, final boolean last, final boolean firstOnLine, final boolean lastOnLine) {
             this.i = i;
             this.x = x;
-            this.p = new P(x, y);
             this.y = y;
             this.m = m;
             this.n = n;
@@ -399,9 +369,17 @@ public final class Grid implements Iterable<Grid.It> {
             this.lastOnLine = lastOnLine;
         }
 
-        public It set(final char ch) {
-            a[x][y] = ch;
-            return it(x, y);
+        public It go(final Direction direction) {
+            return it(x + direction.dx, y + direction.dy);
+        }
+
+        public Optional<It> tryToGo(final Direction direction) { // no passing through walls
+            return switch (direction) {
+                case Up -> y > 0 ? Optional.of(it(x, y - 1)) : Optional.empty();
+                case Down -> y < n - 1 ? Optional.of(it(x, y + 1)) : Optional.empty();
+                case Left -> x > 0 ? Optional.of(it(x - 1, y)) : Optional.empty();
+                case Right -> x < m - 1 ? Optional.of(it(x + 1, y)) : Optional.empty();
+            };
         }
 
         public It set(final char ch, final int d, final boolean b) {
@@ -409,19 +387,6 @@ public final class Grid implements Iterable<Grid.It> {
             Grid.this.d[x][y] = d;
             Grid.this.b[x][y] = b;
             return it(x, y);
-        }
-
-        public It go(final Direction direction) {
-            return it(x + direction.dx, y + direction.dy);
-        }
-
-        public Optional<It> constrainedTo(final Direction direction) { // no passing through walls
-            return switch (direction) {
-                case Up -> y > 0 ? Optional.of(it(x, y - 1)) : Optional.empty();
-                case Down -> y < n - 1 ? Optional.of(it(x, y + 1)) : Optional.empty();
-                case Left -> x > 0 ? Optional.of(it(x - 1, y)) : Optional.empty();
-                case Right -> x < m - 1 ? Optional.of(it(x + 1, y)) : Optional.empty();
-            };
         }
     }
 
@@ -434,25 +399,4 @@ public final class Grid implements Iterable<Grid.It> {
             this.dy = dy;
         }
     }
-
-    public final class P {
-        public final int x;
-        public final int y;
-        public final boolean inside;
-
-        public P(final int x, final int y) {
-            this.x = x;
-            this.y = y;
-            this.inside = x >= 0 && x < m && y >= 0 && y < n;
-        }
-
-        public P to(final Direction direction) {
-            return new P(x + direction.dx, y + direction.dy);
-        }
-
-        public Seq<P> n4() {
-            return ALL_DIRECTIONS.map(this::to).where(p -> p.inside);
-        }
-    }
-
 }
