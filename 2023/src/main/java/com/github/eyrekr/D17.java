@@ -14,8 +14,8 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 /**
  * https://adventofcode.com/2023/day/17
- * 1)
- * 2)
+ * 1) 684
+ * 2) 822
  */
 class D17 extends AoC {
 
@@ -48,14 +48,14 @@ class D17 extends AoC {
             if (current.state.i == (grid.m * grid.n - 1)) return current.score;
 
             Seq<Direction> allowedDirections;
-            if (current.state.direction == Direction.None) {
+            if (current.state.direction == Direction.None) { // we are at the start [0,0]
                 allowedDirections = Seq.of(Direction.Down, Direction.Right);
-            } else if (current.state.stepsInTheDirection < minStepsInOneDirection) {
+            } else if (current.state.stepsInTheDirection < minStepsInOneDirection) { // we cannot change direction
                 allowedDirections = Seq.of(current.state.direction);
-            } else {
+            } else { // we can go anywhere, but we cannot turn around
                 allowedDirections = directions.removeFirst(current.state.direction.opposite());
             }
-            if (current.state.stepsInTheDirection >= maxStepsInOneDirection) {
+            if (current.state.stepsInTheDirection >= maxStepsInOneDirection) { // we must change direction
                 allowedDirections = allowedDirections.removeFirst(current.state.direction);
             }
 
