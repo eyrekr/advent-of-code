@@ -15,7 +15,6 @@ class D03 extends AoC {
 
     final Grid grid;
 
-
     D03(String input) {
         super(input);
         grid = Grid.of(input);
