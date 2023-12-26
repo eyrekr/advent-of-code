@@ -391,12 +391,14 @@ public final class Grid implements Iterable<Grid.It> {
     }
 
     public enum Direction {
-        Up(0, -1), Down(0, +1), Left(-1, 0), Right(+1, 0);
-        final int dx, dy;
+        Up(0, -1, '↑'), Down(0, +1, '↓'), Left(-1, 0, '←'), Right(+1, 0, '→');
+        public final int dx, dy;
+        public final char ch;
 
-        Direction(int dx, int dy) {
+        Direction(int dx, int dy, char ch) {
             this.dx = dx;
             this.dy = dy;
+            this.ch = ch;
         }
     }
 }

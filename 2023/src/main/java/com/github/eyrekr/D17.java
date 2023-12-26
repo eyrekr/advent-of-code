@@ -6,8 +6,6 @@ import com.github.eyrekr.util.Grid.It;
 import com.github.eyrekr.util.Seq;
 import com.github.eyrekr.util.Str;
 
-import java.util.Arrays;
-
 
 /**
  * https://adventofcode.com/2023/day/17
@@ -16,7 +14,7 @@ import java.util.Arrays;
  */
 class D17 extends AoC {
 
-    final Direction[] directions = Direction.values();
+    final Seq<Direction> directions = Seq.of(Direction.Right, Direction.Down, Direction.Left, Direction.Up);
     final Grid grid = Grid.of(input);
 
     D17(final String input) {
@@ -24,31 +22,34 @@ class D17 extends AoC {
     }
 
     long star1() {
+        // initialize the distances and the boolean flag, that means "visited"
+        grid.each(it -> it.set(it.ch, Integer.MAX_VALUE, false));
         final Seq<Tail>[][] paths = new Seq[grid.m][grid.n];
-        paths[0][0] = Seq.of(new Tail(0));
+        paths[0][0] = Seq.of(new Tail(null, null, null));
         grid.d[0][0] = 0;
 
         while (true) {
             final It p0 = grid.reduce(null, (min, p) -> min == null || (!p.b && p.d < min.d) ? p : min);
             if (p0 == null) break; // everything visited
             p0.set('*', p0.d, true);
-            for (final Direction direction : directions) {
-                p0.tryToGo(direction)
-                        .filter(p1 -> !p1.b) // only the not visited
-                        .ifPresent(p1 -> {
-                            final int d1 = p0.d + p1.digit;
-                            if (p1.d > d1) { // we can improve
-                                p1.set(p1.ch, d1, p1.b);
-                                paths[p1.x][p1.y] = paths[p0.x][p0.y]
-                                        .map(path -> path.add(direction))
-                                        .unique();
-                            } else if (p1.d == d1) { // there is an alternative path
-                                paths[p1.x][p1.y] = paths[p1.x][p1.y]
-                                        .addSeq(paths[p0.x][p0.y].map(path -> path.add(direction)))
-                                        .unique();
-                            }
-                        });
-            }
+            // if there is only one way to get to p0 and the last 3 steps are in the same direction,
+            // it means that this direction is forbidden now
+            final Direction forbidden = paths[p0.x][p0.y].length == 1 ? paths[p0.x][p0.y].value.forbidden() : null;
+            directions
+                    .where(direction -> direction != forbidden)
+                    .each(direction -> {
+                        p0.tryToGo(direction)
+                                .filter(p1 -> !p1.b) // only if not visited already
+                                .ifPresent(p1 -> {
+                                    final int d1 = p0.d + p1.digit;
+                                    if (p1.d > d1) { // we can improve
+                                        p1.set(p1.ch, d1, p1.b);
+                                        paths[p1.x][p1.y] = paths[p0.x][p0.y].map(tail -> tail.add(direction)).unique();
+                                    } else if (p1.d == d1) { // there are alternative paths
+                                        paths[p1.x][p1.y] = paths[p1.x][p1.y].addSeq(paths[p0.x][p0.y].map(tail -> tail.add(direction))).unique();
+                                    }
+                                });
+                    });
 
             {// print distances
                 Str.print("@y-----------------------------------------------------------------\n");
@@ -70,9 +71,18 @@ class D17 extends AoC {
         return 0L;
     }
 
-    record Tail(int t) {
+    record Tail(Direction a, Direction b, Direction c) {
         Tail add(final Direction d) {
-            return new Tail((t *10 + (d.ordinal() + 1))/1000);
+            return new Tail(b, c, d);
+        }
+
+        Direction forbidden() {
+            return a == b && b == c ? a : null;
+        }
+
+        @Override
+        public String toString() {
+            return "" + a.ch + b.ch + c.ch;
         }
     }
 }

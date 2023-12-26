@@ -188,7 +188,7 @@ public final class Seq<E> implements Iterable<E> {
         return unique(new HashSet<>());
     }
 
-    private Seq<E> unique(final Set<E> visited) {
+    public Seq<E> unique(final Set<E> visited) {
         if (isEmpty) return this;
         if (visited.contains(value)) return tail.unique(visited);
         visited.add(value);
