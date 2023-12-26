@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 public final class Grid implements Iterable<Grid.It> {
-    private static final Seq<D> ALL_DIRECTIONS = Seq.of(D.U, D.D, D.L, D.R);
+    private static final Seq<Direction> ALL_DIRECTIONS = Seq.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right);
     public static final char C0 = '\0';
 
     public final int m;
@@ -411,30 +411,25 @@ public final class Grid implements Iterable<Grid.It> {
             return it(x, y);
         }
 
-        public It to(final D d) {
-            return switch (d) {
-                case U -> it(x, y - 1);
-                case D -> it(x, y + 1);
-                case L -> it(x - 1, y);
-                case R -> it(x + 1, y);
-            };
+        public It go(final Direction direction) {
+            return it(x + direction.dx, y + direction.dy);
         }
 
-        public Optional<It> constrainedTo(final D d) { // no passing through walls
-            return switch (d) {
-                case U -> y > 0 ? Optional.of(it(x, y - 1)) : Optional.empty();
-                case D -> y < n - 1 ? Optional.of(it(x, y + 1)) : Optional.empty();
-                case L -> x > 0 ? Optional.of(it(x - 1, y)) : Optional.empty();
-                case R -> x < m - 1 ? Optional.of(it(x + 1, y)) : Optional.empty();
+        public Optional<It> constrainedTo(final Direction direction) { // no passing through walls
+            return switch (direction) {
+                case Up -> y > 0 ? Optional.of(it(x, y - 1)) : Optional.empty();
+                case Down -> y < n - 1 ? Optional.of(it(x, y + 1)) : Optional.empty();
+                case Left -> x > 0 ? Optional.of(it(x - 1, y)) : Optional.empty();
+                case Right -> x < m - 1 ? Optional.of(it(x + 1, y)) : Optional.empty();
             };
         }
     }
 
-    public enum D {
-        U(0, -1), D(0, +1), L(-1, 0), R(+1, 0);
+    public enum Direction {
+        Up(0, -1), Down(0, +1), Left(-1, 0), Right(+1, 0);
         final int dx, dy;
 
-        D(int dx, int dy) {
+        Direction(int dx, int dy) {
             this.dx = dx;
             this.dy = dy;
         }
@@ -451,8 +446,8 @@ public final class Grid implements Iterable<Grid.It> {
             this.inside = x >= 0 && x < m && y >= 0 && y < n;
         }
 
-        public P to(final D d) {
-            return new P(x + d.dx, y + d.dy);
+        public P to(final Direction direction) {
+            return new P(x + direction.dx, y + direction.dy);
         }
 
         public Seq<P> n4() {

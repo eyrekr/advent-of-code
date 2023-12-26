@@ -14,7 +14,7 @@ import java.util.stream.Stream;
  */
 class D02 {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         final Grid grid = Grid.from(Path.of("src/main/resources/D03.txt"));
 
         long sum = 0;

@@ -13,23 +13,23 @@ import java.util.Set;
  */
 class D16 extends AoC {
 
-    final static Instr[] INSTRUCTIONS = new Instr[]{
-            new Instr('-', Grid.D.D, Grid.D.L),
-            new Instr('-', Grid.D.D, Grid.D.R),
-            new Instr('-', Grid.D.U, Grid.D.L),
-            new Instr('-', Grid.D.U, Grid.D.R),
-            new Instr('|', Grid.D.L, Grid.D.U),
-            new Instr('|', Grid.D.L, Grid.D.D),
-            new Instr('|', Grid.D.R, Grid.D.U),
-            new Instr('|', Grid.D.R, Grid.D.D),
-            new Instr('\\', Grid.D.L, Grid.D.U),
-            new Instr('\\', Grid.D.R, Grid.D.D),
-            new Instr('\\', Grid.D.U, Grid.D.L),
-            new Instr('\\', Grid.D.D, Grid.D.R),
-            new Instr('/', Grid.D.L, Grid.D.D),
-            new Instr('/', Grid.D.R, Grid.D.U),
-            new Instr('/', Grid.D.U, Grid.D.R),
-            new Instr('/', Grid.D.D, Grid.D.L),
+    final static Instruction[] INSTRUCTIONS = new Instruction[]{
+            new Instruction('-', Grid.Direction.Down, Grid.Direction.Left),
+            new Instruction('-', Grid.Direction.Down, Grid.Direction.Right),
+            new Instruction('-', Grid.Direction.Up, Grid.Direction.Left),
+            new Instruction('-', Grid.Direction.Up, Grid.Direction.Right),
+            new Instruction('|', Grid.Direction.Left, Grid.Direction.Up),
+            new Instruction('|', Grid.Direction.Left, Grid.Direction.Down),
+            new Instruction('|', Grid.Direction.Right, Grid.Direction.Up),
+            new Instruction('|', Grid.Direction.Right, Grid.Direction.Down),
+            new Instruction('\\', Grid.Direction.Left, Grid.Direction.Up),
+            new Instruction('\\', Grid.Direction.Right, Grid.Direction.Down),
+            new Instruction('\\', Grid.Direction.Up, Grid.Direction.Left),
+            new Instruction('\\', Grid.Direction.Down, Grid.Direction.Right),
+            new Instruction('/', Grid.Direction.Left, Grid.Direction.Down),
+            new Instruction('/', Grid.Direction.Right, Grid.Direction.Up),
+            new Instruction('/', Grid.Direction.Up, Grid.Direction.Right),
+            new Instruction('/', Grid.Direction.Down, Grid.Direction.Left),
     };
 
     final Grid grid;
@@ -40,18 +40,18 @@ class D16 extends AoC {
     }
 
     long star1() {
-        return calculate(new Step(0, 0, Grid.D.R));
+        return calculate(new Step(0, 0, Grid.Direction.Right));
     }
 
     long star2() {
         long max = 0L;
         for (int x = 0; x < grid.m; x++) {
-            max = Math.max(max, calculate(new Step(x, 0, Grid.D.D)));
-            max = Math.max(max, calculate(new Step(x, grid.n - 1, Grid.D.U)));
+            max = Math.max(max, calculate(new Step(x, 0, Grid.Direction.Down)));
+            max = Math.max(max, calculate(new Step(x, grid.n - 1, Grid.Direction.Up)));
         }
         for (int y = 0; y < grid.n; y++) {
-            max = Math.max(max, calculate(new Step(0, y, Grid.D.R)));
-            max = Math.max(max, calculate(new Step(grid.m - 1, grid.n - 1, Grid.D.L)));
+            max = Math.max(max, calculate(new Step(0, y, Grid.Direction.Right)));
+            max = Math.max(max, calculate(new Step(grid.m - 1, grid.n - 1, Grid.Direction.Left)));
         }
         return max;
     }
@@ -69,19 +69,19 @@ class D16 extends AoC {
             final Grid.It it = grid.it(step.x, step.y);
             boolean justPass = true;
             for (final var instr : INSTRUCTIONS) {
-                if (instr.ch == it.ch && instr.in == step.d) {
+                if (instr.ch == it.ch && instr.in == step.direction) {
                     it.constrainedTo(instr.out).ifPresent(next -> buffer.addLast(new Step(next.x, next.y, instr.out)));
                     justPass = false;
                 }
             }
-            if (justPass) it.constrainedTo(step.d).ifPresent(next -> buffer.addLast(new Step(next.x, next.y, step.d)));
+            if (justPass) it.constrainedTo(step.direction).ifPresent(next -> buffer.addLast(new Step(next.x, next.y, step.direction)));
         }
         return mask.chWhere(ch -> ch == '#').length;
     }
 
-    record Instr(char ch, Grid.D in, Grid.D out) {
+    record Instruction(char ch, Grid.Direction in, Grid.Direction out) {
     }
 
-    record Step(int x, int y, Grid.D d) {
+    record Step(int x, int y, Grid.Direction direction) {
     }
 }

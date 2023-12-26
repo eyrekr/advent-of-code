@@ -1,7 +1,7 @@
 package com.github.eyrekr;
 
 import com.github.eyrekr.util.Grid;
-import com.github.eyrekr.util.Grid.D;
+import com.github.eyrekr.util.Grid.Direction;
 import com.github.eyrekr.util.Str;
 import org.apache.commons.lang3.StringUtils;
 
@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  */
 class D10 extends AoC {
 
-    static final Map<Character, Character> NICER = Map.of(
+    static final Map<Character, Character> ASCII = Map.of(
             'S', '*',
             '-', '─',
             '|', '│',
@@ -28,7 +28,7 @@ class D10 extends AoC {
 
     D10(final String input) {
         super(input);
-        this.grid = Grid.of(lines).map(it -> NICER.getOrDefault(it.ch, Grid.C0));
+        this.grid = Grid.of(lines).map(it -> ASCII.getOrDefault(it.ch, Grid.C0));
     }
 
     long star1() {
@@ -42,11 +42,11 @@ class D10 extends AoC {
         return area(stencil);
     }
 
-    private long area(final char[][] stencil) { // ray casting
+    long area(final char[][] stencil) { // ray casting
         long area = 0;
         for (int y = 0; y < grid.n; y++) {
             boolean inside = false;
-            char open = '\0';
+            char open = Grid.C0;
             for (int x = 0; x < grid.m; x++) {
                 final char ch = stencil[x][y];
                 if (ch > 0) { // border
@@ -77,9 +77,9 @@ class D10 extends AoC {
         return area;
     }
 
-    private long traverse(final Consumer<Grid.It> process) {
-        final Grid.It start = grid.first(it -> it.ch == '*');
-        State state = new State(start, D.U, 0);
+    long traverse(final Consumer<Grid.It> process) {
+        final Grid.It start = grid.chFirst(ch -> ch == '*');
+        State state = new State(start, Direction.Up, 0);
         while (true) {
             process.accept(state.it);
             if (state.it.ch == '*' && state.length > 0) {
@@ -89,24 +89,20 @@ class D10 extends AoC {
         }
     }
 
-    record State(Grid.It it, D direction, int length) {
+    record State(Grid.It it, Direction in, int length) {
         State next() {
-            final D newDirection = switch (it.ch) {
-                case '*' -> StringUtils.contains("│┌┐", it.neighbours4[0]) ? D.U
-                        : StringUtils.contains("│└┘", it.neighbours4[3]) ? D.D
-                        : D.R;
-                case '│' -> direction;
-                case '─' -> direction;
-                case '┌' -> direction == D.L ? D.D : D.R;
-                case '┐' -> direction == D.U ? D.L : D.D;
-                case '┘' -> direction == D.D ? D.L : D.U;
-                case '└' -> direction == D.D ? D.R : D.U;
+            final Direction out = switch (it.ch) {
+                case '*' -> StringUtils.contains("│┌┐", it.neighbours4[0]) ? Direction.Up
+                        : StringUtils.contains("│└┘", it.neighbours4[3]) ? Direction.Down
+                        : Direction.Right;
+                case '│', '─' -> in;
+                case '┌' -> in == Direction.Left ? Direction.Down : Direction.Right;
+                case '┐' -> in == Direction.Up ? Direction.Left : Direction.Down;
+                case '┘' -> in == Direction.Down ? Direction.Left : Direction.Up;
+                case '└' -> in == Direction.Down ? Direction.Right : Direction.Up;
                 default -> throw new IllegalStateException(toString());
             };
-            return new State(it.to(newDirection), newDirection, length + 1);
-        }
-        boolean end(){
-            return it.ch=='*' && length > 0;
+            return new State(it.go(out), out, length + 1);
         }
     }
 }
