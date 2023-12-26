@@ -339,6 +339,10 @@ public final class Seq<E> implements Iterable<E> {
                 });
     }
 
+    public Arr toArr(final ToLongFunction<? super E> tranform) {
+        return reduce(Arr.empty(), (arr, e) -> arr.addLast(tranform.applyAsLong(e)));
+    }
+
     public Map<E, Integer> frequency() {
         return reduce(new HashMap<>(), (map, element) -> {
             final int frequency = map.getOrDefault(element, 0);

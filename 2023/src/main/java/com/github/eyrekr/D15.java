@@ -21,7 +21,7 @@ class D15 extends AoC {
     }
 
     long star1() {
-        return words.map(D15::hash).reduce(Integer::sum);
+        return words.toArr(D15::hash).sum();
     }
 
     long star2() {
