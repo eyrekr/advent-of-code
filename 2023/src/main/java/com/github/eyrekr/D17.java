@@ -29,7 +29,7 @@ class D17 extends AoC {
         grid.d[0][0] = 0;
 
         while (true) {
-            final It p0 = grid.reduce(null, (min, p) -> min == null || (!p.b && p.d < min.d) ? p : min);
+            final It p0 = grid.reduce(null, (min, p) -> !p.b && (min == null || p.d < min.d) ? p : min);
             if (p0 == null) break; // everything visited
             p0.set('*', p0.d, true);
             // if there is only one way to get to p0 and the last 3 steps are in the same direction,
@@ -82,7 +82,7 @@ class D17 extends AoC {
 
         @Override
         public String toString() {
-            return "" + a.ch + b.ch + c.ch;
+            return "" + (a != null ? a.ch : ' ') + (b != null ? b.ch : ' ') + (c != null ? c.ch : ' ');
         }
     }
 }
