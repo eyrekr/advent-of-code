@@ -9,16 +9,14 @@ import org.apache.commons.lang3.StringUtils;
  */
 class D01 extends AoC {
 
-
     public D01(String input) {
         super(input);
     }
 
     @Override
     long star1() {
-        return lines.map(text-> StringUtils.removeAll(text, "[a-zA-Z_]")).map(D01::toNumber).reduce(0L, Long::sum);
+        return lines.map(D01::toNumber).reduce(0L, Long::sum);
     }
-
 
     @Override
     long star2() {
@@ -49,10 +47,17 @@ class D01 extends AoC {
         text = StringUtils.replace(text, "eight", "8");
         text = StringUtils.replace(text, "nine", "9");
 
-        return StringUtils.removeAll(text, "[a-zA-Z_]");
+        return text;
     }
 
     static int toNumber(final String input) {
-        return (input.charAt(0) - '0') * 10 + (input.charAt(input.length() - 1) - '0');
+        int first = -1, last = -1;
+        for (final char ch : input.toCharArray()) {
+            if (Character.isDigit(ch)) {
+                last = Character.digit(ch, 10);
+            }
+            if (first < 0) first = last;
+        }
+        return first * 10 + last;
     }
 }
