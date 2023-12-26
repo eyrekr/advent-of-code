@@ -3,8 +3,6 @@ package com.github.eyrekr;
 import com.github.eyrekr.util.Seq;
 import org.apache.commons.lang3.StringUtils;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
 import static java.util.function.Function.identity;
@@ -15,21 +13,27 @@ import static java.util.stream.Collectors.groupingBy;
  * 1) 248559379
  * 2) 249631254
  */
-class D07 {
+class D07 extends AoC {
     static final char JOKER = '*';
 
-    public static void main(String[] args) throws Exception {
-        final Seq<String> lines = Seq.fromArray(Files.readString(Path.of("src/main/resources/D07.txt")).split("\n"));
-        System.out.printf("%d\n%d\n",
-                solve(lines.map(line -> Card.from(line, false))),
-                solve(lines.map(line -> Card.from(line, true))));
+    D07(String input) {
+        super(input);
     }
 
-    static long solve(final Seq<Card> cards) {
+    @Override
+    long star1() {
+        return solve(lines.map(line -> Card.from(line, false)));
+    }
+
+    @Override
+    long star2() {
+        return solve(lines.map(line -> Card.from(line, true)));
+    }
+
+    long solve(final Seq<Card> cards) {
         return cards
                 .sortedBy(Card::compareTo)
                 .mapWith(Seq.range(0, cards.length), Card::changeOrder)
-                .print("\n")
                 .reduce(0L, (acc, card) -> acc + card.bid * (card.order + 1));
     }
 
