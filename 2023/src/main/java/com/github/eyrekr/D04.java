@@ -4,8 +4,6 @@ import com.github.eyrekr.util.Seq;
 import com.github.eyrekr.util.Str;
 import org.apache.commons.lang3.StringUtils;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 
 /**
@@ -13,11 +11,22 @@ import java.util.Arrays;
  * 1) 26426
  * 2) 6227972
  */
-class D04 {
+class D04 extends AoC {
 
-    public static void main(String[] args) throws Exception {
-        final Card[] deck = Files.readAllLines(Path.of("src/main/resources/D04.txt")).stream().map(Card::new).toArray(Card[]::new);
+    final Card[] deck;
 
+    D04(String input) {
+        super(input);
+        deck = lines.map(Card::new).toArray(Card[]::new);
+    }
+
+    @Override
+    long star1() {
+        return Arrays.stream(deck).mapToLong(card -> card.points).sum();
+    }
+
+    @Override
+    long star2() {
         for (int cardNumber = 0; cardNumber < deck.length; cardNumber++) {
             final Card card = deck[cardNumber];
             for (int d = 1; d <= card.matchingNumbers && cardNumber + d < deck.length; d++) {
@@ -25,10 +34,7 @@ class D04 {
                 cardYouWin.instances += card.instances; // you win as many times as you have this card
             }
         }
-
-        System.out.printf("SUM POINTS = %d\nSUM INSTANCES = %d\n",
-                Arrays.stream(deck).mapToLong(card -> card.points).sum(),
-                Arrays.stream(deck).mapToLong(card -> card.instances).sum());
+        return Arrays.stream(deck).mapToLong(card -> card.instances).sum();
     }
 
     static class Card {

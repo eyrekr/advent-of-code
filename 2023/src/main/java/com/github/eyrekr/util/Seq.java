@@ -3,10 +3,7 @@ package com.github.eyrekr.util;
 import org.apache.commons.lang3.function.TriFunction;
 
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 
 /**
  * Sequence of objects.
@@ -332,11 +329,14 @@ public final class Seq<E> implements Iterable<E> {
         return isEmpty || seq.isEmpty ? init : tail.reduceWith(seq.tail, combine.apply(init, value, seq.value), combine);
     }
 
-    public E[] toArray() {
-        return reduceWith(range(0, length), (E[]) (new Object[length]), (array, element, index) -> {
-            array[index] = element;
-            return array;
-        });
+    public E[] toArray(final IntFunction<E[]> arrayGenerator) {
+        return reduceWith(
+                range(0, length),
+                arrayGenerator.apply(length),
+                (array, element, index) -> {
+                    array[index] = element;
+                    return array;
+                });
     }
 
     public Map<E, Integer> frequency() {
