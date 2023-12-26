@@ -93,17 +93,12 @@ public final class Grid implements Iterable<Grid.It> {
         return it(y * m + x);
     }
 
-    public Grid dijkstra(final int x0, final int y0, final XYPredicate forbidden) {
-        final boolean[][] f = new boolean[m][n];
-        forEachXY((x, y) -> f[x][y] = forbidden.test(x, y));
-        return dijkstra(x0, y0, f);
-    }
-
     public Grid dijkstra(final int x0, final int y0, final boolean[][] forbidden) {
-        forEachXY((x, y) -> {
-            d[x][y] = Integer.MAX_VALUE;
-            b[x][y] = false; // represents: visited
-        });
+        for (int y = 0; y < n; y++)
+            for (int x = 0; x < m; x++) {
+                d[x][y] = Integer.MAX_VALUE;
+                b[x][y] = !forbidden[x][y]; // represents: visited
+            }
         final LinkedList<P> pointsToVisit = new LinkedList<>();
         pointsToVisit.addFirst(new P(x0, y0));
         d[x0][y0] = 0;
@@ -120,6 +115,14 @@ public final class Grid implements Iterable<Grid.It> {
                     .each(p -> d[p.x][p.y] = d0 + 1); // shall be improved
         }
         return this;
+    }
+
+    public Grid repeat(final int factor) {
+        final Grid grid = Grid.of(m * factor, n * factor);
+        for (int y = 0; y < n * factor; y++)
+            for (int x = 0; x < m * factor; x++)
+                grid.a[x][y] = a[x % m][y % n];
+        return grid;
     }
 
     public Grid each(final Consumer<It> consumer) {
@@ -337,21 +340,6 @@ public final class Grid implements Iterable<Grid.It> {
     @Override
     public String toString() {
         return reduce(new StringBuilder(), (builder, it) -> it.lastOnLine ? builder.append(it.ch).append('\n') : builder.append(it.ch)).toString();
-    }
-
-    private Grid forEachXY(final XYConsumer consumer) {
-        for (int y = 0; y < n; y++)
-            for (int x = 0; x < m; x++)
-                consumer.consume(x, y);
-        return this;
-    }
-
-    public interface XYConsumer {
-        void consume(int x, int y);
-    }
-
-    public interface XYPredicate {
-        boolean test(int x, int y);
     }
 
     public final class Column {
