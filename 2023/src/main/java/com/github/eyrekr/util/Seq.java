@@ -40,7 +40,7 @@ public final class Seq<E> implements Iterable<E> {
     }
 
     public static <T> Seq<T> fromArray(final T[] array) {
-        return array == null ? empty() : range(0, array.length).carryMap(array, (arr, i) -> arr[i.intValue()]);
+        return array == null ? empty() : range(0, array.length).carryMap(array, (arr, i) -> arr[i]);
     }
 
     public static <T> Seq<T> fromIterable(final Iterable<T> collection) {
@@ -52,7 +52,7 @@ public final class Seq<E> implements Iterable<E> {
     }
 
     public static Seq<Character> ofCharactersFromString(final String string) {
-        return string == null ? empty() : range(0, string.length()).carryMap(string, (str, i) -> str.charAt(i.intValue()));
+        return string == null ? empty() : range(0, string.length()).carryMap(string, String::charAt);
     }
 
     public static Seq<String> ofLinesFromString(final String string) {
@@ -334,7 +334,7 @@ public final class Seq<E> implements Iterable<E> {
 
     public E[] toArray() {
         return reduceWith(range(0, length), (E[]) (new Object[length]), (array, element, index) -> {
-            array[index.intValue()] = element;
+            array[index] = element;
             return array;
         });
     }
@@ -394,36 +394,5 @@ public final class Seq<E> implements Iterable<E> {
             steps++;
             return value;
         }
-    }
-
-
-    public static void main(String[] args) {
-        Seq.range(1, 10).print();
-        System.out.println(Seq.of(10, 20, -5, 7).max(Integer::compare));
-        Seq.of(10, 7, 20, -5, 7, 0).sortedBy(Integer::compare).print();
-        Seq.fromIterable(List.of("x", "y", "z")).print();
-        Seq.of("a", "b", "c", "d", "e").mapWithPrev((value, prev) -> prev + "=>" + value).print();
-        Seq.of("a", "b", "c", "d", "e").mapWithNext((value, next) -> value + "=>" + next).print();
-        Seq.of("m", "n", "o", "p").addLast("Q").print();
-        Str.print("%s - %s\n",
-                Seq.of("m", "n", "o", "p").lastValue,
-                Seq.of("m").lastValue
-        );
-
-        Str.print("%b\n", Seq.of(1, 1, 3).equals(Seq.of(1, 1, 3)));
-        Seq.of("A", "B", "C", "D", "E", "F").removeAt(3).print();
-        Seq.of("A", "B", "C", "D", "C", "F").removeFirst("C").print();
-        Seq.of("A", "B", "C", "D", "C", "F").removeAll("C").print();
-
-        Seq.of("A", "B", "C", "D", "E", "F").replaceAt(3, "X").print();
-        Seq.of("A", "B", "C", "D", "C", "F").replaceFirst("C", "X").print();
-        Seq.of("A", "B", "C", "D", "C", "F").replaceAll("C", "X").print();
-
-        Str.print("%d\n", Seq.of("A", "B", "C", "D", "C", "F").indexOfFirst("C"));
-        Str.print("%d\n", Seq.of("A", "B", "C", "D", "C", "F").indexOfFirst("F"));
-        Str.print("%d\n", Seq.of("A", "B", "C", "D", "C", "F").indexOfFirst("A"));
-        Str.print("%d\n", Seq.of("A", "B", "C", "D", "C", "F").indexOfFirst("X"));
-
-        Seq.of("A", "B", "C", "D", "E", "D", "F", "D", "G").unique().print();
     }
 }

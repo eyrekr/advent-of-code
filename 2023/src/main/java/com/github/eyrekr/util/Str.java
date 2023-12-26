@@ -103,10 +103,4 @@ public final class Str {
         builder.append(Ascii.RESET);
         System.out.print(builder);
     }
-
-    public static void main(String[] args) {
-        print("**bold**__underline__//italic//\n");
-        print("@rRED@gGREEN@bBLUE@cCYAN@mMAGENTA@yYELLOW@kBLACK@wGRAY@@\n");
-        print("@RRED@GGREEN@BBLUE@CCYAN@MMAGENTA@YYELLOW@KBLACK@WGRAY@@\n");
-    }
 }

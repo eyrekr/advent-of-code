@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TestD14 {
-    final String SAMPLE = """
+    final String sample = """
             O....#....
             O.OO#....#
             .....##...
@@ -19,25 +19,26 @@ class TestD14 {
             #....###..
             #OO..#....
             """;
+    final String input = Str.testResource("D14.txt");
 
     @Test
     void sampleStar1() {
-        assertThat(new D14(SAMPLE).star1()).isEqualTo(136L);
+        assertThat(new D14(sample).star1()).isEqualTo(136L);
     }
 
     @Test
     void sampleStar2() {
-        assertThat(new D14(SAMPLE).star2()).isEqualTo(64L);
+        assertThat(new D14(sample).star2()).isEqualTo(64L);
     }
 
     @Test
     void star1() {
-        assertThat(new D14(Str.testResource("D14.txt")).star1()).isEqualTo(106186L);
+        assertThat(new D14(input).star1()).isEqualTo(106186L);
     }
 
     @Test
     void star2() {
-        assertThat(new D14(Str.testResource("D14.txt")).star2()).isEqualTo(106390L);
+        assertThat(new D14(input).star2()).isEqualTo(106390L);
     }
 
     @Test
@@ -54,7 +55,7 @@ class TestD14 {
                 #...O###..
                 #..OO#....
                 """);
-        final Grid actual = afterCycles(Grid.of(SAMPLE), 1);
+        final Grid actual = afterCycles(Grid.of(sample), 1);
         assertThat(actual).isEqualTo(expected);
         assertThat(D14.score(actual)).isEqualTo(87);
     }
@@ -73,7 +74,7 @@ class TestD14 {
                 #..OO###..
                 #.OOO#...O
                 """);
-        final Grid actual = afterCycles(Grid.of(SAMPLE), 2);
+        final Grid actual = afterCycles(Grid.of(sample), 2);
         assertThat(actual).isEqualTo(expected);
         assertThat(D14.score(actual)).isEqualTo(69);
     }
@@ -92,14 +93,14 @@ class TestD14 {
                 #...O###.O
                 #.OOO#...O
                 """);
-        final Grid actual = afterCycles(Grid.of(SAMPLE), 3);
+        final Grid actual = afterCycles(Grid.of(sample), 3);
         assertThat(actual).isEqualTo(expected);
         assertThat(D14.score(actual)).isEqualTo(69);
     }
 
     private Grid afterCycles(final Grid grid, final int n) {
         Grid result = grid;
-        for(int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++) {
             result = D14.cycle(result);
         }
         return result;

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TestD17 {
-    final String SAMPLE = """
+    final String sample = """
             2413432311323
             3215453535623
             3255245654254
@@ -21,25 +21,26 @@ class TestD17 {
             2546548887735
             4322674655533
             """;
+    final String input = Str.testResource("D17.txt");
 
     @Test
     void sampleStar1() {
-        assertThat(new D17(SAMPLE).star1()).isEqualTo(102L);
+        assertThat(new D17(sample).star1()).isEqualTo(102L);
     }
 
     @Test
     void sampleStar2() {
-        assertThat(new D17(SAMPLE).star2()).isEqualTo(0L);
+        assertThat(new D17(sample).star2()).isEqualTo(0L);
     }
 
     @Test
     void star1() {
-        assertThat(new D17(Str.testResource("D17.txt")).star1()).isEqualTo(0L);
+        assertThat(new D17(input).star1()).isEqualTo(0L);
     }
 
     @Test
     void star2() {
-        assertThat(new D17(Str.testResource("D17.txt")).star2()).isEqualTo(0L);
+        assertThat(new D17(input).star2()).isEqualTo(0L);
     }
 
 }

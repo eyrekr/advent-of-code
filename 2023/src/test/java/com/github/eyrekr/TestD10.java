@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TestD10 {
-    final String SAMPLE = """
+    final String sample = """
             7-F7-
             .FJ|7
             SJLL7
@@ -14,7 +14,7 @@ class TestD10 {
             LJ.LJ
             """;
 
-    final static String SAMPLE_2A = """
+    final String sample2A = """
             .F----7F7F7F7F-7....
             .|F--7||||||||FJ....
             .||.FJ||||||||L7....
@@ -27,7 +27,7 @@ class TestD10 {
             ....L---J.LJ.LJLJ...
             """;
 
-    final static String SAMPLE_2B = """
+    final  String sample2B = """
             FF7FSF7F7F7F7F7F---7
             L|LJ||||||||||||F--J
             FL-7LJLJ||||||LJL-77
@@ -40,28 +40,30 @@ class TestD10 {
             L7JLJL-JLJLJL--JLJ.L
             """;
 
+    final String input = Str.testResource("D10.txt");
+
     @Test
     void sampleStar1() {
-        assertThat(new D10(SAMPLE).star1()).isEqualTo(8L);
+        assertThat(new D10(sample).star1()).isEqualTo(8L);
     }
 
     @Test
     void sampleStar2A() {
-        assertThat(new D10(SAMPLE_2A).star2()).isEqualTo(8L);
+        assertThat(new D10(sample2A).star2()).isEqualTo(8L);
     }
 
     @Test
     void sampleStar2B() {
-        assertThat(new D10(SAMPLE_2B).star2()).isEqualTo(10L);
+        assertThat(new D10(sample2B).star2()).isEqualTo(10L);
     }
 
     @Test
     void star1() {
-        assertThat(new D10(Str.testResource("D10.txt")).star1()).isEqualTo(6903L);
+        assertThat(new D10(input).star1()).isEqualTo(6903L);
     }
 
     @Test
     void star2() {
-        assertThat(new D10(Str.testResource("D10.txt")).star2()).isEqualTo(265L);
+        assertThat(new D10(input).star2()).isEqualTo(265L);
     }
 }

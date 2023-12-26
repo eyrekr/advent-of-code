@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TestD13 {
-    final String SAMPLE = """
+    final String sample = """
             #.##..##.
             ..#.##.#.
             ##......#
@@ -23,25 +23,26 @@ class TestD13 {
             ..##..###
             #....#..#
             """;
+    final String input = Str.testResource("D13.txt");
 
     @Test
     void sampleStar1() {
-        assertThat(new D13(SAMPLE).star1()).isEqualTo(405L);
+        assertThat(new D13(sample).star1()).isEqualTo(405L);
     }
 
     @Test
     void sampleStar2() {
-        assertThat(new D13(SAMPLE).star2()).isEqualTo(400L);
+        assertThat(new D13(sample).star2()).isEqualTo(400L);
     }
 
     @Test
     void star1() {
-        assertThat(new D13(Str.testResource("D13.txt")).star1()).isEqualTo(30535L);
+        assertThat(new D13(input).star1()).isEqualTo(30535L);
     }
 
     @Test
     void star2() {
-        assertThat(new D13(Str.testResource("D13.txt")).star2()).isEqualTo(30844L);
+        assertThat(new D13(input).star2()).isEqualTo(30844L);
     }
 
 }

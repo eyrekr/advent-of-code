@@ -6,14 +6,14 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TestD20 {
-    final String SAMPLE_A = """
+    final String sampleA = """
             broadcaster -> a, b, c
             %a -> b
             %b -> c
             %c -> inv
             &inv -> a
             """;
-    final String SAMPLE_B = """
+    final String sampleB = """
             broadcaster -> a
             %a -> inv, con
             &inv -> b
@@ -21,24 +21,26 @@ class TestD20 {
             &con -> output
             """;
 
+    final String input = Str.testResource("D20.txt");
+
     @Test
     void sampleStar1A() {
-        assertThat(new D20(SAMPLE_A).star1()).isEqualTo(32_000_000L);
+        assertThat(new D20(sampleA).star1()).isEqualTo(32_000_000L);
     }
 
     @Test
     void sampleStar1B() {
-        assertThat(new D20(SAMPLE_B).star1()).isEqualTo(11_687_500L);
+        assertThat(new D20(sampleB).star1()).isEqualTo(11_687_500L);
     }
 
     @Test
     void star1() {
-        assertThat(new D20(Str.testResource("D20.txt")).star1()).isEqualTo(899848294L);
+        assertThat(new D20(input).star1()).isEqualTo(899848294L);
     }
 
     @Test
     void star2() {
-        assertThat(new D20(Str.testResource("D20.txt")).star2()).isEqualTo(247454898168563L);
+        assertThat(new D20(input).star2()).isEqualTo(247454898168563L);
     }
 
 }

@@ -5,12 +5,10 @@ import com.github.eyrekr.util.Seq;
 import com.github.eyrekr.util.Str;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TestD12 {
-    final String SAMPLE = """
+    final String sample = """
             ???.### 1,1,3
             .??..??...?##. 1,1,3
             ?#?#?#?#?#?#?#? 1,3,1,6
@@ -18,25 +16,26 @@ class TestD12 {
             ????.######..#####. 1,6,5
             ?###???????? 3,2,1
             """;
+    final String input = Str.testResource("D12.txt");
 
     @Test
     void sampleStar1() {
-        assertThat(new D12(SAMPLE).star1()).isEqualTo(21L);
+        assertThat(new D12(sample).star1()).isEqualTo(21L);
     }
 
     @Test
     void sampleStar2() {
-        assertThat(new D12(SAMPLE).star2()).isEqualTo(525152L);
+        assertThat(new D12(sample).star2()).isEqualTo(525152L);
     }
 
     @Test
     void star1() {
-        assertThat(new D12(Str.testResource("D12.txt")).star1()).isEqualTo(6871L);
+        assertThat(new D12(input).star1()).isEqualTo(6871L);
     }
 
     @Test
     void star2() {
-        assertThat(new D12(Str.testResource("D12.txt")).star2()).isEqualTo(2043098029844L);
+        assertThat(new D12(input).star2()).isEqualTo(2043098029844L);
     }
 
     @Test
