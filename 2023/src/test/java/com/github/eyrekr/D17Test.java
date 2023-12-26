@@ -30,17 +30,17 @@ class D17Test {
 
     @Test
     void sampleStar2() {
-        assertThat(new D17(sample).star2()).isEqualTo(0L);
+        assertThat(new D17(sample).star2()).isEqualTo(94L);
     }
 
     @Test
     void star1() {
-        assertThat(new D17(input).star1()).isEqualTo(0L);
+        assertThat(new D17(input).star1()).isEqualTo(684L);
     }
 
     @Test
     void star2() {
-        assertThat(new D17(input).star2()).isEqualTo(0L);
+        assertThat(new D17(input).star2()).isEqualTo(822L);
     }
 
 }

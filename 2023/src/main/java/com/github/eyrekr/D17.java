@@ -27,6 +27,15 @@ class D17 extends AoC {
     }
 
     long star1() {
+        return solve(0, 3);
+    }
+
+
+    long star2() {
+        return solve(4, 10);
+    }
+
+    long solve(final int minStepsInOneDirection, final int maxStepsInOneDirection) {
         final Set<State> visited = new HashSet<>();
         final PriorityQueue<Step> steps = new PriorityQueue<>(Comparator.comparing(Step::score));
         steps.add(new Step(new State(0, Direction.None, 0), 0L));
@@ -36,12 +45,22 @@ class D17 extends AoC {
             if (visited.contains(current.state)) continue;
             visited.add(current.state);
 
-            if (current.state.i == (grid.m  * grid.n - 1)) return current.score;
+            if (current.state.i == (grid.m * grid.n - 1)) return current.score;
 
-            for (final Direction direction : directions) {
+            Seq<Direction> allowedDirections;
+            if (current.state.direction == Direction.None) {
+                allowedDirections = Seq.of(Direction.Down, Direction.Right);
+            } else if (current.state.stepsInTheDirection < minStepsInOneDirection) {
+                allowedDirections = Seq.of(current.state.direction);
+            } else {
+                allowedDirections = directions.removeFirst(current.state.direction.opposite());
+            }
+            if (current.state.stepsInTheDirection >= maxStepsInOneDirection) {
+                allowedDirections = allowedDirections.removeFirst(current.state.direction);
+            }
+
+            for (final Direction direction : allowedDirections) {
                 final boolean sameDirectionAsBefore = direction == current.state.direction;
-                if (sameDirectionAsBefore && current.state.stepsInTheDirection >= 3) continue;
-                if (current.state.direction.isOpposite(direction)) continue;
                 final Grid.It it = grid.it(current.state.i);
                 it.tryToGo(direction)
                         .map(next -> new Step(
@@ -54,11 +73,6 @@ class D17 extends AoC {
             }
         }
         throw new IllegalStateException();
-    }
-
-
-    long star2() {
-        return 0L;
     }
 
     record State(int i, Direction direction, int stepsInTheDirection) {

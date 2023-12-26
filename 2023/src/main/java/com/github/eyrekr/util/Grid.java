@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -389,6 +390,19 @@ public final class Grid implements Iterable<Grid.It> {
             Grid.this.b[x][y] = b;
             return it(x, y);
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof It that && that.i == this.i) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(i);
+        }
     }
 
     public enum Direction {
@@ -407,12 +421,22 @@ public final class Grid implements Iterable<Grid.It> {
         }
 
         public boolean isOpposite(final Direction direction) {
-            return switch(this) {
-                case None ->  false;
+            return switch (this) {
+                case None -> false;
                 case Up -> direction == Down;
                 case Down -> direction == Up;
                 case Left -> direction == Right;
                 case Right -> direction == Left;
+            };
+        }
+
+        public Direction opposite() {
+            return switch (this) {
+                case None -> None;
+                case Up -> Down;
+                case Down -> Up;
+                case Left -> Right;
+                case Right -> Left;
             };
         }
     }
