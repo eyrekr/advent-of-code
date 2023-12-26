@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TestD16 {
+class D16Test {
     final String sample = """
             .|...\\....
             |.-.\\.....

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TestD17 {
+class D17Test {
     final String sample = """
             2413432311323
             3215453535623

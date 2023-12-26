@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TestD10 {
+class D10Test {
     final String sample = """
             7-F7-
             .FJ|7

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TestD12 {
+class D12Test {
     final String sample = """
             ???.### 1,1,3
             .??..??...?##. 1,1,3

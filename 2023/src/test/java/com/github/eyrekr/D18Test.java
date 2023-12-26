@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TestD18 {
+class D18Test {
     final String sample = """
             R 6 (#70c710)
             D 5 (#0dc571)

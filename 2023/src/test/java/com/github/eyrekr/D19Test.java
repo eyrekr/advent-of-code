@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TestD19 {
+class D19Test {
     final String sample = """
             px{a<2006:qkq,m>2090:A,rfg}
             pv{a>1716:R,A}

@@ -3,7 +3,7 @@ package com.github.eyrekr;
 import com.github.eyrekr.util.Str;
 import org.junit.jupiter.api.Test;
 
-class TestD08 {
+class D08Test {
 
     final String input = Str.testResource("D08.txt");
 

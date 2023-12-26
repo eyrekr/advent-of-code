@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TestD20 {
+class D20Test {
     final String sampleA = """
             broadcaster -> a, b, c
             %a -> b
