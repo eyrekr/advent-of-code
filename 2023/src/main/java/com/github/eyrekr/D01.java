@@ -2,21 +2,27 @@ package com.github.eyrekr;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-
 /**
  * https://adventofcode.com/2023/day/1
  * 1) 54331
  * 2) 54518
  */
-public class D01 {
+class D01 extends AoC {
 
-    public static void main(final String... args) throws Exception {
-        final List<String> lines = Files.readAllLines(Path.of("src/main/resources/D01.txt"));
-        final var sum = lines.stream().map(D01::translate).mapToInt(D01::toNumber).sum();
-        System.out.println(sum);
+
+    public D01(String input) {
+        super(input);
+    }
+
+    @Override
+    long star1() {
+        return lines.map(text-> StringUtils.removeAll(text, "[a-zA-Z_]")).map(D01::toNumber).reduce(0L, Long::sum);
+    }
+
+
+    @Override
+    long star2() {
+        return lines.map(D01::translate).map(D01::toNumber).reduce(0L, Long::sum);
     }
 
     static String translate(final String input) {
