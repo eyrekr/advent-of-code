@@ -379,6 +379,7 @@ public final class Grid implements Iterable<Grid.It> {
                 case Down -> y < n - 1 ? Optional.of(it(x, y + 1)) : Optional.empty();
                 case Left -> x > 0 ? Optional.of(it(x - 1, y)) : Optional.empty();
                 case Right -> x < m - 1 ? Optional.of(it(x + 1, y)) : Optional.empty();
+                case None -> Optional.of(this);
             };
         }
 
@@ -391,7 +392,11 @@ public final class Grid implements Iterable<Grid.It> {
     }
 
     public enum Direction {
-        Up(0, -1, '↑'), Down(0, +1, '↓'), Left(-1, 0, '←'), Right(+1, 0, '→');
+        None(0, 0, '×'),
+        Up(0, -1, '↑'),
+        Down(0, +1, '↓'),
+        Left(-1, 0, '←'),
+        Right(+1, 0, '→');
         public final int dx, dy;
         public final char ch;
 
@@ -399,6 +404,16 @@ public final class Grid implements Iterable<Grid.It> {
             this.dx = dx;
             this.dy = dy;
             this.ch = ch;
+        }
+
+        public boolean isOpposite(final Direction direction) {
+            return switch(this) {
+                case None ->  false;
+                case Up -> direction == Down;
+                case Down -> direction == Up;
+                case Left -> direction == Right;
+                case Right -> direction == Left;
+            };
         }
     }
 }
