@@ -3,6 +3,9 @@ package com.github.eyrekr;
 import com.github.eyrekr.util.Grid;
 import com.github.eyrekr.util.Str;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * https://adventofcode.com/2023/day/21
  * 1) 3598
@@ -10,76 +13,55 @@ import com.github.eyrekr.util.Str;
  */
 class D21 extends AoC {
 
-    static final int STONE = -9999;
-    static final int UNREACHABLE = -9;
-
     final Grid grid;
+    final long steps;
 
-    D21(final String input) {
+    D21(final String input, final long steps) {
         super(input);
+        this.steps = steps;
         grid = Grid.of(input);
     }
 
-    long star1(final int steps) {
-        // init
-        int[][] d = new int[grid.m][grid.n];
-        for (final var it : grid) {
-            switch (it.ch) {
-                case '#' -> d[it.x][it.y] = STONE;
-                case 'S' -> d[it.x][it.y] = 0;
-                default -> d[it.x][it.y] = UNREACHABLE;
-            }
-        }
+    @Override
+    long star1() {
+        // let us treat grid.d as "parity" where 0 - even, 1 - odd
+        grid.each(it -> it.set(it.ch, -1, false));
+        final Grid.It start = grid.chFirst(ch -> ch == 'S');
+        start.set('*', 0, true);
+        Set<Integer> border = new HashSet<>();
+        border.add(start.i);
 
         // iterate
-        for (int step = 0; step < steps; step++) {
-            int[][] tmp = new int[grid.m][grid.n];
-            for (int y = 0; y < grid.n; y++) {
-                for (int x = 0; x < grid.m; x++) {
-                    if (d[x][y] == STONE) {
-                        tmp[x][y] = STONE;
-                    }
-                    if (d[x][y] == step) {
-                        if (x - 1 >= 0 && tmp[x - 1][y] != STONE) tmp[x - 1][y] = step + 1;
-                        if (x + 1 < grid.m && tmp[x + 1][y] != STONE) tmp[x + 1][y] = step + 1;
-                        if (y - 1 >= 0 && tmp[x][y - 1] != STONE) tmp[x][y - 1] = step + 1;
-                        if (y + 1 < grid.n && tmp[x][y + 1] != STONE) tmp[x][y + 1] = step + 1;
-                    }
-                }
+        for (int step = 1; step <= steps; step++) {
+            final Set<Integer> expandedBorder = new HashSet<>();
+            final int parity = step % 2;
+            for (final int i : border) {
+                grid.it(i).unvisitedNeighbours()
+                        .where(n -> n.ch != '#')
+                        .each(n -> {
+                            n.set(n.ch, parity, true);
+                            expandedBorder.add(n.i);
+                        });
             }
-            d = tmp;
+            border = expandedBorder;
 
-            print(step, d);
+            Str.print("\n\nAfter step @c%d\n", step);
+            grid.print(it -> switch (it.ch) {
+                case '#' -> "@w#";
+                case '*' -> "@y*";
+                case '.' -> it.d == parity ? "@r**O**" : "@w.";
+                default -> "@W?";
+            });
         }
 
-        // calculate the steps
-        long sum = 0;
-        for (int i = 0; i < grid.m * grid.n; i++)
-            if (d[i % grid.m][i / grid.m] == steps) sum++;
-        return sum;
+        // calculate the places with the given parity
+        return grid.sum(it -> it.d == steps % 2 ? 1 : 0);
     }
 
 
-    long star2(final int steps) {
+    @Override
+    long star2() {
         return 0L;
-    }
-
-
-    void print(final int step, final int[][] d) {
-        Str.print("After step @c%d\n", step + 1);
-        for (int y = 0; y < grid.n; y++) {
-            for (int x = 0; x < grid.m; x++) {
-                if (d[x][y] == STONE) {
-                    Str.print("@w#");
-                } else if (d[x][y] == step + 1) {
-                    Str.print("@rO");
-                } else {
-                    Str.print("@w.");
-                }
-            }
-            Str.print("\n");
-        }
-        Str.print("\n\n");
     }
 
 }

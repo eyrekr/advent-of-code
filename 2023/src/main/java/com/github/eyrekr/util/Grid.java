@@ -87,7 +87,11 @@ public final class Grid implements Iterable<Grid.It> {
         final char[] ch4 = new char[]{at(x, y - 1), at(x - 1, y), at(x + 1, y), at(x, y + 1)};
         final char[] ch8 = new char[]{at(x - 1, y - 1), at(x, y - 1), at(x + 1, y - 1), at(x - 1, y), at(x + 1, y), at(x - 1, y + 1), at(x, y + 1), at(x + 1, y + 1)};
         final int digit = Character.isDigit(ch) ? Character.digit(ch, 10) : -1;
-        return new It(y * m + x, x, y, m, n, ch, d[x][y], b[x][y], ch4, ch8, digit, x == 0 && y == 0, x == m - 1 && y == n - 1, x == 0, x == m - 1);
+        return new It(
+                this,
+                y * m + x, x, y, m, n, ch, d[x][y], b[x][y],
+                ch4, ch8, digit,
+                x == 0 && y == 0, x == m - 1 && y == n - 1, x == 0, x == m - 1);
     }
 
     public Grid repeat(final int factor) {
@@ -272,6 +276,16 @@ public final class Grid implements Iterable<Grid.It> {
         return this;
     }
 
+    public Grid print(final Function<It, String> transform) {
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < m; x++) {
+                Str.print(transform.apply(it(x, y)));
+            }
+            System.out.println();
+        }
+        return this;
+    }
+
     @Override
     public Iterator<It> iterator() {
         return new GridIterator();
@@ -331,7 +345,8 @@ public final class Grid implements Iterable<Grid.It> {
         }
     }
 
-    public final class It {
+    public static final class It {
+        private final Grid grid;
         public final int i;
         public final int x;
         public final int y;
@@ -348,11 +363,13 @@ public final class Grid implements Iterable<Grid.It> {
         public final boolean firstOnLine;
         public final boolean lastOnLine;
 
-        private It(final int i, final int x, final int y, final int m, final int n,
+        private It(final Grid grid,
+                   final int i, final int x, final int y, final int m, final int n,
                    final char ch, final int d, final boolean b,
                    final char[] neighbours4, final char[] neighbours8,
                    final int digit,
                    final boolean first, final boolean last, final boolean firstOnLine, final boolean lastOnLine) {
+            this.grid = grid;
             this.i = i;
             this.x = x;
             this.y = y;
@@ -371,29 +388,36 @@ public final class Grid implements Iterable<Grid.It> {
         }
 
         public It go(final Direction direction) {
-            return it(x + direction.dx, y + direction.dy);
+            return grid.it(x + direction.dx, y + direction.dy);
         }
 
         public Optional<It> tryToGo(final Direction direction) { // no passing through walls
             return switch (direction) {
-                case Up -> y > 0 ? Optional.of(it(x, y - 1)) : Optional.empty();
-                case Down -> y < n - 1 ? Optional.of(it(x, y + 1)) : Optional.empty();
-                case Left -> x > 0 ? Optional.of(it(x - 1, y)) : Optional.empty();
-                case Right -> x < m - 1 ? Optional.of(it(x + 1, y)) : Optional.empty();
+                case Up -> y > 0 ? Optional.of(grid.it(x, y - 1)) : Optional.empty();
+                case Down -> y < n - 1 ? Optional.of(grid.it(x, y + 1)) : Optional.empty();
+                case Left -> x > 0 ? Optional.of(grid.it(x - 1, y)) : Optional.empty();
+                case Right -> x < m - 1 ? Optional.of(grid.it(x + 1, y)) : Optional.empty();
                 case None -> Optional.of(this);
             };
         }
 
+        public Seq<It> unvisitedNeighbours() {
+            return Seq.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right)
+                    .where(direction -> direction.dx + x >= 0 && direction.dx + x < m && direction.dy + y >= 0 && direction.dy + y < n)
+                    .map(this::go)
+                    .where(it -> !it.b);
+        }
+
         public It set(final char ch, final int d, final boolean b) {
-            Grid.this.a[x][y] = ch;
-            Grid.this.d[x][y] = d;
-            Grid.this.b[x][y] = b;
-            return it(x, y);
+            grid.a[x][y] = ch;
+            grid.d[x][y] = d;
+            grid.b[x][y] = b;
+            return grid.it(x, y);
         }
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof It that && that.i == this.i) {
+            if (o instanceof It that && that.grid == this.grid && that.i == this.i) {
                 return true;
             }
             return false;
@@ -401,7 +425,7 @@ public final class Grid implements Iterable<Grid.It> {
 
         @Override
         public int hashCode() {
-            return Objects.hash(i);
+            return Objects.hash(grid, i);
         }
     }
 
