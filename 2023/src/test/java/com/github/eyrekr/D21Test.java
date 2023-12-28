@@ -33,7 +33,7 @@ class D21Test {
 
     @Test
     void star2() {
-        assertThat(new D21(input, 26501365L).star2()).isEqualTo(0L);
+        assertThat(new D21(input, 26501365L).star2()).isEqualTo(601441063166538L);
     }
 
 }
