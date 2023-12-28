@@ -14,8 +14,8 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 /**
  * https://adventofcode.com/2023/day/22
- * 1)
- * 2)
+ * 1) 418
+ * 2) 70702L
  */
 class D22 extends AoC {
     static final int GROUND = 0;
@@ -128,8 +128,5 @@ class D22 extends AoC {
             final var n = Str.longs(input).map(Long::intValue);
             return new Brick(generator.incrementAndGet(), n.at(0), n.at(1), n.at(2), n.at(3), n.at(4), n.at(5));
         }
-    }
-
-    record Edge(int bottom, int top) {
     }
 }
