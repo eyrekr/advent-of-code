@@ -11,13 +11,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 2)
  */
 class D22 extends AoC {
+    static final int GROUND = 0;
 
     final Seq<Brick> bricks;
     final Brick bounds;
 
     D22(final String input) {
         super(input);
-        this.bricks = lines.carryMap(new AtomicInteger(), Brick::from).sortedBy(Brick::z0);
+        this.bricks = lines.carryMap(new AtomicInteger(GROUND), Brick::from).sortedBy(Brick::z0);
         this.bounds = bricks.reduce(
                 new Brick(0, 0, 0, 0, 0, 0, 0),
                 (volume, brick) -> new Brick(0,
@@ -27,11 +28,10 @@ class D22 extends AoC {
 
     @Override
     long star1() {
-        //bricks.first(30).print("\n");
         final int[][] zbuffer = new int[bounds.x1 + 1][bounds.y1 + 1];
-        final int[][] brickOnTop = new int[bounds.x1 + 1][bounds.y1 + 1]; // 0 means ground
+        final int[][] brickOnTop = new int[bounds.x1 + 1][bounds.y1 + 1];
 
-        Seq<Integer> soleSupport = Seq.empty();
+        Seq<Integer> soleSupportBrick = Seq.empty();
         for (final Brick brick : bricks) {
             int z = Integer.MIN_VALUE;
             Seq<Integer> supportedBy = Seq.empty();
@@ -55,10 +55,11 @@ class D22 extends AoC {
             }
 
             // if this brick is only supported by one other brick, that brick cannot be safely disintegrated
-            if (supportedBy.unique().removeAll(0).length == 1) soleSupport = soleSupport.addFirst(supportedBy.value);
+            supportedBy = supportedBy.unique().removeFirst(GROUND);
+            if (supportedBy.length == 1) soleSupportBrick = soleSupportBrick.addFirst(supportedBy.value);
         }
 
-        return bricks.length - soleSupport.unique().length; //624L too high
+        return bricks.length - soleSupportBrick.unique().length;
     }
 
 

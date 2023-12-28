@@ -29,7 +29,7 @@ class D22Test {
 
     @Test
     void star1() {
-        assertThat(new D22(input).star1()).isEqualTo(0L);
+        assertThat(new D22(input).star1()).isEqualTo(418L);
     }
 
     @Test
