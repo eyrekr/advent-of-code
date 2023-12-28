@@ -19,7 +19,7 @@ class D22Test {
 
     @Test
     void sampleStar1() {
-        assertThat(new D22(sample).star1()).isEqualTo(0L);
+        assertThat(new D22(sample).star1()).isEqualTo(5L);
     }
 
     @Test

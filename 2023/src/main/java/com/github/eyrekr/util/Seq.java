@@ -180,6 +180,10 @@ public final class Seq<E> implements Iterable<E> {
         return lower.addFirst(value).addSeq(upper);
     }
 
+    public <T extends Comparable<T>> Seq<E> sortedBy(final Function<? super E, T> property) {
+        return sortedBy(Comparator.comparing(property::apply));
+    }
+
     public Seq<E> sorted() {
         return sortedBy(Comparator.comparing((Object a) -> ((Comparable) a)));
     }
