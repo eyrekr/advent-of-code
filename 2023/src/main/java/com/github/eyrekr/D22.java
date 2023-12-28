@@ -3,7 +3,13 @@ package com.github.eyrekr;
 import com.github.eyrekr.util.Seq;
 import com.github.eyrekr.util.Str;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 /**
  * https://adventofcode.com/2023/day/22
@@ -65,7 +71,52 @@ class D22 extends AoC {
 
     @Override
     long star2() {
-        return 0L;
+        final int[][] zbuffer = new int[bounds.x1 + 1][bounds.y1 + 1];
+        final int[][] brickOnTop = new int[bounds.x1 + 1][bounds.y1 + 1];
+        final Seq<Edge> edges = bricks.map(brick -> {
+                    int z = Integer.MIN_VALUE;
+                    Seq<Integer> supportedBy = Seq.empty();
+                    for (int x = brick.x0; x <= brick.x1; x++) {
+                        for (int y = brick.y0; y <= brick.y1; y++) {
+                            if (zbuffer[x][y] == z) {
+                                supportedBy = supportedBy.addFirst(brickOnTop[x][y]);
+                            } else if (zbuffer[x][y] > z) {
+                                z = zbuffer[x][y];
+                                supportedBy = Seq.of(brickOnTop[x][y]);
+                            }
+                        }
+                    }
+
+                    final int z1 = z + (brick.z1 - brick.z0) + 1;
+                    for (int x = brick.x0; x <= brick.x1; x++) {
+                        for (int y = brick.y0; y <= brick.y1; y++) {
+                            zbuffer[x][y] = z1;
+                            brickOnTop[x][y] = brick.id;
+                        }
+                    }
+
+                    return supportedBy.unique().removeFirst(GROUND).map(under -> new Edge(under, brick.id));
+                })
+                .flatMap(Function.identity());
+        return bricks.map(brick -> score(brick.id, edges)).reduce(Integer::sum);
+    }
+
+    int score(final int id, final Seq<Edge> edges) {
+        final Set<Integer> fallen = new HashSet<>();
+        final LinkedList<Integer> queue = new LinkedList<>();
+        queue.add(id);
+        while (isNotEmpty(queue)) {
+            final int brick = queue.removeFirst();
+            final boolean allUnderThisBrickHaveFallen = brick == id || edges
+                    .where(edge -> edge.top == brick)
+                    .map(Edge::bottom)
+                    .allAre(fallen::contains);
+            if (allUnderThisBrickHaveFallen) {
+                fallen.add(brick);
+                edges.where(edge -> edge.bottom == brick).map(Edge::top).each(queue::addLast);
+            }
+        }
+        return fallen.size() -1;
     }
 
     record Brick(int id, int x0, int y0, int z0, int x1, int y1, int z1) {
@@ -73,5 +124,8 @@ class D22 extends AoC {
             final var n = Str.longs(input).map(Long::intValue);
             return new Brick(generator.incrementAndGet(), n.at(0), n.at(1), n.at(2), n.at(3), n.at(4), n.at(5));
         }
+    }
+
+    record Edge(int bottom, int top) {
     }
 }
