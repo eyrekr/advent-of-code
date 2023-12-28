@@ -5,9 +5,7 @@ import com.github.eyrekr.util.Str;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
@@ -105,19 +103,27 @@ class D22 extends AoC {
             });
         }
 
-        return bricks.map(brick -> score(brick.id, above, under)).reduce(Integer::sum);
+        final Map<Integer, Brick> index = bricks.indexBy(Brick::id);
+        return bricks.map(brick -> score(brick, index, above, under)).reduce(Integer::sum);
     }
 
-    int score(final int id, final Multimap<Integer, Integer> above, final Multimap<Integer, Integer> under) {
+    int score(final Brick brick, final Map<Integer, Brick> index, final Multimap<Integer, Integer> above, final Multimap<Integer, Integer> under) {
         final Set<Integer> fallen = new HashSet<>();
-        final LinkedList<Integer> queue = new LinkedList<>();
-        queue.add(id);
+        final PriorityQueue<Brick> queue = new PriorityQueue<>(Comparator.comparingInt(Brick::z0));
+        final Set<Integer> enqueued = new HashSet<>();
+        queue.add(brick);
+        enqueued.add(brick.id);
         while (isNotEmpty(queue)) {
-            final int brick = queue.removeFirst();
-            final boolean allUnderThisBrickHaveFallen = brick == id || fallen.containsAll(under.get(brick));
+            final Brick current = queue.poll();
+            final boolean allUnderThisBrickHaveFallen = brick == current || fallen.containsAll(under.get(current.id));
             if (allUnderThisBrickHaveFallen) {
-                fallen.add(brick);
-                above.get(brick).forEach(queue::addLast);
+                fallen.add(current.id);
+                above.get(current.id).stream()
+                        .filter(i -> !enqueued.contains(i))
+                        .forEach(a -> {
+                            enqueued.add(a);
+                            queue.add(index.get(a));
+                        });
             }
         }
         return fallen.size() - 1;
