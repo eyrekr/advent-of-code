@@ -113,6 +113,7 @@ class D22 extends AoC {
         final Set<Integer> enqueued = new HashSet<>();
         queue.add(brick);
         enqueued.add(brick.id);
+
         while (isNotEmpty(queue)) {
             final Brick current = queue.poll();
             final boolean allUnderThisBrickHaveFallen = brick == current || fallen.containsAll(under.get(current.id));
