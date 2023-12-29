@@ -1,5 +1,6 @@
 package com.github.eyrekr;
 
+import com.github.eyrekr.util.Arr;
 import com.github.eyrekr.util.Grid;
 import com.github.eyrekr.util.Grid.Direction;
 import com.github.eyrekr.util.Grid.It;
@@ -38,8 +39,36 @@ class D23 extends AoC {
             edges = edges.addSeq(e);
         }
 
-        edges.print("\n");
-        return 0L;
+
+        Arr sortedWaypoints = Arr.empty();
+        {// topological sort
+            Arr queue = Arr.of(start.i);
+            while (queue.isNotEmpty) {
+                final long source = queue.peek();
+                queue = queue.removeFirst();
+                if (!sortedWaypoints.has(source)) sortedWaypoints = sortedWaypoints.addLast(source);
+                queue = queue.addLast(edges.where(e -> e.a == source).map(e -> e.b).toArr(i -> i));
+            }
+            sortedWaypoints.print();
+        }
+
+
+        int[] distance = new int[sortedWaypoints.length];
+        {// max path
+            while(sortedWaypoints.isNotEmpty) {
+                final long source = sortedWaypoints.peek();
+                sortedWaypoints = sortedWaypoints.removeFirst();
+
+                for (final Edge edge : edges.where(e -> e.a == source)) {
+                    final int d0 = distance[edge.a];
+                    final int d1 = distance[edge.b];
+                    if (d0 - edge.distance < d1) {
+                        distance[edge.b] = d0 + edge.distance; // improve;
+                    }
+                }
+            }
+        }
+        return -distance[sortedWaypoints.length-1];
     }
 
     Seq<It> waypoints() {

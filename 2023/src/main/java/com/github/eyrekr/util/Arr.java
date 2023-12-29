@@ -6,12 +6,13 @@ import java.util.*;
  * Array of numbers.
  * Optimized for better performance than @{@link Seq}.
  */
-public final class Arr {
+public final class Arr {//TODO Implement Iterable<Long>
 
     private static final int MIN_CAPACITY = 16;
 
     public final int length;
     public final boolean isEmpty;
+    public final boolean isNotEmpty;
     private final long[] a;
     private final int start;
     private final boolean isFull;
@@ -21,6 +22,7 @@ public final class Arr {
         this.a = new long[MIN_CAPACITY];
         this.length = 0;
         this.isEmpty = true;
+        this.isNotEmpty = false;
         this.start = 0;
         this.isFull = false;
         this.safeToAdd = true;
@@ -31,6 +33,7 @@ public final class Arr {
         this.start = start % a.length;
         this.length = length;
         this.isEmpty = this.length == 0;
+        this.isNotEmpty = !this.isEmpty;
         this.isFull = this.length == a.length;
         this.safeToAdd = safeToAdd;
     }
@@ -55,6 +58,12 @@ public final class Arr {
      */
     public static Arr empty() {
         return new Arr();
+    }
+
+    public static Arr repeat(final long value, final int n) {
+        final long[] b = new long[n];
+        Arrays.fill(b, value);
+        return new Arr(b, 0, b.length, true);
     }
 
     public static Arr of(final long value, final long... values) {
@@ -132,6 +141,14 @@ public final class Arr {
         }
     }
 
+    public Arr addLast(final Arr values) {
+        Arr tmp = this;
+        for (int i = 0; i < values.length; i++) {
+            tmp = tmp.addLast(values.at(i));
+        }
+        return tmp;
+    }
+
     /**
      * @return New array without the last value. If the array is empty, the operation does not do anything.
      */
@@ -159,6 +176,13 @@ public final class Arr {
      */
     public Arr removeFirst() {
         return isEmpty ? this : new Arr(a, start + 1, length - 1, false);
+    }
+
+    /**
+     * @return The first value in the array. Equivalent of {@code at(0)}.
+     */
+    public long peek() {
+        return at(0);
     }
 
     /**
