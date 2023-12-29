@@ -13,7 +13,7 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 /**
  * https://adventofcode.com/2023/day/22
  * 1) 418
- * 2) 70702L
+ * 2) 70702
  */
 class D22 extends AoC {
     static final int GROUND = 0;
