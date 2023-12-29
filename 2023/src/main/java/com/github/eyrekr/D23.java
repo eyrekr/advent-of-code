@@ -32,20 +32,12 @@ class D23 extends AoC {
         Seq<Edge> edges = Seq.empty();
         for (final It source : waypoints) {
             if (Objects.equals(source, end)) continue;
-            final Seq<Edge> e = directions.where(direction -> {
-                        final It next = source.go(direction);
-                        if (next == null) return false;
-                        return next.ch == '.' || switch (direction) {
-                            case Up -> next.ch == '^';
-                            case Down -> next.ch == 'v';
-                            case Left -> next.ch == '<';
-                            case Right -> next.ch == '>';
-                            default -> false;
-                        };
-                    })
+            final Seq<Edge> e = directions
+                    .where(direction -> isValidDirection(source, direction))
                     .map(direction -> findNextWaypoint(waypoints, source, source.go(direction), direction, 1));
             edges = edges.addSeq(e);
         }
+
         edges.print("\n");
         return 0L;
     }
@@ -79,7 +71,6 @@ class D23 extends AoC {
             default -> false;
         };
     }
-
 
     @Override
     long star2() {
