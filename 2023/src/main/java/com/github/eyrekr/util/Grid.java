@@ -82,7 +82,7 @@ public final class Grid implements Iterable<Grid.It> {
     }
 
     public It it(final int x, final int y) {
-        if (x < 0 || y < 0 || x >= m || y >= n) throw new IllegalStateException();
+        if (x < 0 || y < 0 || x >= m || y >= n) return null;
         final char ch = a[x][y];
         final char[] ch4 = new char[]{at(x, y - 1), at(x - 1, y), at(x + 1, y), at(x, y + 1)};
         final char[] ch8 = new char[]{at(x - 1, y - 1), at(x, y - 1), at(x + 1, y - 1), at(x - 1, y), at(x + 1, y), at(x - 1, y + 1), at(x, y + 1), at(x + 1, y + 1)};
@@ -402,10 +402,13 @@ public final class Grid implements Iterable<Grid.It> {
         }
 
         public Seq<It> unvisitedNeighbours() {
+            return neighbours().where(it -> !it.b);
+        }
+
+        public Seq<It> neighbours() {
             return Seq.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right)
                     .where(direction -> direction.dx + x >= 0 && direction.dx + x < m && direction.dy + y >= 0 && direction.dy + y < n)
-                    .map(this::go)
-                    .where(it -> !it.b);
+                    .map(this::go);
         }
 
         public It set(final char ch, final int d, final boolean b) {
