@@ -228,6 +228,24 @@ public final class Grid implements Iterable<Grid.It> {
         return builder.toString();
     }
 
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof final Grid that && that.m == this.m && that.n == this.n) {
+            for (int y = 0; y < n; y++)
+                for (int x = 0; x < m; x++)
+                    if (a[x][y] != that.a[x][y]) return false;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int code = 31 * m * n;
+        for (int i = 0; i < m * n; i++) code *= a[i % m][i / m];
+        return code;
+    }
+
     public static final class It {
         private final Grid grid;
         public final int i;
