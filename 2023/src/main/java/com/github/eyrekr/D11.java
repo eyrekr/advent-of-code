@@ -14,7 +14,7 @@ class D11 extends AoC {
 
     D11(final String input) {
         super(input);
-        this.grid = Grid.of(lines);
+        this.grid = Grid.of(input);
     }
 
     long star1() {
@@ -26,7 +26,7 @@ class D11 extends AoC {
     }
 
     Seq<long[]> expandedStars(final long gap) {
-        final var stars = grid.where(it -> it.ch == '#').map(it -> new long[]{it.x, it.y});
+        final var stars = grid.where('#').map(it -> new long[]{it.x, it.y});
         final var columnsWithStars = stars.map(p -> p[0]).unique();
         final var rowsWithStars = stars.map(p -> p[1]).unique();
         return stars.map(p -> new long[]{

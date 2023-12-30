@@ -1,10 +1,10 @@
 package com.github.eyrekr;
 
 import com.github.eyrekr.immutable.Arr;
-import com.github.eyrekr.util.Grid;
-import com.github.eyrekr.util.Grid.Direction;
-import com.github.eyrekr.util.Grid.It;
 import com.github.eyrekr.immutable.Seq;
+import com.github.eyrekr.raster.Direction;
+import com.github.eyrekr.util.Grid;
+import com.github.eyrekr.util.Grid.It;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ class D23 extends AoC {
 
     @Override
     long star1() {
-        final It start = grid.chFirst(ch -> ch == '.'), end = grid.chLast(ch -> ch == '.');
+        final It start = grid.first('.'), end = grid.last('.');
         final Seq<It> waypoints = waypoints().addFirst(start).addFirst(end);
         waypoints.each(it -> it.set(it.ch, 0, true));
 

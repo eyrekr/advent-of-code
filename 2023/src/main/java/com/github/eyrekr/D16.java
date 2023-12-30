@@ -1,5 +1,6 @@
 package com.github.eyrekr;
 
+import com.github.eyrekr.raster.Direction;
 import com.github.eyrekr.util.Grid;
 
 import java.util.HashSet;
@@ -14,22 +15,22 @@ import java.util.Set;
 class D16 extends AoC {
 
     final static Instruction[] INSTRUCTIONS = new Instruction[]{
-            new Instruction('-', Grid.Direction.Down, Grid.Direction.Left),
-            new Instruction('-', Grid.Direction.Down, Grid.Direction.Right),
-            new Instruction('-', Grid.Direction.Up, Grid.Direction.Left),
-            new Instruction('-', Grid.Direction.Up, Grid.Direction.Right),
-            new Instruction('|', Grid.Direction.Left, Grid.Direction.Up),
-            new Instruction('|', Grid.Direction.Left, Grid.Direction.Down),
-            new Instruction('|', Grid.Direction.Right, Grid.Direction.Up),
-            new Instruction('|', Grid.Direction.Right, Grid.Direction.Down),
-            new Instruction('\\', Grid.Direction.Left, Grid.Direction.Up),
-            new Instruction('\\', Grid.Direction.Right, Grid.Direction.Down),
-            new Instruction('\\', Grid.Direction.Up, Grid.Direction.Left),
-            new Instruction('\\', Grid.Direction.Down, Grid.Direction.Right),
-            new Instruction('/', Grid.Direction.Left, Grid.Direction.Down),
-            new Instruction('/', Grid.Direction.Right, Grid.Direction.Up),
-            new Instruction('/', Grid.Direction.Up, Grid.Direction.Right),
-            new Instruction('/', Grid.Direction.Down, Grid.Direction.Left),
+            new Instruction('-', Direction.Down, Direction.Left),
+            new Instruction('-', Direction.Down, Direction.Right),
+            new Instruction('-', Direction.Up, Direction.Left),
+            new Instruction('-', Direction.Up, Direction.Right),
+            new Instruction('|', Direction.Left, Direction.Up),
+            new Instruction('|', Direction.Left, Direction.Down),
+            new Instruction('|', Direction.Right, Direction.Up),
+            new Instruction('|', Direction.Right, Direction.Down),
+            new Instruction('\\', Direction.Left, Direction.Up),
+            new Instruction('\\', Direction.Right, Direction.Down),
+            new Instruction('\\', Direction.Up, Direction.Left),
+            new Instruction('\\', Direction.Down, Direction.Right),
+            new Instruction('/', Direction.Left, Direction.Down),
+            new Instruction('/', Direction.Right, Direction.Up),
+            new Instruction('/', Direction.Up, Direction.Right),
+            new Instruction('/', Direction.Down, Direction.Left),
     };
 
     final Grid grid;
@@ -40,18 +41,18 @@ class D16 extends AoC {
     }
 
     long star1() {
-        return calculate(new Step(0, 0, Grid.Direction.Right));
+        return calculate(new Step(0, 0, Direction.Right));
     }
 
     long star2() {
         long max = 0L;
         for (int x = 0; x < grid.m; x++) {
-            max = Math.max(max, calculate(new Step(x, 0, Grid.Direction.Down)));
-            max = Math.max(max, calculate(new Step(x, grid.n - 1, Grid.Direction.Up)));
+            max = Math.max(max, calculate(new Step(x, 0, Direction.Down)));
+            max = Math.max(max, calculate(new Step(x, grid.n - 1, Direction.Up)));
         }
         for (int y = 0; y < grid.n; y++) {
-            max = Math.max(max, calculate(new Step(0, y, Grid.Direction.Right)));
-            max = Math.max(max, calculate(new Step(grid.m - 1, grid.n - 1, Grid.Direction.Left)));
+            max = Math.max(max, calculate(new Step(0, y, Direction.Right)));
+            max = Math.max(max, calculate(new Step(grid.m - 1, grid.n - 1, Direction.Left)));
         }
         return max;
     }
@@ -76,12 +77,12 @@ class D16 extends AoC {
             }
             if (justPass) it.tryToGo(step.direction).ifPresent(next -> buffer.addLast(new Step(next.x, next.y, step.direction)));
         }
-        return mask.chWhere(ch -> ch == '#').length;
+        return mask.where('#').length;
     }
 
-    record Instruction(char ch, Grid.Direction in, Grid.Direction out) {
+    record Instruction(char ch, Direction in, Direction out) {
     }
 
-    record Step(int x, int y, Grid.Direction direction) {
+    record Step(int x, int y, Direction direction) {
     }
 }

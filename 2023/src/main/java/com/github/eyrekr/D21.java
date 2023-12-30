@@ -30,7 +30,7 @@ class D21 extends AoC {
     @Override
     long star2() {
         final int factor = grid.m, delta = grid.m / 2;
-        final Grid inflatedGrid = grid.repeat(7).chMap(ch -> ch == 'S' ? '.' : ch);
+        final Grid inflatedGrid = grid.repeat(7).replace(ch -> ch == 'S' ? '.' : ch);
         inflatedGrid.it(inflatedGrid.m / 2, inflatedGrid.n / 2).set('S', 0, true);
 
         final long f0 = run(inflatedGrid, 0 * factor + delta);
@@ -53,7 +53,7 @@ class D21 extends AoC {
     long run(final Grid grid, final long steps) {
         // let us treat grid.d as "parity" where -1 - not reached yet, 0 - even, 1 - odd
         grid.each(it -> it.set(it.ch, -1, false));
-        final Grid.It start = grid.chFirst(ch -> ch == 'S' || ch == '*');
+        final Grid.It start = grid.firstOneOf("S*");
         start.set('*', 0, true);
         Set<Integer> border = new HashSet<>();
         border.add(start.i);

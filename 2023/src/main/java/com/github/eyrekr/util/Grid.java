@@ -2,12 +2,9 @@ package com.github.eyrekr.util;
 
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.output.Out;
+import com.github.eyrekr.raster.Direction;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -16,7 +13,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public final class Grid implements Iterable<Grid.It> {
-    private static final Seq<Direction> ALL_DIRECTIONS = Seq.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right);
     public static final char C0 = '\0';
 
     public final int m;
@@ -37,38 +33,13 @@ public final class Grid implements Iterable<Grid.It> {
         return new Grid(m, n, new char[m][n]);
     }
 
-    @Deprecated // use the Grid.of(String) version
-    public static Grid from(final Path path) {
-        try {
-            return Grid.of(Files.readAllLines(path));
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
     public static Grid of(final String input) {
-        return Grid.of(Seq.ofLinesFromString(input));
-    }
-
-    public static Grid of(final List<String> lines) {
-        final int n = lines.size();
-        final int m = lines.get(0).length();
-        final char[][] data = new char[m][n];
-        for (int y = 0; y < n; y++) {
-            final char[] line = lines.get(y).toCharArray();
-            for (int x = 0; x < m; x++) {
-                data[x][y] = line[x];
-            }
-        }
-        return new Grid(m, n, data);
-    }
-
-    public static Grid of(final Seq<String> lines) {
+        final String[] lines = input.split("\n");
         final int n = lines.length;
-        final int m = lines.value.length();
+        final int m = lines[0].length();
         final char[][] data = new char[m][n];
         for (int y = 0; y < n; y++) {
-            final char[] line = lines.at(y).toCharArray();
+            final char[] line = lines[y].toCharArray();
             for (int x = 0; x < m; x++) {
                 data[x][y] = line[x];
             }
@@ -106,53 +77,45 @@ public final class Grid implements Iterable<Grid.It> {
     }
 
     public Grid each(final Consumer<It> consumer) {
-        for (int i = 0; i < m * n; i++) {
-            consumer.accept(it(i));
-        }
+        for (int i = 0; i < m * n; i++) consumer.accept(it(i));
         return this;
     }
 
     public It first(final Predicate<It> predicate) {
         for (int i = 0; i < m * n; i++) {
             final It it = it(i);
-            if (predicate.test(it)) {
-                return it;
-            }
+            if (predicate.test(it)) return it;
         }
         return null;
     }
 
-    public It chFirst(final Predicate<Character> predicate) {
-        for (int y = 0; y < n; y++) {
-            for (int x = 0; x < m; x++) {
-                final char ch = a[x][y];
-                if (predicate.test(ch)) {
-                    return it(x, y);
-                }
-            }
-        }
+    public It first(final char ch) {
+        for (int y = 0; y < n; y++)
+            for (int x = 0; x < m; x++)
+                if (a[x][y] == ch) return it(x, y);
+        return null;
+    }
+
+    @Deprecated
+    public It firstOneOf(final String characters) {
+        for (int y = 0; y < n; y++)
+            for (int x = 0; x < m; x++)
+                if (characters.indexOf(a[x][y]) >= 0) return it(x, y);
         return null;
     }
 
     public It last(final Predicate<It> predicate) {
         for (int i = m * n - 1; i >= 0; i--) {
             final It it = it(i);
-            if (predicate.test(it)) {
-                return it;
-            }
+            if (predicate.test(it)) return it;
         }
         return null;
     }
 
-    public It chLast(final Predicate<Character> predicate) {
-        for (int y = n - 1; y >= 0; y--) {
-            for (int x = m - 1; x >= 0; x--) {
-                final char ch = a[x][y];
-                if (predicate.test(ch)) {
-                    return it(x, y);
-                }
-            }
-        }
+    public It last(final char ch) {
+        for (int y = n - 1; y >= 0; y--)
+            for (int x = m - 1; x >= 0; x--)
+                if (a[x][y] == ch) return it(x, y);
         return null;
     }
 
@@ -160,69 +123,44 @@ public final class Grid implements Iterable<Grid.It> {
         Seq<It> seq = Seq.empty();
         for (int i = m * n - 1; i >= 0; i--) {
             final It it = it(i);
-            if (predicate.test(it)) {
-                seq = seq.addFirst(it);
-            }
+            if (predicate.test(it)) seq = seq.addFirst(it);
         }
         return seq;
     }
 
-    public Seq<It> chWhere(final Predicate<Character> predicate) {
+    public Seq<It> where(final char ch) {
         Seq<It> seq = Seq.empty();
-        for (int y = n - 1; y >= 0; y--) {
-            final char[] row = a[y];
-            for (int x = m - 1; x >= 0; x--) {
-                final char ch = row[x];
-                if (predicate.test(ch)) {
-                    seq = seq.addFirst(it(x, y));
-                }
-            }
-        }
+        for (int y = n - 1; y >= 0; y--)
+            for (int x = m - 1; x >= 0; x--)
+                if (a[x][y] == ch) seq = seq.addFirst(it(x, y));
         return seq;
     }
 
     public Grid transpose() {
         final char[][] transposed = new char[n][m];
-        for (int y = 0; y < n; y++) {
-            for (int x = 0; x < m; x++) {
+        for (int y = 0; y < n; y++)
+            for (int x = 0; x < m; x++)
                 transposed[y][x] = a[x][y];
-            }
-        }
         return new Grid(n, m, transposed);
     }
 
     public Grid rotateCW() { //clockwise
         final char[][] rotated = new char[n][m];
-        for (int y = 0; y < n; y++) {
-            for (int x = 0; x < m; x++) {
+        for (int y = 0; y < n; y++)
+            for (int x = 0; x < m; x++)
                 rotated[m - 1 - y][x] = a[x][y];
-            }
-        }
         return new Grid(n, m, rotated);
     }
 
     public Grid rotateCCW() { //counter-clockwise
         final char[][] rotated = new char[n][m];
-        for (int y = 0; y < n; y++) {
-            for (int x = 0; x < m; x++) {
+        for (int y = 0; y < n; y++)
+            for (int x = 0; x < m; x++)
                 rotated[y][n - 1 - x] = a[x][y];
-            }
-        }
         return new Grid(n, m, rotated);
     }
 
-    public Grid map(final Function<It, Character> transform) {
-        final Grid grid = new Grid(m, n, new char[m][n]);
-        for (int y = 0; y < n; y++) {
-            for (int x = 0; x < m; x++) {
-                final Character ch = transform.apply(it(x, y));
-                grid.a[x][y] = ch == null ? C0 : ch;
-            }
-        }
-        return grid;
-    }
-
-    public Grid chMap(final Function<Character, Character> transform) {
+    public Grid replace(final Function<Character, Character> transform) {
         final Grid grid = new Grid(m, n, new char[m][n]);
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < m; x++) {
@@ -255,18 +193,6 @@ public final class Grid implements Iterable<Grid.It> {
 
     public int sum(final Function<It, Integer> transform) {
         return reduce(0, (acc, it) -> acc + transform.apply(it));
-    }
-
-    public int chSum(final Function<Character, Integer> transform) {
-        return chReduce(0, (acc, ch) -> acc + transform.apply(ch));
-    }
-
-    public Seq<Column> columns() {
-        Seq<Column> columns = Seq.empty();
-        for (int x = m - 1; x >= 0; x--) {
-            columns = columns.addLast(new Column(x, m, a[x]));
-        }
-        return columns;
     }
 
     public Grid print() {
@@ -330,22 +256,6 @@ public final class Grid implements Iterable<Grid.It> {
     @Override
     public String toString() {
         return reduce(new StringBuilder(), (builder, it) -> it.lastOnLine ? builder.append(it.ch).append('\n') : builder.append(it.ch)).toString();
-    }
-
-    public final class Column {
-        public final int x;
-        public final int m;
-        public final char[] a;
-        public final boolean first;
-        public final boolean last;
-
-        private Column(final int x, final int m, final char[] a) {
-            this.x = x;
-            this.m = m;
-            this.a = a;
-            this.first = x == 0;
-            this.last = x == m - 1;
-        }
     }
 
     public static final class It {
@@ -435,39 +345,5 @@ public final class Grid implements Iterable<Grid.It> {
         }
     }
 
-    public enum Direction {
-        None(0, 0, '×'),
-        Up(0, -1, '↑'),
-        Down(0, +1, '↓'),
-        Left(-1, 0, '←'),
-        Right(+1, 0, '→');
-        public final int dx, dy;
-        public final char ch;
 
-        Direction(int dx, int dy, char ch) {
-            this.dx = dx;
-            this.dy = dy;
-            this.ch = ch;
-        }
-
-        public boolean isOpposite(final Direction direction) {
-            return switch (this) {
-                case None -> false;
-                case Up -> direction == Down;
-                case Down -> direction == Up;
-                case Left -> direction == Right;
-                case Right -> direction == Left;
-            };
-        }
-
-        public Direction opposite() {
-            return switch (this) {
-                case None -> None;
-                case Up -> Down;
-                case Down -> Up;
-                case Left -> Right;
-                case Right -> Left;
-            };
-        }
-    }
 }

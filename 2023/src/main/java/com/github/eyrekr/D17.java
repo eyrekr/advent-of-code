@@ -1,8 +1,8 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.util.Grid;
-import com.github.eyrekr.util.Grid.Direction;
 import com.github.eyrekr.immutable.Seq;
+import com.github.eyrekr.raster.Direction;
+import com.github.eyrekr.util.Grid;
 
 import java.util.Comparator;
 import java.util.HashSet;

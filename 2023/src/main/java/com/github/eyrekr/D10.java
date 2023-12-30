@@ -1,8 +1,8 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.util.Grid;
-import com.github.eyrekr.util.Grid.Direction;
 import com.github.eyrekr.output.Out;
+import com.github.eyrekr.raster.Direction;
+import com.github.eyrekr.util.Grid;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
@@ -28,7 +28,7 @@ class D10 extends AoC {
 
     D10(final String input) {
         super(input);
-        this.grid = Grid.of(lines).map(it -> ASCII.getOrDefault(it.ch, Grid.C0));
+        this.grid = Grid.of(input).replace(ch -> ASCII.getOrDefault(ch, Grid.C0));
     }
 
     long star1() {
@@ -78,7 +78,7 @@ class D10 extends AoC {
     }
 
     long traverse(final Consumer<Grid.It> process) {
-        final Grid.It start = grid.chFirst(ch -> ch == '*');
+        final Grid.It start = grid.first('*');
         State state = new State(start, Direction.Up, 0);
         while (true) {
             process.accept(state.it);
