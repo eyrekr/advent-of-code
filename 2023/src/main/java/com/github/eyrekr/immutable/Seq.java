@@ -144,7 +144,7 @@ public final class Seq<E> implements Iterable<E> {
         return isEmpty || seq.isEmpty ? empty() : new Seq<>(translate.apply(value, seq.value), tail.mapWith(seq.tail, translate));
     }
 
-    public <R> Seq<R> flatMap(final Function<? super E, Seq<R>> translate) {
+    public <R> Seq<R> flatMap(final Function<? super E, Seq<R>> translate) { // FIXME It takes elements backwards!
         return reduceR(empty(), (acc, element) -> acc.addSeq(translate.apply(element)));
     }
 

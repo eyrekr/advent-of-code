@@ -1,6 +1,5 @@
 package com.github.eyrekr.immutable;
 
-import com.github.eyrekr.immutable.Arr;
 import org.junit.jupiter.api.Test;
 
 import java.util.Comparator;
@@ -9,7 +8,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TestArr {
+class ArrTest {
 
     static final Arr ARR = Arr.of(-1, 0, 1)
             .addFirst(-2)
