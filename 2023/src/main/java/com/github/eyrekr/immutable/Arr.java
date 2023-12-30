@@ -346,7 +346,7 @@ public final class Arr<E> implements Iterable<E> {
      * @return New array with the values in reversed order.
      * @complexity O(n)
      */
-    public Arr<E> reverse() {
+    public Arr<E> reversed() {
         final Arr<E> arr = clone(1);
         for (int i = 0; i < length; i++)
             arr.a[i] = at(length - i - 1);
@@ -354,10 +354,18 @@ public final class Arr<E> implements Iterable<E> {
     }
 
     /**
+     * @return New array with the values sorted by the surrogate values.
+     * @complexity O(n log n)
+     */
+    public <T extends Comparable<T>> Arr<E> sortedBy(final Function<? super E, T> transform) {
+        return sortedBy(Comparator.comparing(transform::apply));
+    }
+
+    /**
      * @return New array with the values sorted in the given order.
      * @complexity O(n log n)
      */
-    public Arr<E> sortBy(final Comparator<? super E> comparator) {
+    public Arr<E> sortedBy(final Comparator<? super E> comparator) {
         final Arr<E> arr = clone(1);
         quicksort((E[]) arr.a, 0, length - 1, comparator);
         return arr;
@@ -556,9 +564,21 @@ public final class Arr<E> implements Iterable<E> {
     }
 
     public Set<E> toSet() {
-        final Set<E> set = new HashSet<>();
+        final Set<E> set = new HashSet<>(length);
         for (int i = 0; i < length; i++) set.add(at(i));
         return set;
+    }
+
+    public List<E> toList() {
+        final List<E> list = new ArrayList<>(length);
+        for (int i = 0; i < length; i++) list.add(at(i));
+        return list;
+    }
+
+    public Seq<E> toSeq() {
+        Seq<E> seq = Seq.empty();
+        for (int i = length - 1; i >= 0; i--) seq = seq.addFirst(at(i));
+        return seq;
     }
 
     @Override

@@ -333,7 +333,7 @@ public final class Longs implements Iterable<Long> {
      * @return The accumulated value.
      * @complexity O(n)
      */
-    public <R> R reduce(final R init, final LongToR<R> reducer) {
+    public <R> R reduce(final R init, final AccumulatedLongToR<R> reducer) {
         R acc = init;
         for (int i = 0; i < length; i++) {
             acc = reducer.reduce(acc, at(i));
@@ -409,7 +409,7 @@ public final class Longs implements Iterable<Long> {
      * @return New array with the values in reversed order.
      * @complexity O(n)
      */
-    public Longs reverse() {
+    public Longs reversed() {
         final Longs arr = clone(1);
         for (int i = 0; i < length; i++) {
             arr.a[i] = at(length - i - 1);
@@ -421,7 +421,7 @@ public final class Longs implements Iterable<Long> {
      * @return New array with the values sorted in the ascending order.
      * @complexity O(n log n)
      */
-    public Longs sort() {
+    public Longs sorted() {
         final Longs arr = clone(1);
         arr.print();
         Arrays.sort(arr.a, 0, length);
@@ -432,15 +432,15 @@ public final class Longs implements Iterable<Long> {
      * @return New array with the values sorted by the surrogate values.
      * @complexity O(n log n)
      */
-    public Longs sortBy(final LongToLong transform) {
-        return sortBy((a, b) -> Long.compare(transform.apply(a), transform.apply(b)));
+    public Longs sortedBy(final LongToLong transform) {
+        return sortedBy((a, b) -> Long.compare(transform.apply(a), transform.apply(b)));
     }
 
     /**
      * @return New array with the values sorted in the given order.
      * @complexity O(n log n)
      */
-    public Longs sortBy(final LongLongToInt comparator) {
+    public Longs sortedBy(final LongLongToInt comparator) {
         final Longs arr = clone(1);
         quicksort(arr.a, 0, length - 1, comparator);
         return arr;
@@ -705,6 +705,12 @@ public final class Longs implements Iterable<Long> {
         return set;
     }
 
+    public <R> Arr<R> toArr(final LongToR<? extends R> transform) {
+        Arr<R> arr = Arr.empty();
+        for (int i = 0; i < length; i++) arr.addLast(transform.apply(at(i)));
+        return arr;
+    }
+
     @FunctionalInterface
     public interface RichLongToString {
         String format(long value, int i, boolean first, boolean last);
@@ -720,32 +726,18 @@ public final class Longs implements Iterable<Long> {
     }
 
     @FunctionalInterface
-    public interface RichLongToBool {
-        boolean test(long value, int i, boolean first, boolean last);
-
-        default RichLongToBool negate() {
-            return (value, i, first, last) -> !test(value, i, first, last);
-        }
-    }
-
-    @FunctionalInterface
     public interface LongToR<R> {
-        R reduce(R accumulator, long value);
+        R apply(long value);
     }
 
     @FunctionalInterface
-    public interface RichLongToR<R> {
-        R reduce(R accumulator, long value, int i, boolean first, boolean last);
+    public interface AccumulatedLongToR<R> {
+        R reduce(R accumulator, long value);
     }
 
     @FunctionalInterface
     public interface LongToLong {
         long apply(long value);
-    }
-
-    @FunctionalInterface
-    public interface RichLongToLong {
-        long apply(long value, int i, boolean first, boolean last);
     }
 
     @FunctionalInterface
@@ -760,18 +752,8 @@ public final class Longs implements Iterable<Long> {
     }
 
     @FunctionalInterface
-    public interface RichLongLongToLong {
-        long apply(long value, long other, int i, boolean first, boolean last);
-    }
-
-    @FunctionalInterface
     public interface LongToArr {
         Longs apply(long value);
-    }
-
-    @FunctionalInterface
-    public interface RichLongToArr {
-        Longs apply(long value, int i, boolean first, boolean last);
     }
 
     @FunctionalInterface

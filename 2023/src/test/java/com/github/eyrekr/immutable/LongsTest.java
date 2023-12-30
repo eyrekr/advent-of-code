@@ -376,33 +376,33 @@ class LongsTest {
 
     @Test
     void reverse() {
-        assertThat(Longs.of(1, 2, 3, -1, 0, 4).reverse()).isEqualTo(Longs.of(4, 0, -1, 3, 2, 1));
+        assertThat(Longs.of(1, 2, 3, -1, 0, 4).reversed()).isEqualTo(Longs.of(4, 0, -1, 3, 2, 1));
     }
 
     @Test
     void arr_reverse() {
-        assertThat(ARR.reverse()).isEqualTo(Longs.of(3, 2, 1, 0, -1, -2, -3));
+        assertThat(ARR.reversed()).isEqualTo(Longs.of(3, 2, 1, 0, -1, -2, -3));
     }
 
     @Test
     void sort() {
-        assertThat(Longs.of(1, 2, 0, 3, -1, 0, 4).sort()).isEqualTo(Longs.of(-1, 0, 0, 1, 2, 3, 4));
+        assertThat(Longs.of(1, 2, 0, 3, -1, 0, 4).sorted()).isEqualTo(Longs.of(-1, 0, 0, 1, 2, 3, 4));
     }
 
     @Test
     void arr_sort() {
-        assertThat(ARR.sort()).isEqualTo(ARR);
+        assertThat(ARR.sorted()).isEqualTo(ARR);
     }
 
     @Test
     void sortBy() {
-        assertThat(Longs.of(1, 2, 0, 3, -1, 0, 4).sortBy(l -> -l))
+        assertThat(Longs.of(1, 2, 0, 3, -1, 0, 4).sortedBy(l -> -l))
                 .isEqualTo(Longs.of(4, 3, 2, 1, 0, 0, -1));
     }
 
     @Test
     void arr_sortBy() {
-        assertThat(ARR.sortBy(Math::abs)).isEqualTo(Longs.of(0, 1, -1, 2, -2, 3, -3));
+        assertThat(ARR.sortedBy(Math::abs)).isEqualTo(Longs.of(0, 1, -1, 2, -2, 3, -3));
     }
 
     @Test
