@@ -1,7 +1,7 @@
 package com.github.eyrekr;
 
 import com.github.eyrekr.util.Grid;
-import com.github.eyrekr.util.Seq;
+import com.github.eyrekr.immutable.Seq;
 
 /**
  * https://adventofcode.com/2023/day/11

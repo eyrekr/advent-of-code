@@ -1,7 +1,6 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.util.Seq;
-import com.github.eyrekr.util.Str;
+import com.github.eyrekr.immutable.Seq;
 import org.apache.commons.lang3.StringUtils;
 
 /**

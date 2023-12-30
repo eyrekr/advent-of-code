@@ -1,8 +1,8 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.util.Mth;
-import com.github.eyrekr.util.Seq;
-import com.github.eyrekr.util.Str;
+import com.github.eyrekr.math.Algebra;
+import com.github.eyrekr.immutable.Seq;
+import com.github.eyrekr.output.Out;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -101,12 +101,12 @@ class D20 extends AoC {
 
                 if (high && module == secondLast) { // SENDING HIGH TO THE 2ND LAST => WATCH THE CYCLE
                     if (!cycleLength.containsKey(pulse.source)) {
-                        Str.print("@c%s@@ --high-> @c%s@@ during button press @r#%d@@\n", pulse.source.name, module.name, buttonPressCount);
+                        Out.print("@c%s@@ --high-> @c%s@@ during button press @r#%d@@\n", pulse.source.name, module.name, buttonPressCount);
                         cycleLength.put(pulse.source, buttonPressCount);
                     }
                     if (cycleLength.size() == modulesWhoseCyclesWeWatch.length) {
                         // all cycles collected => cycles will fire up 1st time together when LCM
-                        return Seq.fromIterable(cycleLength.values()).reduce(Mth::lcm);
+                        return Seq.fromIterable(cycleLength.values()).reduce(Algebra::lcm);
                     }
                 }
 

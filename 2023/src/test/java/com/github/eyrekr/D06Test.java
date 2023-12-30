@@ -1,6 +1,6 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.util.Seq;
+import com.github.eyrekr.immutable.Seq;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

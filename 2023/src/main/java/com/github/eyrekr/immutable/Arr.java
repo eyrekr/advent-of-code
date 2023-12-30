@@ -1,4 +1,6 @@
-package com.github.eyrekr.util;
+package com.github.eyrekr.immutable;
+
+import com.github.eyrekr.output.Out;
 
 import java.util.*;
 
@@ -558,7 +560,7 @@ public final class Arr {//TODO Implement Iterable<Long>
     public Arr print(final String separator, final RichLongToString formatter) {
         for (int i = 0; i < length; i++) {
             final boolean last = i == length - 1;
-            Str.print("%s%s", formatter.format(at(i), i, i == 0, last), last ? "\n" : separator);
+            Out.print("%s%s", formatter.format(at(i), i, i == 0, last), last ? "\n" : separator);
         }
         return this;
     }

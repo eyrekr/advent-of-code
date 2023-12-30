@@ -1,7 +1,6 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.util.Seq;
-import com.github.eyrekr.util.Str;
+import com.github.eyrekr.immutable.Seq;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
 
@@ -125,7 +124,7 @@ class D19 extends AoC {
             if (l.length == 1) { // last on the line, no conditions
                 return new Rule(TERMINAL, TERMINAL, 0, l[0]);
             } else {
-                final int value = Str.longs(l[0]).value.intValue();
+                final int value = Seq.ofNumbersFromString(l[0]).value.intValue();
                 return new Rule(l[0].charAt(0), l[0].charAt(1), value, l[1]);
             }
         }
@@ -152,7 +151,7 @@ class D19 extends AoC {
 
     record XMAS(long x, long m, long a, long s) {
         static XMAS from(final String line) { //{x=787,m=2655,a=1222,s=2876}
-            final var l = Str.longs(line);
+            final var l = Seq.ofNumbersFromString(line);
             return new XMAS(l.value, l.tail.value, l.tail.tail.value, l.tail.tail.tail.value);
         }
 

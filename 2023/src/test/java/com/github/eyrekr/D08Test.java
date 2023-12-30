@@ -1,6 +1,6 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.util.Str;
+import com.github.eyrekr.output.Out;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,7 +29,7 @@ class D08Test {
             22Z = (22B, 22B)
             XXX = (XXX, XXX)
             """;
-    final String input = Str.testResource("D08.txt");
+    final String input = Out.testResource("D08.txt");
 
     @Test
     void sampleStar1() {

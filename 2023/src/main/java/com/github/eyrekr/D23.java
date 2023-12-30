@@ -1,10 +1,10 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.util.Arr;
+import com.github.eyrekr.immutable.Arr;
 import com.github.eyrekr.util.Grid;
 import com.github.eyrekr.util.Grid.Direction;
 import com.github.eyrekr.util.Grid.It;
-import com.github.eyrekr.util.Seq;
+import com.github.eyrekr.immutable.Seq;
 
 import java.util.HashMap;
 import java.util.Map;

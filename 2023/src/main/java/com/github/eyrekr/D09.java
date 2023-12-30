@@ -1,7 +1,6 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.util.Seq;
-import com.github.eyrekr.util.Str;
+import com.github.eyrekr.immutable.Seq;
 
 /**
  * https://adventofcode.com/2023/day/9
@@ -14,7 +13,7 @@ class D09 extends AoC {
 
     D09(final String input) {
         super(input);
-        this.sequences = lines.map(Str::longs);
+        this.sequences = lines.map(Seq::ofNumbersFromString);
     }
 
     long star1() {

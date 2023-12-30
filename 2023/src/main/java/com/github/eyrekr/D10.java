@@ -2,7 +2,7 @@ package com.github.eyrekr;
 
 import com.github.eyrekr.util.Grid;
 import com.github.eyrekr.util.Grid.Direction;
-import com.github.eyrekr.util.Str;
+import com.github.eyrekr.output.Out;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
@@ -50,7 +50,7 @@ class D10 extends AoC {
             for (int x = 0; x < grid.m; x++) {
                 final char ch = stencil[x][y];
                 if (ch > 0) { // border
-                    Str.print("@w%s", ch);
+                    Out.print("@w%s", ch);
                     if (ch == '─') {
                         //no change
                     } else if (ch == '│') {
@@ -66,13 +66,13 @@ class D10 extends AoC {
                         open = ch;
                     }
                 } else if (inside) { // empty space inside
-                    Str.print("@R**X**");
+                    Out.print("@R**X**");
                     area++;
                 } else { // empty space outside
-                    Str.print(" ");
+                    Out.print(" ");
                 }
             }
-            Str.print("\n");
+            Out.print("\n");
         }
         return area;
     }

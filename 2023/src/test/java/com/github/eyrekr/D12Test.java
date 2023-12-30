@@ -1,8 +1,8 @@
 package com.github.eyrekr;
 
 import com.github.eyrekr.D12.Cache;
-import com.github.eyrekr.util.Seq;
-import com.github.eyrekr.util.Str;
+import com.github.eyrekr.immutable.Seq;
+import com.github.eyrekr.output.Out;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,7 +16,7 @@ class D12Test {
             ????.######..#####. 1,6,5
             ?###???????? 3,2,1
             """;
-    final String input = Str.testResource("D12.txt");
+    final String input = Out.testResource("D12.txt");
 
     @Test
     void sampleStar1() {

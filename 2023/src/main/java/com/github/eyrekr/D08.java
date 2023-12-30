@@ -1,7 +1,7 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.util.Mth;
-import com.github.eyrekr.util.Seq;
+import com.github.eyrekr.math.Algebra;
+import com.github.eyrekr.immutable.Seq;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
@@ -29,7 +29,7 @@ class D08 extends AoC {
     }
 
     long star2() {
-        return Seq.fromIterable(map.keySet()).where(key -> key.endsWith("A")).map(start -> steps(start, "Z")).reduce(1L, Mth::lcm);
+        return Seq.fromIterable(map.keySet()).where(key -> key.endsWith("A")).map(start -> steps(start, "Z")).reduce(1L, Algebra::lcm);
     }
 
     long steps(final String start, final String end) {

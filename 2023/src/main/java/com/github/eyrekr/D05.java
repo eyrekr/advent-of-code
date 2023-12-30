@@ -1,7 +1,6 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.util.Seq;
-import com.github.eyrekr.util.Str;
+import com.github.eyrekr.immutable.Seq;
 
 import java.util.Comparator;
 
@@ -16,9 +15,9 @@ class D05 {
         //final var sections = Seq.fromArray(Files.readString(Path.of("src/main/resources/D05.txt")).split("\n\n"));
         final var sections = Seq.fromArray(SAMPLE.split("\n\n"));
         //final var seeds = Str.longs(sections.order).batch(2).print();
-        final var seeds = Str.longs(sections.value).map(value -> Seq.of(value, 1L)).print();
+        final var seeds = Seq.ofNumbersFromString(sections.value).map(value -> Seq.of(value, 1L)).print();
         final var layers = sections.skip(1)
-                .map(section -> Str.longs(section).batch(3).map(Range::new).map(Interval::new))
+                .map(section -> Seq.ofNumbersFromString(section).batch(3).map(Range::new).map(Interval::new))
                 .map(Layer::new);
         final var collapsedIntervals = layers
                 .map(Layer::complete)

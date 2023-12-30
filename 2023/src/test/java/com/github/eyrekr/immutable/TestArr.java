@@ -1,5 +1,6 @@
-package com.github.eyrekr.util;
+package com.github.eyrekr.immutable;
 
+import com.github.eyrekr.immutable.Arr;
 import org.junit.jupiter.api.Test;
 
 import java.util.Comparator;

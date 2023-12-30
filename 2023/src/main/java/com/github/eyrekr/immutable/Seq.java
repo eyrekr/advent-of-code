@@ -1,9 +1,11 @@
-package com.github.eyrekr.util;
+package com.github.eyrekr.immutable;
 
+import com.github.eyrekr.output.Out;
 import org.apache.commons.lang3.function.TriFunction;
 
 import java.util.*;
 import java.util.function.*;
+import java.util.regex.Pattern;
 
 /**
  * Sequence of objects.
@@ -11,6 +13,8 @@ import java.util.function.*;
  * Quite pointless, because Java cannot optimize tail recursion => for any practical use this structure is good for nothing.
  */
 public final class Seq<E> implements Iterable<E> {
+    private static final Pattern NUMBERS = Pattern.compile("(-?\\d+)", Pattern.MULTILINE | Pattern.DOTALL);
+
     public final E value;
     public final E lastValue;
     public final int length;
@@ -54,6 +58,15 @@ public final class Seq<E> implements Iterable<E> {
 
     public static Seq<String> ofLinesFromString(final String string) {
         return fromArray(string.split("\n"));
+    }
+
+    public static Seq<Long> ofNumbersFromString(final String string) {
+        final var matcher = NUMBERS.matcher(string);
+        Seq<Long> seq = Seq.empty();
+        while (matcher.find()) {
+            seq = seq.addFirst(Long.parseLong(matcher.group()));
+        }
+        return seq.reverse();
     }
 
     public static Seq<Integer> range(final int startInclusive, final int endExclusive) {
@@ -320,7 +333,7 @@ public final class Seq<E> implements Iterable<E> {
 
     public Seq<E> print(final String separator, final Function<? super E, String> format) {
         final String string = "[" + reduceR("", (sum, element) -> sum.isBlank() ? format.apply(element) : format.apply(element) + separator + sum) + "]\n";
-        Str.print(string);
+        Out.print(string);
         return this;
     }
 

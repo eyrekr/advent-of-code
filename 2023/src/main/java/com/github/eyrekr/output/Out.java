@@ -1,13 +1,12 @@
-package com.github.eyrekr.util;
+package com.github.eyrekr.output;
 
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.regex.Pattern;
 
-public final class Str {
+public final class Out {
 
     private interface Ascii {
         String RESET = "\033[0m";
@@ -30,10 +29,8 @@ public final class Str {
         String LIGHT_MAGENTA = "\033[95m";
         String LIGHT_CYAN = "\033[96m";
         String LIGHT_WHITE = "\033[97m";
-
     }
 
-    private static final Pattern NUMBERS = Pattern.compile("(-?\\d+)", Pattern.MULTILINE | Pattern.DOTALL);
     private static final String[] FORMAT_CONTROL = new String[]{
             "@@",
             "@k", "@r", "@g", "@y", "@b", "@m", "@c", "@w",
@@ -44,16 +41,6 @@ public final class Str {
             Ascii.BLACK, Ascii.RED, Ascii.GREEN, Ascii.YELLOW, Ascii.BLUE, Ascii.MAGENTA, Ascii.CYAN, Ascii.WHITE,
             Ascii.LIGHT_BLACK, Ascii.LIGHT_RED, Ascii.LIGHT_GREEN, Ascii.LIGHT_YELLOW, Ascii.LIGHT_BLUE, Ascii.LIGHT_MAGENTA, Ascii.LIGHT_CYAN, Ascii.LIGHT_WHITE,
     };
-
-
-    public static Seq<Long> longs(final String input) {
-        final var matcher = NUMBERS.matcher(input);
-        Seq<Long> seq = Seq.empty();
-        while (matcher.find()) {
-            seq = seq.addFirst(Long.parseLong(matcher.group()));
-        }
-        return seq.reverse();
-    }
 
     public static String mainResource(final String name) {
         try {

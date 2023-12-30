@@ -1,5 +1,8 @@
 package com.github.eyrekr.util;
 
+import com.github.eyrekr.immutable.Seq;
+import com.github.eyrekr.output.Out;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -269,7 +272,7 @@ public final class Grid implements Iterable<Grid.It> {
     public Grid print() {
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < m; x++) {
-                Str.print("" + at(x, y));
+                Out.print("" + at(x, y));
             }
             System.out.println();
         }
@@ -279,7 +282,7 @@ public final class Grid implements Iterable<Grid.It> {
     public Grid print(final Function<It, String> transform) {
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < m; x++) {
-                Str.print(transform.apply(it(x, y)));
+                Out.print(transform.apply(it(x, y)));
             }
             System.out.println();
         }

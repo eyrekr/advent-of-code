@@ -1,7 +1,6 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.util.Seq;
-import com.github.eyrekr.util.Str;
+import com.github.eyrekr.immutable.Seq;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -132,7 +131,7 @@ class D22 extends AoC {
 
     record Brick(int id, int x0, int y0, int z0, int x1, int y1, int z1) {
         static Brick from(final AtomicInteger generator, final String input) {
-            final var n = Str.longs(input).map(Long::intValue);
+            final var n = Seq.ofNumbersFromString(input).map(Long::intValue);
             return new Brick(generator.incrementAndGet(), n.at(0), n.at(1), n.at(2), n.at(3), n.at(4), n.at(5));
         }
     }

@@ -2,7 +2,7 @@ package com.github.eyrekr;
 
 import com.github.eyrekr.util.Grid;
 import com.github.eyrekr.util.Grid.Direction;
-import com.github.eyrekr.util.Seq;
+import com.github.eyrekr.immutable.Seq;
 
 import java.util.Comparator;
 import java.util.HashSet;

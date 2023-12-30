@@ -1,5 +1,6 @@
-package com.github.eyrekr.util;
+package com.github.eyrekr.input;
 
+import com.github.eyrekr.immutable.Seq;
 import org.apache.commons.lang3.Validate;
 
 import java.util.Iterator;

@@ -1,7 +1,6 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.util.Seq;
-import com.github.eyrekr.util.Str;
+import com.github.eyrekr.immutable.Seq;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -75,7 +74,9 @@ class D12 extends AoC {
 
     record Row(Seq<String> stencils, Seq<Long> runs) {
         static Row fromString(final String line) {
-            return new Row(Seq.fromArray(StringUtils.split(StringUtils.substringBefore(line, ' '), '.')), Str.longs(StringUtils.substringAfter(line, ' ')));
+            return new Row(
+                    Seq.fromArray(StringUtils.split(StringUtils.substringBefore(line, ' '), '.')),
+                    Seq.ofNumbersFromString(StringUtils.substringAfter(line, ' ')));
         }
     }
 

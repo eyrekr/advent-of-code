@@ -1,7 +1,6 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.util.Seq;
-import com.github.eyrekr.util.Str;
+import com.github.eyrekr.immutable.Seq;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -43,7 +42,7 @@ class D04 extends AoC {
         long instances = 1;
 
         Card(final String line) {
-            final var numbers = Seq.fromArray(StringUtils.split(line, ":|")).map(Str::longs);
+            final var numbers = Seq.fromArray(StringUtils.split(line, ":|")).map(Seq::ofNumbersFromString);
             final var numbersYouHave = numbers.at(1);
             final var winningNumbers = numbers.at(2);
             this.matchingNumbers = numbersYouHave.where(winningNumbers::has).length;
