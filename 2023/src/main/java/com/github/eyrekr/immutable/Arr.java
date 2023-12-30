@@ -3,13 +3,19 @@ package com.github.eyrekr.immutable;
 import com.github.eyrekr.output.Out;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
- * Array of numbers.
+ * Auto-expandable immutable array of long numbers.
  * Optimized for better performance than @{@link Seq}.
+ * Combines the advantages of both {@link LinkedList} and {@link ArrayList}
+ * <ol>
+ * <li>fast adding and removing to both ends</li>
+ * <li>fast access to all values by their index</li>
+ * </ol>
  */
-public final class Arr {//TODO Implement Iterable<Long>
-
+public final class Arr implements Iterable<Long> {
+    private static final Pattern NUMBERS = Pattern.compile("(-?\\d+)", Pattern.MULTILINE | Pattern.DOTALL);
     private static final int MIN_CAPACITY = 16;
 
     public final int length;
@@ -45,6 +51,7 @@ public final class Arr {//TODO Implement Iterable<Long>
      *               The capacity never drops below the MIN_CAPACITY.
      *               Also, the capacity never drops below the necessary capacity to hold the current elements.
      * @return Deep copy of the array with modified capacity.
+     * @complexity O(n)
      */
     public Arr clone(final double factor) {
         final int n = Math.max(MIN_CAPACITY, Math.max(a.length, (int) (a.length * factor)));
@@ -57,17 +64,26 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New empty array.
+     * @complexity O(1)
      */
     public static Arr empty() {
         return new Arr();
     }
 
+    /**
+     * @return New array of the given size where all values are initialized to the given value.
+     * @complexity O(n)
+     */
     public static Arr repeat(final long value, final int n) {
         final long[] b = new long[n];
         Arrays.fill(b, value);
         return new Arr(b, 0, b.length, true);
     }
 
+    /**
+     * @return New array from the given values.
+     * @complexity O(n)
+     */
     public static Arr of(final long value, final long... values) {
         Arr arr = new Arr();
         arr = arr.addLast(value);
@@ -81,6 +97,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return Deep clone of the supplied array. Operations with this array do not affect the supplied array and vice versa.
+     * @complexity O(n)
      */
     public static Arr fromArray(final long[] array) {
         return new Arr(Arrays.copyOf(array, Math.max(MIN_CAPACITY, array.length)), 0, array.length, true);
@@ -88,6 +105,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return Deep clone of the supplied array. Convenience method for converting from int[].
+     * @complexity O(n)
      */
     public static Arr fromIntArray(final int[] array) {
         final long[] b = new long[Math.max(MIN_CAPACITY, array.length)];
@@ -99,6 +117,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return Array from the supplied iterable collection.
+     * @complexity O(n)
      */
     public static Arr fromIterable(final Iterable<Long> iterable) {
         return fromIterator(iterable.iterator());
@@ -106,6 +125,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return Array using the supplied iterator.
+     * @complexity O(n)
      */
     public static Arr fromIterator(final Iterator<Long> iterator) {
         Arr array = new Arr();
@@ -117,7 +137,20 @@ public final class Arr {//TODO Implement Iterable<Long>
     }
 
     /**
+     * @return Array of all long values extracted from the string.
+     */
+    public static Arr fromString(final String string) {
+        final var matcher = NUMBERS.matcher(string);
+        Arr arr = Arr.empty();
+        while (matcher.find()) {
+            arr = arr.addLast(Long.parseLong(matcher.group()));
+        }
+        return arr;
+    }
+
+    /**
      * @return New array with all values in the range.
+     * @complexity O(n)
      */
     public static Arr range(final long startInclusive, final long endExclusive) {
         int n = (int) (endExclusive - startInclusive);
@@ -130,6 +163,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array with the value at the end of the array.
+     * @complexity O(1)
      */
     public Arr addLast(final long value) {
         if (isFull) {
@@ -143,6 +177,10 @@ public final class Arr {//TODO Implement Iterable<Long>
         }
     }
 
+    /**
+     * @return New array with the values at the end of the array.
+     * @complexity O(n)
+     */
     public Arr addLast(final Arr values) {
         Arr tmp = this;
         for (int i = 0; i < values.length; i++) {
@@ -153,6 +191,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array without the last value. If the array is empty, the operation does not do anything.
+     * @complexity O(1)
      */
     public Arr removeLast() {
         return isEmpty ? this : new Arr(a, start, length - 1, false);
@@ -160,6 +199,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array with the value at the beginning of the array.
+     * @complexity O(1)
      */
     public Arr addFirst(final long value) {
         if (isFull) {
@@ -175,6 +215,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array without the first value. If the array is empty, the operation does not do anything.
+     * @complexity O(1)
      */
     public Arr removeFirst() {
         return isEmpty ? this : new Arr(a, start + 1, length - 1, false);
@@ -182,6 +223,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return The first value in the array. Equivalent of {@code at(0)}.
+     * @complexity O(1)
      */
     public long peek() {
         return at(0);
@@ -191,6 +233,7 @@ public final class Arr {//TODO Implement Iterable<Long>
      * @return Value at the given index. The index neither overflows nor underflows; it goes around.
      * Negative indexes work too: -1 is the last element, -2 is the second last, and so on.
      * If the array is empty, 0 is returned.
+     * @complexity O(1)
      */
     public long at(final int i) {
         if (isEmpty) return 0L;
@@ -200,6 +243,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return True, if the value is in the array at least once.
+     * @complexity O(n)
      */
     public boolean has(final long value) {
         for (int i = 0; i < length; i++) {
@@ -212,6 +256,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return True, if at least one value satisfies the predicate.
+     * @complexity O(n)
      */
     public boolean atLeastOneIs(final LongToBool predicate) {
         for (int i = 0; i < length; i++) {
@@ -224,6 +269,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return True, if at least one value does not satisfy the predicate.
+     * @complexity O(n)
      */
     public boolean atLeastOneIsNot(final LongToBool predicate) {
         return atLeastOneIs(predicate.negate());
@@ -231,6 +277,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return True, if all values match the given value.
+     * @complexity O(n)
      */
     public boolean allMatch(final long value) {
         for (int i = 0; i < length; i++) {
@@ -243,6 +290,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return True, if all values satisfy the predicate.
+     * @complexity O(n)
      */
     public boolean allAre(final LongToBool predicate) {
         for (int i = 0; i < length; i++) {
@@ -255,6 +303,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return True, if no values matches the given value.
+     * @complexity O(n)
      */
     public boolean noneMatch(final long value) {
         for (int i = 0; i < length; i++) {
@@ -267,6 +316,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return True, if no value satisfies the predicate.
+     * @complexity O(n)
      */
     public boolean noneIs(final LongToBool predicate) {
         for (int i = 0; i < length; i++) {
@@ -281,6 +331,7 @@ public final class Arr {//TODO Implement Iterable<Long>
      * @param init    Initial value for the accumulator.
      * @param reducer Function combining the accumulator with the values of the array.
      * @return The accumulated value.
+     * @complexity O(n)
      */
     public <R> R reduce(final R init, final LongToR<R> reducer) {
         R acc = init;
@@ -292,6 +343,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return Sum of all values of the array. 0 for empty array.
+     * @complexity O(n)
      */
     public long sum() {
         long sum = 0L;
@@ -303,6 +355,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return Product of all values of the array. 0 for empty array.
+     * @complexity O(n)
      */
     public long prod() {
         if (isEmpty) return 0L;
@@ -315,6 +368,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return Minimum value in the array. Long.MAX_VALUE for empty array.
+     * @complexity O(n)
      */
     public long min() {
         long min = Long.MAX_VALUE;
@@ -326,6 +380,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return Maximum value in the array. Long.MIN_VALUE for empty array.
+     * @complexity O(n)
      */
     public long max() {
         long max = Long.MIN_VALUE;
@@ -337,6 +392,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array with only those values that satisfy the predicate.
+     * @complexity O(n)
      */
     public Arr where(final LongToBool predicate) {
         Arr array = new Arr();
@@ -351,6 +407,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array with the values in reversed order.
+     * @complexity O(n)
      */
     public Arr reverse() {
         final Arr arr = clone(1);
@@ -362,6 +419,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array with the values sorted in the ascending order.
+     * @complexity O(n log n)
      */
     public Arr sort() {
         final Arr arr = clone(1);
@@ -370,6 +428,10 @@ public final class Arr {//TODO Implement Iterable<Long>
         return arr;
     }
 
+    /**
+     * @return New array with the values sorted in the given order.
+     * @complexity O(n log n)
+     */
     public Arr sortBy(final Comparator<Long> comparator) {
         final Arr arr = clone(1);
         quicksort(arr.a, 0, length - 1, comparator);
@@ -394,6 +456,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array with all duplicate values removed duplicates. In other words, only the first occurrence of the value is kept.
+     * @complexity O(n)
      */
     public Arr unique() {
         Arr arr = new Arr();
@@ -410,6 +473,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array with the first N values.
+     * @complexity O(n)
      */
     public Arr first(final int n) {
         Arr arr = new Arr();
@@ -421,6 +485,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array with the last N values.
+     * @complexity O(n)
      */
     public Arr last(final int n) {
         Arr arr = new Arr();
@@ -432,6 +497,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array without the first N values.
+     * @complexity O(n)
      */
     public Arr skip(final int n) {
         Arr arr = new Arr();
@@ -443,6 +509,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array with the values before the predicate was first not satisfied.
+     * @complexity O(n)
      */
     public Arr takeWhile(final LongToBool predicate) {
         Arr arr = new Arr();
@@ -459,6 +526,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array with the values after the predicate was first not satisfied.
+     * @complexity O(n)
      */
     public Arr skipWhile(final LongToBool predicate) {
         Arr arr = new Arr();
@@ -478,6 +546,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array with values transformed using the supplied function.
+     * @complexity O(n)
      */
     public Arr map(final LongToLong transform) {
         Arr arr = new Arr();
@@ -489,6 +558,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array with values zipped with the other array transformed using the given binary function.
+     * @complexity O(n)
      */
     public Arr mapWith(final Arr other, final LongLongToLong transform) {
         Arr arr = new Arr();
@@ -500,6 +570,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array with all the possible combinations of values transformed using the given binary function.
+     * @complexity O(n ^ 2)
      */
     public Arr prodWith(final Arr other, final LongLongToLong transform) {
         Arr arr = new Arr();
@@ -513,6 +584,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array with all possible unique combinations of values transformed using the given binary function.
+     * @complexity O(n ^ 2)
      */
     public Arr prodUpperTriangleWith(final Arr other, final LongLongToLong transform) {
         Arr arr = new Arr();
@@ -526,6 +598,7 @@ public final class Arr {//TODO Implement Iterable<Long>
 
     /**
      * @return New array with values transformed using the supplied function.
+     * @complexity O(n ^ 2)
      */
     public Arr flatMap(final LongToArr transform) {
         Arr arr = new Arr();
@@ -539,6 +612,7 @@ public final class Arr {//TODO Implement Iterable<Long>
     }
 
     /**
+     * @complexity O(n)
      * Perform an operation with each value of this array.
      */
     public Arr each(final LongToVoid consumer) {
@@ -592,6 +666,11 @@ public final class Arr {//TODO Implement Iterable<Long>
     public int hashCode() {
         // FIXME probably very bad function with terrible distribution
         return reduce(13, (acc, value) -> (int) (value >> 32) * (int) value + acc);
+    }
+
+    @Override
+    public Iterator<Long> iterator() {
+        return new It();
     }
 
     public long[] toArray() {
@@ -687,4 +766,17 @@ public final class Arr {//TODO Implement Iterable<Long>
         Arr apply(long value, int i, boolean first, boolean last);
     }
 
+    private class It implements Iterator<Long> {
+        private int i = 0;
+
+        @Override
+        public boolean hasNext() {
+            return i < Arr.this.length;
+        }
+
+        @Override
+        public Long next() {
+            return Arr.this.at(i++);
+        }
+    }
 }
