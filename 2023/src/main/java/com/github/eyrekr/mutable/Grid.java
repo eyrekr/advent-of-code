@@ -18,8 +18,8 @@ public final class Grid implements Iterable<Grid.It> {
     public final int m;
     public final int n;
     public final char[][] a;
-    public final int[][] d; // distances, e.g. for Dijkstra traversal
-    public final boolean[][] b; // flags, e.g. for visited/unvisited nodes
+    public final int[][] d;
+    public final boolean[][] b;
 
     private Grid(final int m, final int n, final char[][] a) {
         this.m = m;
@@ -121,7 +121,7 @@ public final class Grid implements Iterable<Grid.It> {
             final It it = it(i);
             if (predicate.test(it)) seq = seq.addFirst(it);
         }
-        return seq;
+        return seq.reverse();
     }
 
     public Seq<It> collect(final char ch) {
@@ -129,7 +129,7 @@ public final class Grid implements Iterable<Grid.It> {
         for (int y = n - 1; y >= 0; y--)
             for (int x = m - 1; x >= 0; x--)
                 if (a[x][y] == ch) seq = seq.addFirst(it(x, y));
-        return seq;
+        return seq.reverse();
     }
 
     public Grid transpose() {
@@ -322,10 +322,7 @@ public final class Grid implements Iterable<Grid.It> {
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof It that && that.grid == this.grid && that.i == this.i) {
-                return true;
-            }
-            return false;
+            return o instanceof It that && that.grid == this.grid && that.i == this.i;
         }
 
         @Override
