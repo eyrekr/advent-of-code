@@ -1,6 +1,6 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.immutable.LArr;
+import com.github.eyrekr.immutable.Longs;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.raster.Direction;
 import com.github.eyrekr.mutable.Grid;
@@ -42,9 +42,9 @@ class D23 extends AoC {
         }
 
 
-        LArr sortedWaypoints = LArr.empty();
+        Longs sortedWaypoints = Longs.empty();
         {// topological sort
-            LArr queue = LArr.of(start.i);
+            Longs queue = Longs.of(start.i);
             while (queue.isNotEmpty) {
                 final long source = queue.peek();
                 queue = queue.removeFirst();

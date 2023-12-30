@@ -543,8 +543,8 @@ public final class Arr<E> implements Iterable<E> {
         return this;
     }
 
-    public LArr toLongArr(final Function<? super E, ? extends Number> transform) {
-        LArr arr = LArr.empty();
+    public Longs toLongs(final Function<? super E, ? extends Number> transform) {
+        Longs arr = Longs.empty();
         for (int i = 0; i < length; i++) arr = arr.addLast(transform.apply(at(i)).longValue());
         return arr;
     }

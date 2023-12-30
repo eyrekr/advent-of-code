@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  * <li>fast access to all values by their index</li>
  * </ol>
  */
-public final class LArr implements Iterable<Long> {
+public final class Longs implements Iterable<Long> {
     private static final Pattern NUMBERS = Pattern.compile("(-?\\d+)", Pattern.MULTILINE | Pattern.DOTALL);
     private static final int MIN_CAPACITY = 16;
 
@@ -26,7 +26,7 @@ public final class LArr implements Iterable<Long> {
     private final boolean isFull;
     private final boolean safeToAdd; // copy-on-write safeguard: addLast(1).removeLast().addLast(2) => 2 must not rewrite the 1
 
-    private LArr() {
+    private Longs() {
         this.a = new long[MIN_CAPACITY];
         this.length = 0;
         this.isEmpty = true;
@@ -36,7 +36,7 @@ public final class LArr implements Iterable<Long> {
         this.safeToAdd = true;
     }
 
-    private LArr(final long[] a, final int start, final int length, final boolean safeToAdd) {
+    private Longs(final long[] a, final int start, final int length, final boolean safeToAdd) {
         this.a = a;
         this.start = start % a.length;
         this.length = length;
@@ -53,39 +53,39 @@ public final class LArr implements Iterable<Long> {
      * @return Deep copy of the array with modified capacity.
      * @complexity O(n)
      */
-    public LArr clone(final double factor) {
+    public Longs clone(final double factor) {
         final int n = Math.max(MIN_CAPACITY, Math.max(a.length, (int) (a.length * factor)));
         final long[] b = new long[n];
         for (int i = 0; i < length; i++) {
             b[i] = at(i);
         }
-        return new LArr(b, 0, length, true);
+        return new Longs(b, 0, length, true);
     }
 
     /**
      * @return New empty array.
      * @complexity O(1)
      */
-    public static LArr empty() {
-        return new LArr();
+    public static Longs empty() {
+        return new Longs();
     }
 
     /**
      * @return New array of the given size where all values are initialized to the given value.
      * @complexity O(n)
      */
-    public static LArr repeat(final long value, final int n) {
+    public static Longs repeat(final long value, final int n) {
         final long[] b = new long[n];
         Arrays.fill(b, value);
-        return new LArr(b, 0, b.length, true);
+        return new Longs(b, 0, b.length, true);
     }
 
     /**
      * @return New array from the given values.
      * @complexity O(n)
      */
-    public static LArr of(final long value, final long... values) {
-        LArr arr = new LArr();
+    public static Longs of(final long value, final long... values) {
+        Longs arr = new Longs();
         arr = arr.addLast(value);
         if (values != null) {
             for (final long v : values) {
@@ -99,27 +99,27 @@ public final class LArr implements Iterable<Long> {
      * @return Deep clone of the supplied array. Operations with this array do not affect the supplied array and vice versa.
      * @complexity O(n)
      */
-    public static LArr fromArray(final long[] array) {
-        return new LArr(Arrays.copyOf(array, Math.max(MIN_CAPACITY, array.length)), 0, array.length, true);
+    public static Longs fromArray(final long[] array) {
+        return new Longs(Arrays.copyOf(array, Math.max(MIN_CAPACITY, array.length)), 0, array.length, true);
     }
 
     /**
      * @return Deep clone of the supplied array. Convenience method for converting from int[].
      * @complexity O(n)
      */
-    public static LArr fromIntArray(final int[] array) {
+    public static Longs fromIntArray(final int[] array) {
         final long[] b = new long[Math.max(MIN_CAPACITY, array.length)];
         for (int i = 0; i < array.length; i++) {
             b[i] = array[i];
         }
-        return new LArr(b, 0, array.length, true);
+        return new Longs(b, 0, array.length, true);
     }
 
     /**
      * @return Array from the supplied iterable collection.
      * @complexity O(n)
      */
-    public static LArr fromIterable(final Iterable<Long> iterable) {
+    public static Longs fromIterable(final Iterable<Long> iterable) {
         return fromIterator(iterable.iterator());
     }
 
@@ -127,8 +127,8 @@ public final class LArr implements Iterable<Long> {
      * @return Array using the supplied iterator.
      * @complexity O(n)
      */
-    public static LArr fromIterator(final Iterator<Long> iterator) {
-        LArr array = new LArr();
+    public static Longs fromIterator(final Iterator<Long> iterator) {
+        Longs array = new Longs();
         while (iterator.hasNext()) {
             final long l = iterator.next();
             array = array.addLast(l);
@@ -139,9 +139,9 @@ public final class LArr implements Iterable<Long> {
     /**
      * @return Array of all long values extracted from the string.
      */
-    public static LArr fromString(final String string) {
+    public static Longs fromString(final String string) {
         final var matcher = NUMBERS.matcher(string);
-        LArr arr = LArr.empty();
+        Longs arr = Longs.empty();
         while (matcher.find()) {
             arr = arr.addLast(Long.parseLong(matcher.group()));
         }
@@ -152,9 +152,9 @@ public final class LArr implements Iterable<Long> {
      * @return New array with all values in the range.
      * @complexity O(n)
      */
-    public static LArr range(final long startInclusive, final long endExclusive) {
+    public static Longs range(final long startInclusive, final long endExclusive) {
         int n = (int) (endExclusive - startInclusive);
-        LArr array = new LArr(new long[n], 0, 0, true);
+        Longs array = new Longs(new long[n], 0, 0, true);
         for (long value = startInclusive; value < endExclusive; value++) {
             array = array.addLast(value);
         }
@@ -165,13 +165,13 @@ public final class LArr implements Iterable<Long> {
      * @return New array with the value at the end of the array.
      * @complexity O(1)
      */
-    public LArr addLast(final long value) {
+    public Longs addLast(final long value) {
         if (isFull) {
             return clone(2).addLast(value);
         } else if (safeToAdd) {
             final int i = (start + length) % a.length;
             a[i] = value;
-            return new LArr(a, start, length + 1, true);
+            return new Longs(a, start, length + 1, true);
         } else {
             return clone(1).addLast(value);
         }
@@ -181,8 +181,8 @@ public final class LArr implements Iterable<Long> {
      * @return New array with the values at the end of the array.
      * @complexity O(n)
      */
-    public LArr addLast(final LArr values) {
-        LArr tmp = this;
+    public Longs addLast(final Longs values) {
+        Longs tmp = this;
         for (int i = 0; i < values.length; i++) {
             tmp = tmp.addLast(values.at(i));
         }
@@ -193,21 +193,21 @@ public final class LArr implements Iterable<Long> {
      * @return New array without the last value. If the array is empty, the operation does not do anything.
      * @complexity O(1)
      */
-    public LArr removeLast() {
-        return isEmpty ? this : new LArr(a, start, length - 1, false);
+    public Longs removeLast() {
+        return isEmpty ? this : new Longs(a, start, length - 1, false);
     }
 
     /**
      * @return New array with the value at the beginning of the array.
      * @complexity O(1)
      */
-    public LArr addFirst(final long value) {
+    public Longs addFirst(final long value) {
         if (isFull) {
             return clone(2).addFirst(value);
         } else if (safeToAdd) {
             final int i = (a.length + start - 1) % a.length;
             a[i] = value;
-            return new LArr(a, i, length + 1, true);
+            return new Longs(a, i, length + 1, true);
         } else {
             return clone(1).addFirst(value);
         }
@@ -217,8 +217,8 @@ public final class LArr implements Iterable<Long> {
      * @return New array without the first value. If the array is empty, the operation does not do anything.
      * @complexity O(1)
      */
-    public LArr removeFirst() {
-        return isEmpty ? this : new LArr(a, start + 1, length - 1, false);
+    public Longs removeFirst() {
+        return isEmpty ? this : new Longs(a, start + 1, length - 1, false);
     }
 
     /**
@@ -394,8 +394,8 @@ public final class LArr implements Iterable<Long> {
      * @return New array with only those values that satisfy the predicate.
      * @complexity O(n)
      */
-    public LArr where(final LongToBool predicate) {
-        LArr array = new LArr();
+    public Longs where(final LongToBool predicate) {
+        Longs array = new Longs();
         for (int i = 0; i < length; i++) {
             final long value = at(i);
             if (predicate.test(value)) {
@@ -409,8 +409,8 @@ public final class LArr implements Iterable<Long> {
      * @return New array with the values in reversed order.
      * @complexity O(n)
      */
-    public LArr reverse() {
-        final LArr arr = clone(1);
+    public Longs reverse() {
+        final Longs arr = clone(1);
         for (int i = 0; i < length; i++) {
             arr.a[i] = at(length - i - 1);
         }
@@ -421,29 +421,37 @@ public final class LArr implements Iterable<Long> {
      * @return New array with the values sorted in the ascending order.
      * @complexity O(n log n)
      */
-    public LArr sort() {
-        final LArr arr = clone(1);
+    public Longs sort() {
+        final Longs arr = clone(1);
         arr.print();
         Arrays.sort(arr.a, 0, length);
         return arr;
     }
 
     /**
+     * @return New array with the values sorted by the surrogate values.
+     * @complexity O(n log n)
+     */
+    public Longs sortBy(final LongToLong transform) {
+        return sortBy((a, b) -> Long.compare(transform.apply(a), transform.apply(b)));
+    }
+
+    /**
      * @return New array with the values sorted in the given order.
      * @complexity O(n log n)
      */
-    public LArr sortBy(final Comparator<Long> comparator) {
-        final LArr arr = clone(1);
+    public Longs sortBy(final LongLongToInt comparator) {
+        final Longs arr = clone(1);
         quicksort(arr.a, 0, length - 1, comparator);
         return arr;
     }
 
-    public static void quicksort(final long[] a, final int begin, final int end, final Comparator<Long> comparator) {
+    public static void quicksort(final long[] a, final int begin, final int end, final LongLongToInt comparator) {
         final long pivot = a[begin + end / 2];
         int l = begin, r = end;
         do {
-            while (comparator.compare(a[l], pivot) < 0 && l < end) l++;
-            while (comparator.compare(a[r], pivot) > 0 && r > begin) r--;
+            while (comparator.apply(a[l], pivot) < 0 && l < end) l++;
+            while (comparator.apply(a[r], pivot) > 0 && r > begin) r--;
             if (l <= r) {
                 final long t = a[l];
                 a[l++] = a[r];
@@ -458,8 +466,8 @@ public final class LArr implements Iterable<Long> {
      * @return New array with all duplicate values removed duplicates. In other words, only the first occurrence of the value is kept.
      * @complexity O(n)
      */
-    public LArr unique() {
-        LArr arr = new LArr();
+    public Longs unique() {
+        Longs arr = new Longs();
         final Set<Long> visited = new HashSet<>();
         for (int i = 0; i < length; i++) {
             final long value = at(i);
@@ -475,8 +483,8 @@ public final class LArr implements Iterable<Long> {
      * @return New array with the first N values.
      * @complexity O(n)
      */
-    public LArr first(final int n) {
-        LArr arr = new LArr();
+    public Longs first(final int n) {
+        Longs arr = new Longs();
         for (int i = 0; i < length && i < n; i++) {
             arr = arr.addLast(at(i));
         }
@@ -487,8 +495,8 @@ public final class LArr implements Iterable<Long> {
      * @return New array with the last N values.
      * @complexity O(n)
      */
-    public LArr last(final int n) {
-        LArr arr = new LArr();
+    public Longs last(final int n) {
+        Longs arr = new Longs();
         for (int i = Math.max(0, length - n); i < length; i++) {
             arr = arr.addLast(at(i));
         }
@@ -499,8 +507,8 @@ public final class LArr implements Iterable<Long> {
      * @return New array without the first N values.
      * @complexity O(n)
      */
-    public LArr skip(final int n) {
-        LArr arr = new LArr();
+    public Longs skip(final int n) {
+        Longs arr = new Longs();
         for (int i = n; i < length; i++) {
             arr = arr.addLast(at(i));
         }
@@ -511,8 +519,8 @@ public final class LArr implements Iterable<Long> {
      * @return New array with the values before the predicate was first not satisfied.
      * @complexity O(n)
      */
-    public LArr takeWhile(final LongToBool predicate) {
-        LArr arr = new LArr();
+    public Longs takeWhile(final LongToBool predicate) {
+        Longs arr = new Longs();
         for (int i = 0; i < length; i++) {
             final long value = at(i);
             if (predicate.test(value)) {
@@ -528,8 +536,8 @@ public final class LArr implements Iterable<Long> {
      * @return New array with the values after the predicate was first not satisfied.
      * @complexity O(n)
      */
-    public LArr skipWhile(final LongToBool predicate) {
-        LArr arr = new LArr();
+    public Longs skipWhile(final LongToBool predicate) {
+        Longs arr = new Longs();
         boolean skip = true;
         for (int i = 0; i < length; i++) {
             final long value = at(i);
@@ -548,8 +556,8 @@ public final class LArr implements Iterable<Long> {
      * @return New array with values transformed using the supplied function.
      * @complexity O(n)
      */
-    public LArr map(final LongToLong transform) {
-        LArr arr = new LArr();
+    public Longs map(final LongToLong transform) {
+        Longs arr = new Longs();
         for (int i = 0; i < length; i++) {
             arr = arr.addLast(transform.apply(at(i)));
         }
@@ -560,8 +568,8 @@ public final class LArr implements Iterable<Long> {
      * @return New array with values zipped with the other array transformed using the given binary function.
      * @complexity O(n)
      */
-    public LArr mapWith(final LArr other, final LongLongToLong transform) {
-        LArr arr = new LArr();
+    public Longs mapWith(final Longs other, final LongLongToLong transform) {
+        Longs arr = new Longs();
         for (int i = 0; i < Math.min(length, other.length); i++) {
             arr = arr.addLast(transform.apply(at(i), other.at(i)));
         }
@@ -572,8 +580,8 @@ public final class LArr implements Iterable<Long> {
      * @return New array with all the possible combinations of values transformed using the given binary function.
      * @complexity O(n ^ 2)
      */
-    public LArr prodWith(final LArr other, final LongLongToLong transform) {
-        LArr arr = new LArr();
+    public Longs prodWith(final Longs other, final LongLongToLong transform) {
+        Longs arr = new Longs();
         for (int i = 0; i < length; i++) {
             for (int j = 0; j < other.length; j++) {
                 arr = arr.addLast(transform.apply(at(i), other.at(j)));
@@ -586,8 +594,8 @@ public final class LArr implements Iterable<Long> {
      * @return New array with all possible unique combinations of values transformed using the given binary function.
      * @complexity O(n ^ 2)
      */
-    public LArr prodUpperTriangleWith(final LArr other, final LongLongToLong transform) {
-        LArr arr = new LArr();
+    public Longs prodUpperTriangleWith(final Longs other, final LongLongToLong transform) {
+        Longs arr = new Longs();
         for (int i = 0; i < length; i++) {
             for (int j = i + 1; j < other.length; j++) {
                 arr = arr.addLast(transform.apply(at(i), other.at(j)));
@@ -600,10 +608,10 @@ public final class LArr implements Iterable<Long> {
      * @return New array with values transformed using the supplied function.
      * @complexity O(n ^ 2)
      */
-    public LArr flatMap(final LongToArr transform) {
-        LArr arr = new LArr();
+    public Longs flatMap(final LongToArr transform) {
+        Longs arr = new Longs();
         for (int i = 0; i < length; i++) {
-            final LArr sub = transform.apply(at(i));
+            final Longs sub = transform.apply(at(i));
             for (int j = 0; j < sub.length; j++) {
                 arr = arr.addLast(sub.at(j));
             }
@@ -615,7 +623,7 @@ public final class LArr implements Iterable<Long> {
      * @complexity O(n)
      * Perform an operation with each value of this array.
      */
-    public LArr each(final LongToVoid consumer) {
+    public Longs each(final LongToVoid consumer) {
         for (int i = 0; i < length; i++) {
             final long value = at(i);
             consumer.apply(value);
@@ -623,15 +631,15 @@ public final class LArr implements Iterable<Long> {
         return this;
     }
 
-    public LArr print() {
+    public Longs print() {
         return print(" ");
     }
 
-    public LArr print(final String separator) {
+    public Longs print(final String separator) {
         return print(separator, (value, i, first, last) -> String.valueOf(value));
     }
 
-    public LArr print(final String separator, final RichLongToString formatter) {
+    public Longs print(final String separator, final RichLongToString formatter) {
         for (int i = 0; i < length; i++) {
             final boolean last = i == length - 1;
             Out.print("%s%s", formatter.format(at(i), i, i == 0, last), last ? "\n" : separator);
@@ -653,7 +661,7 @@ public final class LArr implements Iterable<Long> {
 
     @Override
     public boolean equals(final Object obj) {
-        if (obj instanceof LArr that && that.length == this.length) {
+        if (obj instanceof Longs that && that.length == this.length) {
             for (int i = 0; i < length; i++) {
                 if (this.at(i) != that.at(i)) return false;
             }
@@ -758,12 +766,17 @@ public final class LArr implements Iterable<Long> {
 
     @FunctionalInterface
     public interface LongToArr {
-        LArr apply(long value);
+        Longs apply(long value);
     }
 
     @FunctionalInterface
     public interface RichLongToArr {
-        LArr apply(long value, int i, boolean first, boolean last);
+        Longs apply(long value, int i, boolean first, boolean last);
+    }
+
+    @FunctionalInterface
+    public interface LongLongToInt {
+        int apply(long a, long b);
     }
 
     private class It implements Iterator<Long> {
@@ -771,12 +784,12 @@ public final class LArr implements Iterable<Long> {
 
         @Override
         public boolean hasNext() {
-            return i < LArr.this.length;
+            return i < Longs.this.length;
         }
 
         @Override
         public Long next() {
-            return LArr.this.at(i++);
+            return Longs.this.at(i++);
         }
     }
 }
