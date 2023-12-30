@@ -6,6 +6,8 @@ import com.github.eyrekr.util.Grid.Direction;
 import com.github.eyrekr.util.Grid.It;
 import com.github.eyrekr.util.Seq;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -53,22 +55,23 @@ class D23 extends AoC {
         }
 
 
-        int[] distance = new int[sortedWaypoints.length];
+        final Map<Integer, Integer> distance = new HashMap<>();
         {// max path
+            sortedWaypoints.each(value -> distance.put((int)value, 0));
             while(sortedWaypoints.isNotEmpty) {
                 final long source = sortedWaypoints.peek();
                 sortedWaypoints = sortedWaypoints.removeFirst();
 
                 for (final Edge edge : edges.where(e -> e.a == source)) {
-                    final int d0 = distance[edge.a];
-                    final int d1 = distance[edge.b];
+                    final int d0 = distance.get(edge.a);
+                    final int d1 = distance.get(edge.b);
                     if (d0 - edge.distance < d1) {
-                        distance[edge.b] = d0 + edge.distance; // improve;
+                        distance.put(edge.b, d0 + edge.distance); // improve;
                     }
                 }
             }
         }
-        return -distance[sortedWaypoints.length-1];
+        return -distance.get(end.i);
     }
 
     Seq<It> waypoints() {

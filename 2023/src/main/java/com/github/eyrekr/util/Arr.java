@@ -497,7 +497,7 @@ public final class Arr {//TODO Implement Iterable<Long>
     }
 
     /**
-     * @return New array with all the possible combinations (respecting order) of values transformed using the given binary function.
+     * @return New array with all the possible combinations of values transformed using the given binary function.
      */
     public Arr prodWith(final Arr other, final LongLongToLong transform) {
         Arr arr = new Arr();
@@ -510,7 +510,7 @@ public final class Arr {//TODO Implement Iterable<Long>
     }
 
     /**
-     * @return New array with all possible combinations (ignoring order) of values transformed using the given binary function.
+     * @return New array with all possible unique combinations of values transformed using the given binary function.
      */
     public Arr prodUpperTriangleWith(final Arr other, final LongLongToLong transform) {
         Arr arr = new Arr();
@@ -534,6 +534,17 @@ public final class Arr {//TODO Implement Iterable<Long>
             }
         }
         return arr;
+    }
+
+    /**
+     * Perform an operation with each value of this array.
+     */
+    public Arr each(final LongToVoid consumer) {
+        for (int i = 0; i < length; i++) {
+            final long value = at(i);
+            consumer.apply(value);
+        }
+        return this;
     }
 
     public Arr print() {
@@ -646,6 +657,11 @@ public final class Arr {//TODO Implement Iterable<Long>
     @FunctionalInterface
     public interface RichLongToLong {
         long apply(long value, int i, boolean first, boolean last);
+    }
+
+    @FunctionalInterface
+    public interface LongToVoid {
+        void apply(long value);
     }
 
 
