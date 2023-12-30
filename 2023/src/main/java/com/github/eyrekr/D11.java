@@ -1,6 +1,6 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.util.Grid;
+import com.github.eyrekr.mutable.Grid;
 import com.github.eyrekr.immutable.Seq;
 
 /**
@@ -26,7 +26,7 @@ class D11 extends AoC {
     }
 
     Seq<long[]> expandedStars(final long gap) {
-        final var stars = grid.where('#').map(it -> new long[]{it.x, it.y});
+        final var stars = grid.collect('#').map(it -> new long[]{it.x, it.y});
         final var columnsWithStars = stars.map(p -> p[0]).unique();
         final var rowsWithStars = stars.map(p -> p[1]).unique();
         return stars.map(p -> new long[]{

@@ -1,4 +1,4 @@
-package com.github.eyrekr.util;
+package com.github.eyrekr.mutable;
 
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.output.Out;
@@ -119,7 +119,7 @@ public final class Grid implements Iterable<Grid.It> {
         return null;
     }
 
-    public Seq<It> where(final Predicate<It> predicate) {
+    public Seq<It> collect(final Predicate<It> predicate) {
         Seq<It> seq = Seq.empty();
         for (int i = m * n - 1; i >= 0; i--) {
             final It it = it(i);
@@ -128,7 +128,7 @@ public final class Grid implements Iterable<Grid.It> {
         return seq;
     }
 
-    public Seq<It> where(final char ch) {
+    public Seq<It> collect(final char ch) {
         Seq<It> seq = Seq.empty();
         for (int y = n - 1; y >= 0; y--)
             for (int x = m - 1; x >= 0; x--)
@@ -181,16 +181,6 @@ public final class Grid implements Iterable<Grid.It> {
         return acc;
     }
 
-    public <R> R chReduce(final R init, final BiFunction<? super R, Character, ? extends R> reduce) {
-        R acc = init;
-        for (int y = 0; y < n; y++) {
-            for (int x = 0; x < m; x++) {
-                acc = reduce.apply(acc, a[x][y]);
-            }
-        }
-        return acc;
-    }
-
     public int sum(final Function<It, Integer> transform) {
         return reduce(0, (acc, it) -> acc + transform.apply(it));
     }
@@ -200,7 +190,7 @@ public final class Grid implements Iterable<Grid.It> {
             for (int x = 0; x < m; x++) {
                 Out.print("" + at(x, y));
             }
-            System.out.println();
+            Out.print("\n");
         }
         return this;
     }
@@ -210,7 +200,7 @@ public final class Grid implements Iterable<Grid.It> {
             for (int x = 0; x < m; x++) {
                 Out.print(transform.apply(it(x, y)));
             }
-            System.out.println();
+            Out.print("\n");
         }
         return this;
     }
@@ -235,27 +225,15 @@ public final class Grid implements Iterable<Grid.It> {
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (obj instanceof final Grid that) {
-            if (this.m != that.m && this.n != that.n) return false;
-            for (int y = 0; y < n; y++) {
-                for (int x = 0; x < m; x++) {
-                    if (this.a[x][y] != that.a[x][y]) return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return 31 * m * n * chReduce(-1, (acc, ch) -> acc * ch);
-    }
-
-    @Override
     public String toString() {
-        return reduce(new StringBuilder(), (builder, it) -> it.lastOnLine ? builder.append(it.ch).append('\n') : builder.append(it.ch)).toString();
+        final StringBuilder builder = new StringBuilder();
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < m; x++) {
+                builder.append(a[x][y]);
+            }
+            builder.append('\n');
+        }
+        return builder.toString();
     }
 
     public static final class It {

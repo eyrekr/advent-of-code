@@ -1,6 +1,6 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.util.Grid;
+import com.github.eyrekr.mutable.Grid;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 

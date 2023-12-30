@@ -3,8 +3,8 @@ package com.github.eyrekr;
 import com.github.eyrekr.immutable.Arr;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.raster.Direction;
-import com.github.eyrekr.util.Grid;
-import com.github.eyrekr.util.Grid.It;
+import com.github.eyrekr.mutable.Grid;
+import com.github.eyrekr.mutable.Grid.It;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -75,7 +75,7 @@ class D23 extends AoC {
     }
 
     Seq<It> waypoints() {
-        return grid.where(it -> it.ch == '.' && it.neighbours().where(i -> i.ch != '#').length >= 3);
+        return grid.collect(it -> it.ch == '.' && it.neighbours().where(i -> i.ch != '#').length >= 3);
     }
 
     Edge findNextWaypoint(

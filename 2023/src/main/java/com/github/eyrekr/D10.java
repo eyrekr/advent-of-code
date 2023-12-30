@@ -2,7 +2,7 @@ package com.github.eyrekr;
 
 import com.github.eyrekr.output.Out;
 import com.github.eyrekr.raster.Direction;
-import com.github.eyrekr.util.Grid;
+import com.github.eyrekr.mutable.Grid;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;

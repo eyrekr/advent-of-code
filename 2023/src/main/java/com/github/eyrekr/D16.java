@@ -1,7 +1,7 @@
 package com.github.eyrekr;
 
 import com.github.eyrekr.raster.Direction;
-import com.github.eyrekr.util.Grid;
+import com.github.eyrekr.mutable.Grid;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -77,7 +77,7 @@ class D16 extends AoC {
             }
             if (justPass) it.tryToGo(step.direction).ifPresent(next -> buffer.addLast(new Step(next.x, next.y, step.direction)));
         }
-        return mask.where('#').length;
+        return mask.collect('#').length;
     }
 
     record Instruction(char ch, Direction in, Direction out) {
