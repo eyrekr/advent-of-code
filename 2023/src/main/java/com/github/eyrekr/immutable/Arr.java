@@ -7,7 +7,7 @@ import java.util.function.*;
 import java.util.regex.Pattern;
 
 /**
- * Auto-expandable immutable array of long numbers.
+ * Auto-expandable immutable array of elements.
  * Optimized for better performance than @{@link Seq}.
  * Combines the advantages of both {@link LinkedList} and {@link ArrayList}
  * <ol>
@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
  * </ol>
  */
 public final class Arr<E> implements Iterable<E> {
-    private static final Pattern NUMBERS = Pattern.compile("(-?\\d+)", Pattern.MULTILINE | Pattern.DOTALL);
     private static final int MIN_CAPACITY = 16;
 
     public final int length;
