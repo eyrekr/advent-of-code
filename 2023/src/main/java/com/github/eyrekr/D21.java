@@ -71,16 +71,7 @@ class D21 extends AoC {
             }
             border = expandedBorder;
         }
-        return grid.sum(it -> it.d == steps % 2 ? 1 : 0);
-    }
-
-    void print(final Grid grid, final int parity) {
-        grid.print(it -> switch (it.ch) {
-            case '#' -> "@w#";
-            case '*' -> "@y*";
-            case '.' -> it.d == parity ? "@r**O**" : "@w.";
-            default -> "@W?";
-        });
+        return grid.reduce(0, (sum, it) -> it.d == steps % 2 ? sum + 1 : sum);
     }
 
 }

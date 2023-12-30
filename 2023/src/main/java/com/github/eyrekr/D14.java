@@ -76,6 +76,6 @@ class D14 extends AoC {
     }
 
     static long score(final Grid grid) {
-        return grid.sum(it -> it.ch == 'O' ? it.n - it.y : 0);
+        return grid.reduce(0, (sum, it) -> it.ch == 'O' ? sum + (it.n - it.y) : sum);
     }
 }

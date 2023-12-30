@@ -35,16 +35,12 @@ public final class Grid implements Iterable<Grid.It> {
 
     public static Grid of(final String input) {
         final String[] lines = input.split("\n");
-        final int n = lines.length;
-        final int m = lines[0].length();
-        final char[][] data = new char[m][n];
-        for (int y = 0; y < n; y++) {
-            final char[] line = lines[y].toCharArray();
-            for (int x = 0; x < m; x++) {
-                data[x][y] = line[x];
-            }
-        }
-        return new Grid(m, n, data);
+        final int n = lines.length, m = lines[0].length();
+        final char[][] a = new char[m][n];
+        for (int y = 0; y < n; y++)
+            for (int x = 0; x < m; x++)
+                a[x][y] = lines[y].charAt(x);
+        return new Grid(m, n, a);
     }
 
     public char at(int x, int y) {
@@ -181,10 +177,6 @@ public final class Grid implements Iterable<Grid.It> {
         return acc;
     }
 
-    public int sum(final Function<It, Integer> transform) {
-        return reduce(0, (acc, it) -> acc + transform.apply(it));
-    }
-
     public Grid print() {
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < m; x++) {
@@ -302,6 +294,7 @@ public final class Grid implements Iterable<Grid.It> {
                     .map(this::go);
         }
 
+        @Deprecated
         public It set(final char ch, final int d, final boolean b) {
             grid.a[x][y] = ch;
             grid.d[x][y] = d;
