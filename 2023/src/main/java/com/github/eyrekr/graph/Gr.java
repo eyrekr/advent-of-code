@@ -1,69 +1,44 @@
 package com.github.eyrekr.graph;
 
-import com.github.eyrekr.immutable.Arr;
+import com.github.eyrekr.mutable.Arr;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public final class Gr {
-    private final Map<Integer, V> vertices = new HashMap<>();
+public final class Gr<T> {
+    private final AtomicInteger n = new AtomicInteger();
+    private final AtomicInteger m = new AtomicInteger();
+    private final Map<T, V<T>> vertices = new HashMap<>();
 
-    public Gr addVertex(final int i, final String name) {
-        vertices.put(i, new V(i, name));
+    public Gr<T> addVertex(final T t) {
+        vertices.put(t, new V<>(n.getAndIncrement(), t));
         return this;
     }
 
-    public Gr addEdge(final int u, final int v) {
-        final V source = vertices.computeIfAbsent(u, V::new), target = vertices.computeIfAbsent(v, V::new);
-        source.out.add(new E(target));
-        target.in.add(new E(source));
+    public Gr<T> addEdge(final T u, final T v) {
+        return addEdge(u, v, 1);
+    }
+
+    public Gr<T> addEdge(final T u, final T v, final int w) {
+        final V<T> source = vertices.computeIfAbsent(u, z -> new V<>(n.getAndIncrement(), z)),
+                target = vertices.computeIfAbsent(v, z -> new V<>(n.getAndIncrement(), z));
+        source.out.addLast(new E<>(m.getAndIncrement(), target, w));
+        target.in.addLast(new E<>(m.getAndIncrement(), source, w));
         return this;
     }
 
-    public Gr addEdge(final int u, final int v, final int w) {
-        final V source = vertices.computeIfAbsent(u, V::new), target = vertices.computeIfAbsent(v, V::new);
-        source.out.add(new E(target, w));
-        target.in.add(new E(source, w));
-        return this;
-    }
-
-    public int dijkstra(final int u, final int v) {
-        final V source = vertices.computeIfAbsent(u, V::new), target = vertices.computeIfAbsent(v, V::new);
-        final PriorityQueue<V> queue = new PriorityQueue<>(Comparator.comparing(ver))
-        while (queue.isNotEmpty) {
-            final V current = queue.remove();
-            current.out.forEach(e->e.v.improve(current, ));
-
-        }
-    }
 
 
-    static class V {
+    private static final class V<T> {
         final int i;
-        final String name;
-        private final Set<E> in = new HashSet<>(), out = new HashSet<>();
-        private int distance = Integer.MAX_VALUE;
-        private boolean visited = false;
+        final T t;
+        private final Arr<E<T>> in = Arr.empty(), out = Arr.empty();
 
-
-        private V(final int i) {
-            this(i, "v" + i);
-        }
-
-        private V(final int i, final String name) {
+        private V(final int i, final T t) {
             this.i = i;
-            this.name = name;
-        }
-
-        private V reset() {
-            this.distance = Integer.MAX_VALUE;
-            this.visited = false;
-            return this;
-        }
-
-        private V improve(final V source, int w) {
-            if (distance > source.distance + w) distance = source.distance + w;
-            visited = true;
-            return this;
+            this.t = t;
         }
 
         @Override
@@ -78,36 +53,34 @@ public final class Gr {
 
         @Override
         public String toString() {
-            return name;
+            return String.valueOf(t);
         }
     }
 
-    static class E {
-        final V v;
+    private static final class E<T> {
+        final int i;
+        final V<T> v;
         final int w;
 
-        E(final V v) {
-            this(v, 1);
-        }
-
-        E(final V v, final int w) {
+        private E(final int i, final V<T> v, final int w) {
+            this.i = i;
             this.v = v;
             this.w = w;
         }
 
         @Override
         public boolean equals(final Object obj) {
-            return obj instanceof final E that && Objects.equals(this.v, that.v);
+            return obj instanceof final E that && this.i == that.i && this.w == that.w && Objects.equals(this.v, that.v);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(v, w);
+            return Objects.hash(i, v, w);
         }
 
         @Override
         public String toString() {
-            return String.format("--%d-->%s", w, v.name);
+            return String.format("--%d-->%s", w, v.t);
         }
     }
 }
