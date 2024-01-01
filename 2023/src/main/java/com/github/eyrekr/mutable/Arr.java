@@ -3,145 +3,243 @@ package com.github.eyrekr.mutable;
 import com.github.eyrekr.annotation.ReturnsNewInstance;
 import com.github.eyrekr.immutable.Longs;
 import com.github.eyrekr.immutable.Seq;
+import com.github.eyrekr.math.Algebra;
 
 import java.util.*;
 import java.util.function.*;
 
 /**
  * Auto-expandable mutable array of elements.
- * Implemented as a wrapper over {@link com.github.eyrekr.immutable.Arr}
+ * Not thread-safe!
  */
 public final class Arr<E> implements Iterable<E> {
 
-    private com.github.eyrekr.immutable.Arr<E> delegate;
+    private static final int MIN_CAPACITY = 16;
 
-    private Arr(final com.github.eyrekr.immutable.Arr delegate) {
-        this.delegate = delegate;
+    private int length;
+    private Object[] a;
+    private int start;
+
+    private Arr(final int capacity) {
+        final int n = 1 << Algebra.log2(capacity);
+        this.a = new Object[Math.max(MIN_CAPACITY, n)];
+        this.length = 0;
+        this.start = 0;
     }
 
-    public int length() {
-        return delegate.length;
-    }
-
-    public static <T> Arr<T> empty() {
-        return new Arr<>(com.github.eyrekr.immutable.Arr.empty());
-    }
-
-    public static <T> Arr<T> of(final T value, final T... values) {
-        return new Arr<>(com.github.eyrekr.immutable.Arr.of(value, values));
-    }
-
-    public boolean isEmpty() {
-        return delegate.isEmpty;
-    }
-
-    public boolean isNotEmpty() {
-        return delegate.isNotEmpty;
-    }
-
-    public E getFirst() {
-        return delegate.at(0);
-    }
-
-    public E getLast() {
-        return delegate.at(-1);
-    }
-
-    public Arr<E> addLast(final E value) {
-        delegate = delegate.addLast(value);
+    private Arr<E> makeSureThereIsEnoughCapacity() {
+        if (length < a.length) return this;
+        final int n = a.length << 1;
+        final Object[] b = new Object[n];
+        for (int i = 0; i < length; i++) b[i] = at(i);
+        start = 0;
+        a = b;
         return this;
     }
 
-    public Arr<E> addLast(final Arr<? extends E> arr) {
-        delegate = delegate.addLast(arr.delegate);
+    public static <T> Arr<T> empty() {
+        return new Arr<>(MIN_CAPACITY);
+    }
+
+    public static <T> Arr<T> of(final T value, final T... values) {
+        final Arr<T> arr = new Arr<>(values != null ? values.length + 1 : 1);
+        arr.addLast(value);
+        if (values != null) for (final T t : values) arr.addLast(t);
+        return arr;
+    }
+
+    public static <T> Arr<T> repeat(final T value, final int n) {
+        final Arr<T> arr = new Arr<>(n);
+        for (int i = 0; i < n; i++) arr.addLast(value);
+        return arr;
+    }
+
+    public int length() {
+        return length;
+    }
+
+    public boolean isEmpty() {
+        return length == 0;
+    }
+
+    public boolean isNotEmpty() {
+        return length != 0;
+    }
+
+    public Arr<E> copy() {
+        final Arr<E> arr = new Arr<>(a.length);
+        for (int i = 0; i < length; i++) arr.addLast(at(i));
+        return arr;
+    }
+
+    public E getFirst() {
+        return at(0);
+    }
+
+    public E getLast() {
+        return at(-1);
+    }
+
+    public Arr<E> addLast(final E value) {
+        makeSureThereIsEnoughCapacity();
+        final int i = (start + length) % a.length;
+        a[i] = value;
+        length++;
         return this;
     }
 
     public E removeLast() {
-        final E value = delegate.at(-1);
-        delegate = delegate.removeLast();
+        if (length == 0) return null;
+        final E value = at(-1);
+        length--;
         return value;
     }
 
     public Arr<E> addFirst(final E value) {
-        delegate = delegate.addFirst(value);
+        makeSureThereIsEnoughCapacity();
+        start = (a.length + start - 1) % a.length;
+        a[start] = value;
+        length++;
         return this;
     }
 
     public E removeFirst() {
-        final E value = delegate.at(0);
-        delegate = delegate.removeFirst();
+        final E value = at(0);
+        start++;
+        length--;
         return value;
     }
 
     public E at(final int i) {
-        return delegate.at(i);
+        if (length == 0) return null;
+        return (i >= 0)
+                ? (E) a[(start + i % length) % a.length]
+                : (E) a[(a.length + start + length + i % length) % a.length];
     }
 
     public Arr<E> set(final int i, final E value) {
-        delegate.set(i, value);
+        if (length == 0) throw new IndexOutOfBoundsException("Empty");
+        if (i >= 0) a[(start + i % length) % a.length] = value;
+        else a[(a.length + start + length + i % length) % a.length] = value;
         return this;
     }
 
+    public Arr<E> swap(final int i, final int j) {
+        final E a = at(i), b = at(j);
+        return set(i, b).set(j, a);
+    }
+
     public boolean has(final E value) {
-        return delegate.has(value);
+        for (int i = 0; i < length; i++)
+            if (Objects.equals(at(i), value)) return true;
+        return false;
+    }
+
+    public int indexOf(final E value) {
+        for (int i = 0; i < length; i++)
+            if (Objects.equals(at(i), value)) return i;
+        return -1;
     }
 
     public boolean atLeastOneIs(final Predicate<? super E> predicate) {
-        return delegate.atLeastOneIs(predicate);
+        for (int i = 0; i < length; i++)
+            if (predicate.test(at(i))) return true;
+        return false;
     }
 
     public boolean atLeastOneIsNot(final Predicate<? super E> predicate) {
-        return atLeastOneIs(predicate.negate());
+        for (int i = 0; i < length; i++)
+            if (!predicate.test(at(i))) return true;
+        return false;
     }
 
     public boolean allMatch(final E value) {
-        return delegate.allMatch(value);
+        for (int i = 0; i < length; i++)
+            if (!Objects.equals(at(i), value)) return false;
+        return true;
     }
 
     public boolean allAre(final Predicate<? super E> predicate) {
-        return delegate.allAre(predicate);
+        for (int i = 0; i < length; i++)
+            if (!predicate.test(at(i))) return false;
+        return true;
     }
 
     public boolean noneMatch(final E value) {
-        return delegate.noneMatch(value);
+        for (int i = 0; i < length; i++)
+            if (Objects.equals(at(i), value)) return false;
+        return true;
     }
 
     public boolean noneIs(final Predicate<? super E> predicate) {
-        return delegate.noneIs(predicate);
+        for (int i = 0; i < length; i++)
+            if (predicate.test(at(i))) return false;
+        return true;
     }
 
     public <R> R reduce(final R init, final BiFunction<? super R, ? super E, ? extends R> reducer) {
-        return delegate.reduce(init, reducer);
+        R acc = init;
+        for (int i = 0; i < length; i++) acc = reducer.apply(acc, at(i));
+        return acc;
     }
 
     public E reduce(final BiFunction<? super E, ? super E, ? extends E> reducer) {
-        return delegate.reduce(reducer);
+        E acc = at(0);
+        for (int i = 1; i < length; i++) acc = reducer.apply(acc, at(i));
+        return acc;
     }
 
     public E min(final Comparator<? super E> comparator) {
-        return delegate.min(comparator);
+        E min = null;
+        for (int i = 0; i < length; i++)
+            if (min == null || comparator.compare(at(i), min) < 0) min = at(i);
+        return min;
+    }
+
+    public <T extends Comparable<T>> E min(final Function<? super E, T> transform) {
+        return min(Comparator.comparing(transform));
     }
 
     public int argmin(final Comparator<? super E> comparator) {
-        return delegate.argmin(comparator);
+        int index = -1;
+        for (int i = 0; i < length; i++)
+            if (index < 0 || comparator.compare(at(i), at(index)) < 0) index = i;
+        return index;
+    }
+
+    public <T extends Comparable<T>> int argmin(final Function<? super E, T> transform) {
+        return argmin(Comparator.comparing(transform));
     }
 
     public E max(final Comparator<? super E> comparator) {
-        return delegate.max(comparator);
+        E max = null;
+        for (int i = 0; i < length; i++)
+            if (max == null || comparator.compare(at(i), max) > 0) max = at(i);
+        return max;
+    }
+
+    public <T extends Comparable<T>> E max(final Function<? super E, T> transform) {
+        return min(Comparator.comparing(transform));
     }
 
     public int argmax(final Comparator<? super E> comparator) {
-        return delegate.argmax(comparator);
+        int index = -1;
+        for (int i = 0; i < length; i++)
+            if (index < 0 || comparator.compare(at(i), at(index)) > 0) index = i;
+        return index;
+    }
+
+    public <T extends Comparable<T>> int argmax(final Function<? super E, T> transform) {
+        return argmin(Comparator.comparing(transform));
     }
 
     public Arr<E> where(final Predicate<? super E> predicate) {
-        delegate = delegate.where(predicate);
+
         return this;
     }
 
     public Arr<E> reversed() {
-        delegate = delegate.reversed();
+        for (int i = 0; i < length / 2; i++) swap(i, length - i); // FIXME Reverse in O(1)
         return this;
     }
 
