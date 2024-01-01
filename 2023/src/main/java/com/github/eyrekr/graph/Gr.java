@@ -1,7 +1,9 @@
 package com.github.eyrekr.graph;
 
+import com.github.eyrekr.immutable.Longs;
 import com.github.eyrekr.mutable.Arr;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -10,8 +12,8 @@ import java.util.Objects;
  * For sparse graphs.
  */
 public final class Gr<T> {
-    private final Arr<V<T>> v = Arr.empty();
-    private final Arr<E<V<T>>> e = Arr.empty();
+    private final Arr<V<T>> vertices = Arr.empty();
+    private final Arr<E<V<T>>> edges = Arr.empty();
     private final Map<T, V<T>> map = new HashMap<>();
 
     public Gr<T> addVertex(final T t) {
@@ -19,36 +21,53 @@ public final class Gr<T> {
         return this;
     }
 
-    public Gr<T> addEdge(final T u, final T v) {
-        edge(u, v, 1);
+    public Gr<T> addEdge(final T a, final T b) {
+        edge(a, b, 1);
         return this;
     }
 
-    public Gr<T> addEdge(final T u, final T v, final int weight) {
-        edge(u, v, weight);
+    public Gr<T> addEdge(final T a, final T b, final int weight) {
+        edge(a, b, weight);
         return this;
     }
 
     private V<T> vertex(final T t) {
-        final int i = v.length();
+        final int i = vertices.length();
         final V<T> vertex = new V<T>(i, t);
-        v.addLast(vertex);
+        vertices.addLast(vertex);
         map.put(t, vertex);
         return vertex;
     }
 
-    private E<T> edge(final T u, final T v, final int weight) {
-        final V<T> source = map.computeIfAbsent(u, this::vertex), target = map.computeIfAbsent(v, this::vertex);
-        final int i = e.length();
-        final E<T> edge = new E<T>(i, source, target, weight);
-        target.in.addLast(edge);
-        source.out.addLast(edge);
+    private E<T> edge(final T a, final T b, final int weight) {
+        final V<T> u = map.computeIfAbsent(a, this::vertex), v = map.computeIfAbsent(b, this::vertex);
+        final int i = edges.length();
+        final E<T> edge = new E<T>(i, u, v, weight);
+        v.in.addLast(edge);
+        u.out.addLast(edge);
         return edge;
     }
 
-
-    public int distance(final T u, final T v) {
-
+    public long distance_BellmanFordMoore(final T a, final T b) {
+        final int[] d = new int[vertices.length()];
+        final State[] state = new State[vertices.length()];
+        Arrays.fill(d, Integer.MAX_VALUE);
+        Arrays.fill(state, State.Unseen);
+        final V<T> u = map.get(a), v = map.get(b);
+        d[u.i] = 0;
+        state[u.i] = State.Open;
+        final Arr<V<T>> open = Arr.of(u);
+        while (open.isNotEmpty()) {
+            final V<T>  w = open.removeFirst();
+            state[w.i] = State.Closed;
+            for(final E<T> e: w.out)
+                if(d[e.v.i] > d[u.i] + e.weight) {
+                    d[e.v.i] = d[u.i] + e.weight;
+                    state[e.v.i] = State.Open;
+                    open.addLast(e.v);
+                }
+        }
+        return d[v.i];
     }
 
     private static final class V<T> {
@@ -104,4 +123,6 @@ public final class Gr<T> {
             return String.format("%s--%d-->%s", u.t, weight, v.t);
         }
     }
+
+    enum State {Unseen, Open, Closed}
 }

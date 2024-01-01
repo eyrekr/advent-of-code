@@ -39,7 +39,7 @@ public final class Arr<E> implements Iterable<E> {
         return delegate.isNotEmpty;
     }
 
-    public E getFrist() {
+    public E getFirst() {
         return delegate.at(0);
     }
 
@@ -76,6 +76,11 @@ public final class Arr<E> implements Iterable<E> {
 
     public E at(final int i) {
         return delegate.at(i);
+    }
+
+    public Arr<E> set(final int i, final E value) {
+        delegate.set(i, value);
+        return this;
     }
 
     public boolean has(final E value) {

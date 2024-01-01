@@ -4,7 +4,6 @@ import com.github.eyrekr.output.Out;
 
 import java.util.*;
 import java.util.function.*;
-import java.util.regex.Pattern;
 
 /**
  * Auto-expandable immutable array of elements.
@@ -196,6 +195,20 @@ public final class Arr<E> implements Iterable<E> {
         return (i >= 0)
                 ? (E) a[(start + i % length) % a.length]
                 : (E) a[(a.length + start + length + i % length) % a.length];
+    }
+
+    /**
+     * Set new value at the given index. The index neither overflows nor underflows; it goes around.
+     * Negative indexes work too: -1 is the last element, -2 is the second last, and so on.
+     * If the array is empty, nothing is set.
+     * @complexity O(1)
+     */
+    public Arr<E> set(final int i, final E value) {
+        if (isEmpty) return this;
+        final Arr<E> arr = clone(1);
+        if (i >= 0) arr.a[(arr.start + i % arr.length) % arr.a.length] = value;
+        else arr.a[(arr.a.length + arr.start + arr.length + i % arr.length) % arr.a.length] = value;
+        return arr;
     }
 
     /**
