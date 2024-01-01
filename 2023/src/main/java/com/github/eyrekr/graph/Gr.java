@@ -5,31 +5,51 @@ import com.github.eyrekr.mutable.Arr;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * For sparse graphs.
+ */
 public final class Gr<T> {
-    private final AtomicInteger n = new AtomicInteger();
-    private final AtomicInteger m = new AtomicInteger();
-    private final Map<T, V<T>> vertices = new HashMap<>();
+    private final Arr<V<T>> v = Arr.empty();
+    private final Arr<E<V<T>>> e = Arr.empty();
+    private final Map<T, V<T>> map = new HashMap<>();
 
     public Gr<T> addVertex(final T t) {
-        vertices.put(t, new V<>(n.getAndIncrement(), t));
+        vertex(t);
         return this;
     }
 
     public Gr<T> addEdge(final T u, final T v) {
-        return addEdge(u, v, 1);
-    }
-
-    public Gr<T> addEdge(final T u, final T v, final int w) {
-        final V<T> source = vertices.computeIfAbsent(u, z -> new V<>(n.getAndIncrement(), z)),
-                target = vertices.computeIfAbsent(v, z -> new V<>(n.getAndIncrement(), z));
-        source.out.addLast(new E<>(m.getAndIncrement(), target, w));
-        target.in.addLast(new E<>(m.getAndIncrement(), source, w));
+        edge(u, v, 1);
         return this;
     }
 
+    public Gr<T> addEdge(final T u, final T v, final int weight) {
+        edge(u, v, weight);
+        return this;
+    }
 
+    private V<T> vertex(final T t) {
+        final int i = v.length();
+        final V<T> vertex = new V<T>(i, t);
+        v.addLast(vertex);
+        map.put(t, vertex);
+        return vertex;
+    }
+
+    private E<T> edge(final T u, final T v, final int weight) {
+        final V<T> source = map.computeIfAbsent(u, this::vertex), target = map.computeIfAbsent(v, this::vertex);
+        final int i = e.length();
+        final E<T> edge = new E<T>(i, source, target, weight);
+        target.in.addLast(edge);
+        source.out.addLast(edge);
+        return edge;
+    }
+
+
+    public int distance(final T u, final T v) {
+
+    }
 
     private static final class V<T> {
         final int i;
@@ -59,28 +79,29 @@ public final class Gr<T> {
 
     private static final class E<T> {
         final int i;
-        final V<T> v;
-        final int w;
+        final V<T> u, v;
+        final int weight;
 
-        private E(final int i, final V<T> v, final int w) {
+        private E(final int i, final V<T> u, final V<T> v, final int weight) {
             this.i = i;
+            this.u = u;
             this.v = v;
-            this.w = w;
+            this.weight = weight;
         }
 
         @Override
         public boolean equals(final Object obj) {
-            return obj instanceof final E that && this.i == that.i && this.w == that.w && Objects.equals(this.v, that.v);
+            return obj instanceof final E that && this.i == that.i && this.weight == that.weight && this.v.i == that.v.i;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(i, v, w);
+            return Objects.hash(i, weight, v.i);
         }
 
         @Override
         public String toString() {
-            return String.format("--%d-->%s", w, v.t);
+            return String.format("%s--%d-->%s", u.t, weight, v.t);
         }
     }
 }

@@ -19,6 +19,10 @@ public final class Arr<E> implements Iterable<E> {
         this.delegate = delegate;
     }
 
+    public int length() {
+        return delegate.length;
+    }
+
     public static <T> Arr<T> empty() {
         return new Arr<>(com.github.eyrekr.immutable.Arr.empty());
     }
