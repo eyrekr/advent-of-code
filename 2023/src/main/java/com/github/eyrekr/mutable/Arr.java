@@ -1,6 +1,7 @@
 package com.github.eyrekr.mutable;
 
 import com.github.eyrekr.annotation.ReturnsNewInstance;
+import com.github.eyrekr.common.Indexed;
 import com.github.eyrekr.immutable.Longs;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.math.Algebra;
@@ -117,6 +118,10 @@ public final class Arr<E> implements Iterable<E> {
                 : (E) a[(a.length + start + length + i % length) % a.length];
     }
 
+    public E at(final Indexed indexed) {
+        return at(indexed.i());
+    }
+
     public Arr<E> set(final int i, final E value) {
         if (length == 0) throw new IndexOutOfBoundsException("Empty");
         if (i >= 0) a[(start + i % length) % a.length] = value;
@@ -124,10 +129,18 @@ public final class Arr<E> implements Iterable<E> {
         return this;
     }
 
+    public Arr<E> set(final Indexed indexed, final E value) {
+        return set(indexed.i(), value);
+    }
+
     public Arr<E> swap(final int i, final int j) {
         if (i == j) return this;
         final E a = at(i), b = at(j);
         return set(i, b).set(j, a);
+    }
+
+    public Arr<E> swap(final Indexed a, final Indexed b) {
+        return swap(a.i(), b.i());
     }
 
     public boolean has(final E value) {

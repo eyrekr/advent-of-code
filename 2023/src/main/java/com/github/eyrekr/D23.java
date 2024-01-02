@@ -1,13 +1,11 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.immutable.Longs;
+import com.github.eyrekr.graph.Gr;
 import com.github.eyrekr.immutable.Seq;
-import com.github.eyrekr.raster.Direction;
 import com.github.eyrekr.mutable.Grid;
 import com.github.eyrekr.mutable.Grid.It;
+import com.github.eyrekr.raster.Direction;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -32,46 +30,18 @@ class D23 extends AoC {
         final Seq<It> waypoints = waypoints().addFirst(start).addFirst(end);
         waypoints.each(it -> it.set(it.ch, 0, true));
 
-        Seq<Edge> edges = Seq.empty();
+        final Gr<Integer> graph = new Gr<Integer>()
+                .addVertex(start.i, "ENTRY")
+                .addVertex(end.i, "EXIT");
         for (final It source : waypoints) {
             if (Objects.equals(source, end)) continue;
-            final Seq<Edge> e = directions
+            directions
                     .where(direction -> isValidDirection(source, direction))
-                    .map(direction -> findNextWaypoint(waypoints, source, source.go(direction), direction, 1));
-            edges = edges.addSeq(e);
+                    .map(direction -> findNextWaypoint(waypoints, source, source.go(direction), direction, 1))
+                    .each(edge -> graph.addEdge(edge.a, edge.b, edge.distance));
         }
 
-
-        Longs sortedWaypoints = Longs.empty();
-        {// topological sort
-            Longs queue = Longs.of(start.i);
-            while (queue.isNotEmpty) {
-                final long source = queue.peek();
-                queue = queue.removeFirst();
-                if (!sortedWaypoints.has(source)) sortedWaypoints = sortedWaypoints.addLast(source);
-                queue = queue.addLast(edges.where(e -> e.a == source).map(e -> e.b).toArr(i -> i));
-            }
-            sortedWaypoints.print();
-        }
-
-
-        final Map<Integer, Integer> distance = new HashMap<>();
-        {// max path
-            sortedWaypoints.each(value -> distance.put((int)value, 0));
-            while(sortedWaypoints.isNotEmpty) {
-                final long source = sortedWaypoints.peek();
-                sortedWaypoints = sortedWaypoints.removeFirst();
-
-                for (final Edge edge : edges.where(e -> e.a == source)) {
-                    final int d0 = distance.get(edge.a);
-                    final int d1 = distance.get(edge.b);
-                    if (d0 - edge.distance < d1) {
-                        distance.put(edge.b, d0 + edge.distance); // improve;
-                    }
-                }
-            }
-        }
-        return -distance.get(end.i);
+        return graph.distance_BellmanFordMoore(start.i, end.i);
     }
 
     Seq<It> waypoints() {
