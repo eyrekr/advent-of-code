@@ -60,8 +60,8 @@ public final class Gr<T> {
             final V<T> w = open.removeFirst();
             state.set(w, State.Closed);
             for (final E<T> e : w.out)
-                if (d.at(e.v) > d.at(u) + e.weight) {
-                    d.set(e.v, d.at(u) + e.weight);
+                if (d.at(e.v) > d.at(e.u) + e.weight) {
+                    d.set(e.v, d.at(e.u) + e.weight);
                     state.set(e.v, State.Open);
                     open.addLast(e.v);
                 }

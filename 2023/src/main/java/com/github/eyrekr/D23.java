@@ -38,10 +38,10 @@ class D23 extends AoC {
             directions
                     .where(direction -> isValidDirection(source, direction))
                     .map(direction -> findNextWaypoint(waypoints, source, source.go(direction), direction, 1))
-                    .each(edge -> graph.addEdge(edge.a, edge.b, edge.distance));
+                    .each(edge -> graph.addEdge(edge.a, edge.b, -edge.distance));
         }
 
-        return graph.distance_BellmanFordMoore(start.i, end.i);
+        return -graph.distance_BellmanFordMoore(start.i, end.i);
     }
 
     Seq<It> waypoints() {
