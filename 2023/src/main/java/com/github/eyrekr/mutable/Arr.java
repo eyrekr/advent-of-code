@@ -4,6 +4,7 @@ import com.github.eyrekr.annotation.ReturnsNewInstance;
 import com.github.eyrekr.immutable.Longs;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.math.Algebra;
+import com.github.eyrekr.output.Out;
 
 import java.util.*;
 import java.util.function.*;
@@ -27,14 +28,13 @@ public final class Arr<E> implements Iterable<E> {
         this.start = 0;
     }
 
-    private Arr<E> makeSureThereIsEnoughCapacity() {
-        if (length < a.length) return this;
+    private void makeSureThereIsEnoughCapacity() {
+        if (length < a.length) return;
         final int n = a.length << 1;
         final Object[] b = new Object[n];
         for (int i = 0; i < length; i++) b[i] = at(i);
         start = 0;
         a = b;
-        return this;
     }
 
     public static <T> Arr<T> empty() {
@@ -125,6 +125,7 @@ public final class Arr<E> implements Iterable<E> {
     }
 
     public Arr<E> swap(final int i, final int j) {
+        if (i == j) return this;
         final E a = at(i), b = at(j);
         return set(i, b).set(j, a);
     }
@@ -244,119 +245,186 @@ public final class Arr<E> implements Iterable<E> {
     }
 
     public <T extends Comparable<T>> Arr<E> sortedBy(final Function<? super E, T> transform) {
-        delegate = delegate.sortedBy(transform);
-        return this;
+        return sortedBy(Comparator.comparing(transform));
     }
 
     public Arr<E> sortedBy(final Comparator<? super E> comparator) {
-        delegate = delegate.sortedBy(comparator);
+        quicksort(0, length - 1, comparator);
         return this;
     }
 
+    private void quicksort(final int begin, final int end, final Comparator<? super E> comparator) {
+        final E pivot = at(begin + end / 2);
+        int l = begin, r = end;
+        do {
+            while (comparator.compare(at(l), pivot) < 0 && l < end) l++;
+            while (comparator.compare(at(r), pivot) > 0 && r > begin) r--;
+            if (l <= r) swap(l++, r--);
+        } while (l < r);
+        if (r > begin) quicksort(begin, r, comparator);
+        if (l < end) quicksort(l, end, comparator);
+    }
+
     public Arr<E> unique() {
-        delegate = delegate.unique();
+        final Set<E> visited = new HashSet<>();
+        int n = 0;
+        for (int i = 0; i < length; i++) {
+            final E value = at(i);
+            if (!visited.contains(value)) {
+                swap(i, n++);
+                visited.add(value);
+            }
+        }
+        length = n;
         return this;
     }
 
     public Arr<E> first(final int n) {
-        delegate = delegate.first(n);
+        length = Math.min(n, length);
         return this;
     }
 
     public Arr<E> last(final int n) {
-        delegate = delegate.last(n);
+        if (n >= length) return this;
+        start = (start + length - n) % a.length;
+        length = n;
         return this;
     }
 
     public Arr<E> skip(final int n) {
-        delegate = delegate.skip(n);
+        if (n < length) start = (start + n) % a.length;
+        length = Math.max(0, length - n);
         return this;
     }
 
     public Arr<E> takeWhile(final Predicate<? super E> predicate) {
-        delegate = delegate.takeWhile(predicate);
-        return this;
+        int n = 0;
+        while (n < length && predicate.test(at(n))) n++;
+        return first(n);
     }
 
     public Arr<E> skipWhile(final Predicate<? super E> predicate) {
-        delegate = delegate.skipWhile(predicate);
-        return this;
+        int n = 0;
+        while (n < length && predicate.test(at(n))) n++;
+        return skip(n);
     }
 
     @ReturnsNewInstance
     public <R> Arr<R> map(final Function<? super E, ? extends R> transform) {
-        return new Arr<>(delegate.map(transform));
+        final Arr<R> arr = new Arr<>(length);
+        for (int i = 0; i < length; i++) arr.addLast(transform.apply(at(i)));
+        return arr;
     }
 
     @ReturnsNewInstance
     public <F, R> Arr<R> mapWith(final Arr<F> other, final BiFunction<? super E, ? super F, ? extends R> transform) {
-        return new Arr<>(delegate.mapWith(other.delegate, transform));
+        final Arr<R> arr = new Arr<>(length);
+        for (int i = 0; i < length; i++) arr.addLast(transform.apply(at(i), other.at(i)));
+        return arr;
     }
 
     @ReturnsNewInstance
     public <F, R> Arr<R> prodWith(final Arr<F> other, final BiFunction<? super E, ? super F, ? extends R> transform) {
-        return new Arr<>(delegate.prodWith(other.delegate, transform));
+        final Arr<R> arr = new Arr<>(length * other.length);
+        for (int i = 0; i < length; i++)
+            for (int j = 0; j < other.length; j++)
+                arr.addLast(transform.apply(at(i), other.at(j)));
+        return arr;
     }
 
     @ReturnsNewInstance
     public <F, R> Arr<R> prodUpperTriangleWith(final Arr<F> other, final BiFunction<? super E, ? super F, ? extends R> transform) {
-        return new Arr<>(delegate.prodUpperTriangleWith(other.delegate, transform));
+        final Arr<R> arr = new Arr<>(length * other.length / 2);
+        for (int i = 0; i < length; i++)
+            for (int j = i + 1; j < other.length; j++)
+                arr.addLast(transform.apply(at(i), other.at(j)));
+        return arr;
     }
 
     @ReturnsNewInstance
     public <R> Arr<R> flatMap(final Function<? super E, Arr<? extends R>> transform) {
-        return new Arr<>(delegate.flatMap(value -> transform.apply(value).delegate));
+        final Arr<R> arr = new Arr<>(length);
+        for (int i = 0; i < length; i++) {
+            final Arr<? extends R> sub = transform.apply(at(i));
+            for (int j = 0; j < sub.length; j++) arr.addLast(sub.at(j));
+        }
+        return arr;
     }
 
     public Arr<E> each(final Consumer<? super E> consumer) {
-        delegate.each(consumer);
+        for (int i = 0; i < length; i++) consumer.accept(at(i));
+        return this;
+    }
+
+    public Arr<E> each(final Function<? super E, ? extends E> transform) {
+        for (int i = 0; i < length; i++) set(i, transform.apply(at(i)));
         return this;
     }
 
     public Arr<E> print() {
-        delegate.print(" ");
+        print(" ");
         return this;
     }
 
     public Arr<E> print(final String separator) {
-        delegate.print(separator);
-        return this;
+        return print(separator, (e, i, first, last) -> String.valueOf(e));
     }
 
-    public Arr<E> print(final String separator,
-                        final com.github.eyrekr.immutable.Arr.ContextFunction<? super E, String> formatter) {
-        delegate.print(separator, formatter);
+    public Arr<E> print(final String separator, final ContextFunction<? super E, String> formatter) {
+        for (int i = 0; i < length; i++) {
+            final boolean last = i == length - 1;
+            Out.print("%s%s", formatter.apply(at(i), i, i == 0, last), last ? "\n" : separator);
+        }
         return this;
     }
 
     public Longs toLongs(final Function<? super E, ? extends Number> transform) {
-        return delegate.toLongs(transform);
+        Longs arr = Longs.empty();
+        for (int i = 0; i < length; i++) arr = arr.addLast(transform.apply(at(i)).longValue());
+        return arr;
     }
 
     public E[] toArray(final IntFunction<E[]> arrayGenerator) {
-        return delegate.toArray(arrayGenerator);
+        final E[] array = arrayGenerator.apply(length);
+        for (int i = 0; i < length; i++) array[i] = at(i);
+        return array;
     }
 
     public Set<E> toSet() {
-        return delegate.toSet();
+        final Set<E> set = new HashSet<E>(length);
+        for (int i = 0; i < length; i++) set.add(at(i));
+        return set;
     }
 
     public List<E> toList() {
-        return delegate.toList();
+        final List<E> list = new ArrayList<E>(length);
+        for (int i = 0; i < length; i++) list.add(at(i));
+        return list;
     }
 
     public Seq<E> toSeq() {
-        return delegate.toSeq();
+        Seq<E> seq = Seq.empty();
+        for (int i = length - 1; i >= 0; i--) seq = seq.addFirst(at(i));
+        return seq;
     }
 
     @Override
     public String toString() {
-        return delegate.toString();
+        final StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            if (i > 0) builder.append(' ');
+            builder.append(at(i));
+        }
+        return builder.toString();
     }
 
     @Override
     public boolean equals(final Object obj) {
-        return obj instanceof final Arr that && Objects.equals(this.delegate, that.delegate);
+        if (obj instanceof final Arr that && this.length == that.length) {
+            for (int i = 0; i < length; i++) if (!Objects.equals(this.at(i), that.at(i))) return false;
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -366,7 +434,25 @@ public final class Arr<E> implements Iterable<E> {
 
     @Override
     public Iterator<E> iterator() {
-        return delegate.iterator();
+        return new It();
     }
 
+    private class It implements Iterator<E> {
+        private int i = 0;
+
+        @Override
+        public boolean hasNext() {
+            return i < length;
+        }
+
+        @Override
+        public E next() {
+            return at(i++);
+        }
+    }
+
+    @FunctionalInterface
+    public interface ContextFunction<E, R> {
+        R apply(E e, int i, boolean first, boolean last);
+    }
 }
