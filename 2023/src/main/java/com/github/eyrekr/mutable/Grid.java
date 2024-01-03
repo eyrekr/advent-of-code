@@ -20,27 +20,33 @@ public final class Grid implements Iterable<Grid.It> {
     public final char[][] a;
     public final int[][] d;
     public final boolean[][] b;
+    public final boolean maze;
 
-    private Grid(final int m, final int n, final char[][] a) {
+    private Grid(final int m, final int n, final char[][] a, final boolean maze) {
         this.m = m;
         this.n = n;
         this.a = a;
         this.d = new int[m][n];
         this.b = new boolean[m][n];
+        this.maze = maze;
     }
 
     public static Grid of(final int m, final int n) {
-        return new Grid(m, n, new char[m][n]);
+        return new Grid(m, n, new char[m][n], false);
     }
 
     public static Grid of(final String input) {
+        return Grid.of(input, false);
+    }
+
+    public static Grid of(final String input, final boolean maze) {
         final String[] lines = input.split("\n");
         final int n = lines.length, m = lines[0].length();
         final char[][] a = new char[m][n];
         for (int y = 0; y < n; y++)
             for (int x = 0; x < m; x++)
                 a[x][y] = lines[y].charAt(x);
-        return new Grid(m, n, a);
+        return new Grid(m, n, a, maze);
     }
 
     public char at(int x, int y) {
@@ -61,7 +67,8 @@ public final class Grid implements Iterable<Grid.It> {
                 this,
                 y * m + x, x, y, m, n, ch, d[x][y], b[x][y],
                 ch4, ch8, digit,
-                x == 0 && y == 0, x == m - 1 && y == n - 1, x == 0, x == m - 1);
+                x == 0 && y == 0, x == m - 1 && y == n - 1, x == 0, x == m - 1,
+                ch == '#');
     }
 
     public Grid repeat(final int factor) {
@@ -137,7 +144,7 @@ public final class Grid implements Iterable<Grid.It> {
         for (int y = 0; y < n; y++)
             for (int x = 0; x < m; x++)
                 transposed[y][x] = a[x][y];
-        return new Grid(n, m, transposed);
+        return new Grid(n, m, transposed, maze);
     }
 
     public Grid rotateCW() { //clockwise
@@ -145,7 +152,7 @@ public final class Grid implements Iterable<Grid.It> {
         for (int y = 0; y < n; y++)
             for (int x = 0; x < m; x++)
                 rotated[m - 1 - y][x] = a[x][y];
-        return new Grid(n, m, rotated);
+        return new Grid(n, m, rotated, maze);
     }
 
     public Grid rotateCCW() { //counter-clockwise
@@ -153,27 +160,23 @@ public final class Grid implements Iterable<Grid.It> {
         for (int y = 0; y < n; y++)
             for (int x = 0; x < m; x++)
                 rotated[y][n - 1 - x] = a[x][y];
-        return new Grid(n, m, rotated);
+        return new Grid(n, m, rotated, maze);
     }
 
     public Grid replace(final Function<Character, Character> transform) {
-        final Grid grid = new Grid(m, n, new char[m][n]);
-        for (int y = 0; y < n; y++) {
+        for (int y = 0; y < n; y++)
             for (int x = 0; x < m; x++) {
                 final Character ch = transform.apply(a[x][y]);
-                grid.a[x][y] = ch == null ? C0 : ch;
+                a[x][y] = ch == null ? C0 : ch;
             }
-        }
-        return grid;
+        return this;
     }
 
     public <R> R reduce(final R init, final BiFunction<? super R, It, ? extends R> reduce) {
         R acc = init;
-        for (int y = 0; y < n; y++) {
-            for (int x = 0; x < m; x++) {
+        for (int y = 0; y < n; y++)
+            for (int x = 0; x < m; x++)
                 acc = reduce.apply(acc, it(x, y));
-            }
-        }
         return acc;
     }
 
@@ -263,13 +266,15 @@ public final class Grid implements Iterable<Grid.It> {
         public final boolean last;
         public final boolean firstOnLine;
         public final boolean lastOnLine;
+        public final boolean wall;
 
         private It(final Grid grid,
                    final int i, final int x, final int y, final int m, final int n,
                    final char ch, final int d, final boolean b,
                    final char[] neighbours4, final char[] neighbours8,
                    final int digit,
-                   final boolean first, final boolean last, final boolean firstOnLine, final boolean lastOnLine) {
+                   final boolean first, final boolean last, final boolean firstOnLine, final boolean lastOnLine,
+                   final boolean wall) {
             this.grid = grid;
             this.i = i;
             this.x = x;
@@ -286,6 +291,7 @@ public final class Grid implements Iterable<Grid.It> {
             this.last = last;
             this.firstOnLine = firstOnLine;
             this.lastOnLine = lastOnLine;
+            this.wall = wall;
         }
 
         public It go(final Direction direction) {
@@ -309,7 +315,8 @@ public final class Grid implements Iterable<Grid.It> {
         public Seq<It> neighbours() {
             return Seq.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right)
                     .where(direction -> direction.dx + x >= 0 && direction.dx + x < m && direction.dy + y >= 0 && direction.dy + y < n)
-                    .map(this::go);
+                    .map(this::go)
+                    .where(it -> !it.grid.maze || !it.wall);
         }
 
         @Deprecated
