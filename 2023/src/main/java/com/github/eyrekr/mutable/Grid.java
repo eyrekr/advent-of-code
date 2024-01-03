@@ -261,6 +261,7 @@ public final class Grid implements Iterable<Grid.It> {
         public final char[] neighbours8;
         public final int digit;
         public final Direction direction;
+        public final boolean symbolMatchesDirection;
         public final boolean first;
         public final boolean last;
         public final boolean firstOnLine;
@@ -287,6 +288,13 @@ public final class Grid implements Iterable<Grid.It> {
             this.neighbours8 = neighbours8;
             this.digit = digit;
             this.direction = direction;
+            this.symbolMatchesDirection = switch (ch) {
+                case '^' -> direction == Direction.Up;
+                case 'v' -> direction == Direction.Down;
+                case '>' -> direction == Direction.Right;
+                case '<' -> direction == Direction.Down;
+                default -> true;
+            };
             this.first = first;
             this.last = last;
             this.firstOnLine = firstOnLine;

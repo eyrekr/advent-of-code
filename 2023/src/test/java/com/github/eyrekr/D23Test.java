@@ -40,7 +40,7 @@ class D23Test {
 
     @Test
     void sampleStar2() {
-        assertThat(new D23(sample).star2()).isEqualTo(0L);
+        assertThat(new D23(sample).star2()).isEqualTo(154L);
     }
 
     @Test

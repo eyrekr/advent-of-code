@@ -56,12 +56,15 @@ public final class Gr<T> {
         return edge;
     }
 
-    public long distance_BellmanFordMoore(final T a, final T b) {
+    /**
+     * @return The minimum distance in the graph from the source vertex to the target vertex.
+     */
+    public long minDistance_BellmanFordMoore(final T source, final T target) {
         enum State {Unseen, Open, Closed}
 
         final Arr<Integer> d = Arr.repeat(Integer.MAX_VALUE, vertices.length());
         final Arr<State> state = Arr.repeat(State.Unseen, vertices.length());
-        final V<T> u = map.get(a), v = map.get(b);
+        final V<T> u = map.get(source), v = map.get(target);
         d.set(u, 0);
         state.set(u, State.Open);
         final Arr<V<T>> open = Arr.of(u);
@@ -76,6 +79,14 @@ public final class Gr<T> {
                 }
         }
         return d.at(v);
+    }
+
+    /**
+     * @return The maximum distance in the graph from the source vertex to the target vertex (no vertex appears twice in the path).
+     * @complexity O(2 ^ n) - the problem is NP-hard
+     */
+    public long maxDistance(final T source, final T target) {
+        return 0L;
     }
 
     private static final class V<T> implements Indexed {

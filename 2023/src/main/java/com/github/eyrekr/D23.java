@@ -5,7 +5,6 @@ import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.mutable.Grid;
 import com.github.eyrekr.mutable.Grid.It;
 import com.github.eyrekr.mutable.Grid.State;
-import com.github.eyrekr.raster.Direction;
 
 /**
  * https://adventofcode.com/2023/day/23
@@ -29,11 +28,11 @@ class D23 extends AoC {
 
         for (final It source : crossroads) {
             if (source.i == end.i) continue; // nothing emanates from the END, but END is still a crossroads
-            for (final It next : source.neighbours(this::isInValidDirection)) {
+            for (final It next : source.neighbours(neighbour -> neighbour.state != State.Closed && neighbour.symbolMatchesDirection)) {
                 It current = next;
                 int distance = 1;
                 while (crossroads.noneMatch(current)) {
-                    current.setState(State.Closed); // we cannot close crossroads, we would never re-enter them
+                    current.setState(State.Closed).set(current.direction.ch); // we cannot close crossroads, we would never re-enter them
                     current = current.neighbours(neighbour -> neighbour.i != source.i && neighbour.state != State.Closed).value;
                     distance++;
                 }
@@ -41,22 +40,40 @@ class D23 extends AoC {
                 graph.addEdge(source.i, current.i, -distance);
             }
         }
-        return -graph.distance_BellmanFordMoore(start.i, end.i); //
-    }
 
-    boolean isInValidDirection(final It neighbour) {
-        return neighbour.state != State.Closed && switch (neighbour.ch) {
-            case '^' -> neighbour.direction == Direction.Up;
-            case 'v' -> neighbour.direction == Direction.Down;
-            case '>' -> neighbour.direction == Direction.Right;
-            case '<' -> neighbour.direction == Direction.Down;
-            default -> true;
-        };
+        grid.print();
+        // in directed acyclic graphs the MAX(path) = -MIN(-path)
+        return -graph.minDistance_BellmanFordMoore(start.i, end.i);
     }
 
     @Override
     long star2() {
-        return 0L;
+        final It start = grid.first('.'), end = grid.last('.');
+        final Seq<It> crossroads = grid.collect(it -> !it.wall && it.neighbours().length >= 3).addFirst(end).addFirst(start);
+        final Gr<Integer> graph = Gr.empty();
+
+        for (final It source : crossroads) {
+            if (source.i == end.i) continue;
+            for (final It next : source.neighbours(neighbour -> neighbour.state != State.Closed && neighbour.symbolMatchesDirection)) {
+                It current = next;
+                int distance = 1;
+                while (crossroads.noneMatch(current)) {
+                    current.setState(State.Closed).set(current.direction.ch);
+                    current = current.neighbours(neighbour -> neighbour.i != source.i && neighbour.state != State.Closed).value;
+                    distance++;
+                }
+
+                graph.addEdge(source.i, current.i, distance).addEdge(current.i, source.i, distance); // bidirectional
+            }
+        }
+
+        grid.print(it-> switch(it.ch){
+            case '.' -> "@r*";
+            case '#' -> "@W#";
+            default-> "@C" + it.ch;
+        });
+        // in directed acyclic graphs the MAX(path) = -MIN(-path)
+        return graph.minDistance_BellmanFordMoore(start.i, end.i);
     }
 
 }
