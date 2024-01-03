@@ -2,11 +2,9 @@ package com.github.eyrekr;
 
 import com.github.eyrekr.graph.Gr;
 import com.github.eyrekr.immutable.Seq;
-import com.github.eyrekr.mutable.Arr;
 import com.github.eyrekr.mutable.Grid;
 import com.github.eyrekr.mutable.Grid.It;
 import com.github.eyrekr.mutable.Grid.State;
-import com.github.eyrekr.output.Out;
 import com.github.eyrekr.raster.Direction;
 
 /**
@@ -30,39 +28,30 @@ class D23 extends AoC {
         final Gr<Integer> graph = Gr.empty();
 
         for (final It source : crossroads) {
-            if (source.i == end.i) continue;
-            for (final It next : source.neighbours(neighbour -> neighbour.state != State.Closed && switch (neighbour.ch) {
-                case '^' -> neighbour.direction == Direction.Up;
-                case 'v' -> neighbour.direction == Direction.Down;
-                case '>' -> neighbour.direction == Direction.Right;
-                case '<' -> neighbour.direction == Direction.Down;
-                default -> true;
-            })) {
+            if (source.i == end.i) continue; // nothing emanates from the END, but END is still a crossroads
+            for (final It next : source.neighbours(this::isInValidDirection)) {
                 It current = next;
                 int distance = 1;
                 while (crossroads.noneMatch(current)) {
-                    current.setState(State.Closed);
+                    current.setState(State.Closed); // we cannot close crossroads, we would never re-enter them
                     current = current.neighbours(neighbour -> neighbour.i != source.i && neighbour.state != State.Closed).value;
                     distance++;
-
-//                    Out.print("\nSOURCE **%d** DISTANCE **%d**\n", source.i, distance);
-//                    current.grid.print(it -> {
-//                        if (it.i == source.i) return "@R*";
-//                        if (it.state == State.Closed) return "@bX";
-//                        return switch (it.ch) {
-//                            case '#' -> "@W#";
-//                            case '.' -> "@w.";
-//                            case '^', 'v', '<', '>' -> "@c" + it.ch;
-//                            default -> "@@" + it.ch;
-//                        };
-//                    });
                 }
 
                 graph.addEdge(source.i, current.i, -distance);
             }
         }
+        return -graph.distance_BellmanFordMoore(start.i, end.i); //
+    }
 
-        return -graph.distance_BellmanFordMoore(start.i, end.i);
+    boolean isInValidDirection(final It neighbour) {
+        return neighbour.state != State.Closed && switch (neighbour.ch) {
+            case '^' -> neighbour.direction == Direction.Up;
+            case 'v' -> neighbour.direction == Direction.Down;
+            case '>' -> neighbour.direction == Direction.Right;
+            case '<' -> neighbour.direction == Direction.Down;
+            default -> true;
+        };
     }
 
     @Override
