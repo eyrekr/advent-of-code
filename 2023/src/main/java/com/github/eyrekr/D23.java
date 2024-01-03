@@ -2,20 +2,19 @@ package com.github.eyrekr;
 
 import com.github.eyrekr.graph.Gr;
 import com.github.eyrekr.immutable.Seq;
+import com.github.eyrekr.mutable.Arr;
 import com.github.eyrekr.mutable.Grid;
 import com.github.eyrekr.mutable.Grid.It;
+import com.github.eyrekr.mutable.Grid.State;
+import com.github.eyrekr.output.Out;
 import com.github.eyrekr.raster.Direction;
-
-import java.util.Objects;
 
 /**
  * https://adventofcode.com/2023/day/23
- * 1)
+ * 1) 2070
  * 2)
  */
 class D23 extends AoC {
-
-    final Seq<Direction> directions = Seq.of(Direction.Down, Direction.Right, Direction.Up, Direction.Left);
 
     final Grid grid;
 
@@ -27,43 +26,43 @@ class D23 extends AoC {
     @Override
     long star1() {
         final It start = grid.first('.'), end = grid.last('.');
-        final Seq<It> waypoints = grid.collect(it -> it.ch == '.' && it.neighbours(n -> !n.wall).length >= 3).addFirst(start).addFirst(end);
-
+        final Seq<It> crossroads = grid.collect(it -> !it.wall && it.neighbours().length >= 3).addFirst(end).addFirst(start);
         final Gr<Integer> graph = Gr.empty();
-        graph.addVertex(start.i, "ENTRY").addVertex(end.i, "EXIT");
-        for (final It source : waypoints) {
-            if (Objects.equals(source, end)) continue;
-            directions
-                    .where(direction -> isValidDirection(source, direction))
-                    .map(direction -> findNextWaypoint(waypoints, source, direction))
-                    .each(edge -> graph.addEdge(edge.a, edge.b, -edge.distance));
+
+        for (final It source : crossroads) {
+            if (source.i == end.i) continue;
+            for (final It next : source.neighbours(neighbour -> neighbour.state != State.Closed && switch (neighbour.ch) {
+                case '^' -> neighbour.direction == Direction.Up;
+                case 'v' -> neighbour.direction == Direction.Down;
+                case '>' -> neighbour.direction == Direction.Right;
+                case '<' -> neighbour.direction == Direction.Down;
+                default -> true;
+            })) {
+                It current = next;
+                int distance = 1;
+                while (crossroads.noneMatch(current)) {
+                    current.setState(State.Closed);
+                    current = current.neighbours(neighbour -> neighbour.i != source.i && neighbour.state != State.Closed).value;
+                    distance++;
+
+//                    Out.print("\nSOURCE **%d** DISTANCE **%d**\n", source.i, distance);
+//                    current.grid.print(it -> {
+//                        if (it.i == source.i) return "@R*";
+//                        if (it.state == State.Closed) return "@bX";
+//                        return switch (it.ch) {
+//                            case '#' -> "@W#";
+//                            case '.' -> "@w.";
+//                            case '^', 'v', '<', '>' -> "@c" + it.ch;
+//                            default -> "@@" + it.ch;
+//                        };
+//                    });
+                }
+
+                graph.addEdge(source.i, current.i, -distance);
+            }
         }
 
         return -graph.distance_BellmanFordMoore(start.i, end.i);
-    }
-
-    Edge findNextWaypoint(final Seq<It> waypoints, final It source, final Direction direction) {
-        It current = source.go(direction);
-        int distance = 1, previous = source.i;
-        while (!waypoints.has(current)) {
-            final int forbidden = previous;
-            previous = current.i;
-            current = current.neighbours(n -> n.i != forbidden && !n.wall).value;
-            distance++;
-        }
-        return new Edge(source.i, current.i, distance);
-    }
-
-    boolean isValidDirection(final It source, final Direction direction) {
-        final It next = source.go(direction);
-        if (next == null) return false;
-        return next.ch == '.' || switch (direction) {
-            case Up -> next.ch == '^';
-            case Down -> next.ch == 'v';
-            case Left -> next.ch == '<';
-            case Right -> next.ch == '>';
-            default -> false;
-        };
     }
 
     @Override
@@ -71,6 +70,4 @@ class D23 extends AoC {
         return 0L;
     }
 
-    record Edge(int a, int b, int distance) {
-    }
 }

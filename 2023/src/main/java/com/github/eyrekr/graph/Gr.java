@@ -57,6 +57,8 @@ public final class Gr<T> {
     }
 
     public long distance_BellmanFordMoore(final T a, final T b) {
+        enum State {Unseen, Open, Closed}
+
         final Arr<Integer> d = Arr.repeat(Integer.MAX_VALUE, vertices.length());
         final Arr<State> state = Arr.repeat(State.Unseen, vertices.length());
         final V<T> u = map.get(a), v = map.get(b);
@@ -141,6 +143,4 @@ public final class Gr<T> {
             return String.format("%s--%d-->%s", u.t, weight, v.t);
         }
     }
-
-    enum State {Unseen, Open, Closed}
 }

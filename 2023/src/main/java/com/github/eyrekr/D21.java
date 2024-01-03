@@ -1,6 +1,7 @@
 package com.github.eyrekr;
 
 import com.github.eyrekr.mutable.Grid;
+import com.github.eyrekr.mutable.Grid.State;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,7 +32,7 @@ class D21 extends AoC {
     long star2() {
         final int factor = grid.m, delta = grid.m / 2;
         final Grid inflatedGrid = grid.repeat(7).replace(ch -> ch == 'S' ? '.' : ch);
-        inflatedGrid.it(inflatedGrid.m / 2, inflatedGrid.n / 2).set('S', 0, true);
+        inflatedGrid.it(inflatedGrid.m / 2, inflatedGrid.n / 2).set('S');
 
         final long f0 = run(inflatedGrid, 0 * factor + delta);
         final long f1 = run(inflatedGrid, 1 * factor + delta);
@@ -52,9 +53,8 @@ class D21 extends AoC {
 
     long run(final Grid grid, final long steps) {
         // let us treat grid.d as "parity" where -1 - not reached yet, 0 - even, 1 - odd
-        grid.each(it -> it.set(it.ch, -1, false));
-        final Grid.It start = grid.firstOneOf("S*");
-        start.set('*', 0, true);
+        grid.each(it -> it.setDistance(-1).setState(State.Unseen));
+        final Grid.It start = grid.first('S').setDistance(0).setState(State.Closed);
         Set<Integer> border = new HashSet<>();
         border.add(start.i);
 
@@ -62,10 +62,10 @@ class D21 extends AoC {
             final Set<Integer> expandedBorder = new HashSet<>();
             final int parity = step % 2;
             for (final int i : border) {
-                grid.it(i).neighbours(it -> !it.b && !it.wall)
-                        .each(n -> {
-                            n.set(n.ch, parity, true);
-                            expandedBorder.add(n.i);
+                grid.it(i).neighbours(it -> it.state != State.Closed && !it.wall)
+                        .each(neighbour -> {
+                            neighbour.setDistance(parity).setState(State.Closed);
+                            expandedBorder.add(neighbour.i);
                         });
             }
             border = expandedBorder;
