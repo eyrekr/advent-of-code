@@ -15,6 +15,13 @@ public final class Gr<T> {
     private final Arr<E<T>> edges = Arr.empty();
     private final Map<T, V<T>> map = new HashMap<>();
 
+    private Gr() {
+    }
+
+    public static <E> Gr<E> empty() {
+        return new Gr<>();
+    }
+
     public Gr<T> addVertex(final T t, final String alias) {
         vertex(t, alias);
         return this;
