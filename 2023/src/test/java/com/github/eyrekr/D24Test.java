@@ -17,22 +17,22 @@ class D24Test {
 
     @Test
     void sampleStar1() {
-        assertThat(new D24(sample).star1()).isEqualTo(2L);
+        assertThat(new D24(sample, 7, 27).star1()).isEqualTo(2L);
     }
 
     @Test
     void sampleStar2() {
-        assertThat(new D24(sample).star2()).isEqualTo(0L);
+        assertThat(new D24(sample, 0, 0).star2()).isEqualTo(0L);
     }
 
     @Test
     void star1() {
-        assertThat(new D24(input).star1()).isEqualTo(0L);
+        assertThat(new D24(input, 200_000_000_000_000L, 400_000_000_000_000L).star1()).isEqualTo(11098L);
     }
 
     @Test
     void star2() {
-        assertThat(new D24(input).star2()).isEqualTo(0L);
+        assertThat(new D24(input, 0, 0).star2()).isEqualTo(0L);
     }
 
 }

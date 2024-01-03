@@ -356,8 +356,12 @@ public final class Seq<E> implements Iterable<E> {
                 });
     }
 
-    public Longs toArr(final ToLongFunction<? super E> tranform) {
+    public Longs toLongs(final ToLongFunction<? super E> tranform) {
         return reduce(Longs.empty(), (arr, e) -> arr.addLast(tranform.applyAsLong(e)));
+    }
+
+    public Arr<E> toArr() {
+        return reduce(Arr.empty(), Arr::addLast);
     }
 
     public Map<E, Integer> frequency() {

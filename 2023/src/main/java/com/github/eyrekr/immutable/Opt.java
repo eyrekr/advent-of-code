@@ -40,6 +40,18 @@ public final class Opt<E> {
         return missing ? empty() : (Opt<R>) transform.apply(value);
     }
 
+    public E getValue() {
+        return value;
+    }
+
+    public boolean isPresent() {
+        return present;
+    }
+
+    public boolean isMissing() {
+        return missing;
+    }
+
     public E get() {
         if (missing) throw new IllegalStateException();
         return value;
