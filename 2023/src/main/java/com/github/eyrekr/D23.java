@@ -4,7 +4,6 @@ import com.github.eyrekr.graph.Gr;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.mutable.Grid;
 import com.github.eyrekr.mutable.Grid.It;
-import com.github.eyrekr.output.Out;
 import com.github.eyrekr.raster.Direction;
 
 import java.util.Objects;
@@ -28,7 +27,7 @@ class D23 extends AoC {
     @Override
     long star1() {
         final It start = grid.first('.'), end = grid.last('.');
-        final Seq<It> waypoints = grid.collect(it -> it.ch == '.' && it.neighbours().length >= 3).addFirst(start).addFirst(end);
+        final Seq<It> waypoints = grid.collect(it -> it.ch == '.' && it.neighbours(n -> !n.wall).length >= 3).addFirst(start).addFirst(end);
 
         final Gr<Integer> graph = Gr.empty();
         graph.addVertex(start.i, "ENTRY").addVertex(end.i, "EXIT");
@@ -49,10 +48,9 @@ class D23 extends AoC {
         while (!waypoints.has(current)) {
             final int forbidden = previous;
             previous = current.i;
-            current = current.neighbours().where(it -> it.i != forbidden).value;
+            current = current.neighbours(n -> n.i != forbidden && !n.wall).value;
             distance++;
         }
-        Out.print("%d -> %d = %d\n", source.i, current.i, distance);
         return new Edge(source.i, current.i, distance);
     }
 

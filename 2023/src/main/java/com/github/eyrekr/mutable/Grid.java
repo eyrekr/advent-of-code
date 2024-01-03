@@ -308,15 +308,11 @@ public final class Grid implements Iterable<Grid.It> {
             };
         }
 
-        public Seq<It> unvisitedNeighbours() {
-            return neighbours().where(it -> !it.b);
-        }
-
-        public Seq<It> neighbours() {
+        public Seq<It> neighbours(final Predicate<It> predicate) {
             return Seq.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right)
                     .where(direction -> direction.dx + x >= 0 && direction.dx + x < m && direction.dy + y >= 0 && direction.dy + y < n)
                     .map(this::go)
-                    .where(it -> !it.grid.maze || !it.wall);
+                    .where(predicate);
         }
 
         @Deprecated

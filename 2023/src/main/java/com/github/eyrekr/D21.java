@@ -62,8 +62,7 @@ class D21 extends AoC {
             final Set<Integer> expandedBorder = new HashSet<>();
             final int parity = step % 2;
             for (final int i : border) {
-                grid.it(i).unvisitedNeighbours()
-                        .where(n -> n.ch != '#')
+                grid.it(i).neighbours(it -> !it.b && !it.wall)
                         .each(n -> {
                             n.set(n.ch, parity, true);
                             expandedBorder.add(n.i);
