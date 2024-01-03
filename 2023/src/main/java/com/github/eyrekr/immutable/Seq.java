@@ -160,24 +160,24 @@ public final class Seq<E> implements Iterable<E> {
         return isEmpty ? init : combine.apply(tail.reduceR(init, combine), value);
     }
 
-    public E reduceR(final BiFunction<? super E, ? super E, ? extends E> combine) {
-        return isEmpty ? null : tail.reduceR(value, combine);
+    public Opt<E> reduceR(final BiFunction<? super E, ? super E, ? extends E> combine) {
+        return isEmpty ? Opt.empty() : Opt.of(tail.reduceR(value, combine));
     }
 
     public <R> R reduce(final R init, final BiFunction<? super R, ? super E, ? extends R> combine) { // right-to-left
         return isEmpty ? init : tail.reduce(combine.apply(init, value), combine);
     }
 
-    public E reduce(final BiFunction<? super E, ? super E, ? extends E> combine) {
-        return isEmpty ? null : tail.reduce(value, combine);
+    public Opt<E> reduce(final BiFunction<? super E, ? super E, ? extends E> combine) {
+        return isEmpty ? Opt.empty() : Opt.of(tail.reduce(value, combine));
     }
 
     public Seq<E> where(final Predicate<? super E> predicate) {
         return isEmpty ? this : predicate.test(value) ? new Seq<>(value, tail.where(predicate)) : tail.where(predicate);
     }
 
-    public E firstWhere(final Predicate<? super E> predicate) {
-        return isEmpty ? null : predicate.test(value) ? value : tail.firstWhere(predicate);
+    public Opt<E> firstWhere(final Predicate<? super E> predicate) {
+        return isEmpty ? Opt.empty() : predicate.test(value) ? Opt.of(value) : tail.firstWhere(predicate);
     }
 
     public Seq<E> reverse() {
@@ -212,20 +212,20 @@ public final class Seq<E> implements Iterable<E> {
         return new Seq<>(value, tail.unique(visited));
     }
 
-    public E min(final Comparator<? super E> comparator) {
+    public Opt<E> min(final Comparator<? super E> comparator) {
         return reduce((a, b) -> comparator.compare(a, b) < 0 ? a : b);
     }
 
-    public E min() {
-        return (E) min(Comparator.comparing((Object a) -> ((Comparable) a)));
+    public Opt<E> min() {
+        return min(Comparator.comparing((Object a) -> ((Comparable) a)));
     }
 
-    public E max(final Comparator<? super E> comparator) {
+    public Opt<E> max(final Comparator<? super E> comparator) {
         return reduce((a, b) -> comparator.compare(a, b) > 0 ? a : b);
     }
 
-    public E max() {
-        return (E) max(Comparator.comparing((Object a) -> ((Comparable) a)));
+    public Opt<E> max() {
+        return max(Comparator.comparing((Object a) -> ((Comparable) a)));
     }
 
     public Seq<Seq<E>> split(final Predicate<? super E> predicate) {

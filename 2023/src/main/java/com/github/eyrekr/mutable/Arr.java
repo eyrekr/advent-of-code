@@ -3,6 +3,7 @@ package com.github.eyrekr.mutable;
 import com.github.eyrekr.annotation.ReturnsNewInstance;
 import com.github.eyrekr.common.Indexed;
 import com.github.eyrekr.immutable.Longs;
+import com.github.eyrekr.immutable.Opt;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.math.Algebra;
 import com.github.eyrekr.output.Out;
@@ -197,20 +198,22 @@ public final class Arr<E> implements Iterable<E> {
         return acc;
     }
 
-    public E reduce(final BiFunction<? super E, ? super E, ? extends E> reducer) {
+    public Opt<E> reduce(final BiFunction<? super E, ? super E, ? extends E> reducer) {
+        if (isEmpty()) return Opt.empty();
         E acc = at(0);
         for (int i = 1; i < length; i++) acc = reducer.apply(acc, at(i));
-        return acc;
+        return Opt.of(acc);
     }
 
-    public E min(final Comparator<? super E> comparator) {
+    public Opt<E> min(final Comparator<? super E> comparator) {
+        if (isEmpty()) return Opt.empty();
         E min = null;
         for (int i = 0; i < length; i++)
             if (min == null || comparator.compare(at(i), min) < 0) min = at(i);
-        return min;
+        return Opt.of(min);
     }
 
-    public <T extends Comparable<T>> E min(final Function<? super E, T> transform) {
+    public <T extends Comparable<T>> Opt<E> min(final Function<? super E, T> transform) {
         return min(Comparator.comparing(transform));
     }
 
@@ -225,14 +228,15 @@ public final class Arr<E> implements Iterable<E> {
         return argmin(Comparator.comparing(transform));
     }
 
-    public E max(final Comparator<? super E> comparator) {
+    public Opt<E> max(final Comparator<? super E> comparator) {
+        if (isEmpty()) return Opt.empty();
         E max = null;
         for (int i = 0; i < length; i++)
             if (max == null || comparator.compare(at(i), max) > 0) max = at(i);
-        return max;
+        return Opt.of(max);
     }
 
-    public <T extends Comparable<T>> E max(final Function<? super E, T> transform) {
+    public <T extends Comparable<T>> Opt<E> max(final Function<? super E, T> transform) {
         return min(Comparator.comparing(transform));
     }
 

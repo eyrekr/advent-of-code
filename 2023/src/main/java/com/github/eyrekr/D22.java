@@ -103,7 +103,7 @@ class D22 extends AoC {
         }
 
         final Map<Integer, Brick> index = bricks.indexBy(Brick::id);
-        return bricks.map(brick -> score(brick, index, above, under)).reduce(Integer::sum);
+        return bricks.map(brick -> score(brick, index, above, under)).reduce(Integer::sum).get();
     }
 
     int score(final Brick brick, final Map<Integer, Brick> index, final Multimap<Integer, Integer> above, final Multimap<Integer, Integer> under) {

@@ -28,11 +28,11 @@ class D12 extends AoC {
     }
 
     long star1() {
-        return rows.map(row -> arrange(row.stencils, row.runs, new Cache())).reduce(Long::sum);
+        return rows.map(row -> arrange(row.stencils, row.runs, new Cache())).reduce(Long::sum).get();
     }
 
     long star2() {
-        return unfoldedRows.map(row -> arrange(row.stencils, row.runs, new Cache())).reduce(Long::sum);
+        return unfoldedRows.map(row -> arrange(row.stencils, row.runs, new Cache())).reduce(Long::sum).get();
     }
 
     static long arrange(final Seq<String> stencils, final Seq<Long> runs, final Cache cache) {

@@ -1,7 +1,7 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.mutable.Grid;
 import com.github.eyrekr.immutable.Seq;
+import com.github.eyrekr.mutable.Grid;
 
 /**
  * https://adventofcode.com/2023/day/11
@@ -36,7 +36,10 @@ class D11 extends AoC {
     }
 
     long solveFor(final Seq<long[]> stars) {
-        return stars.contextMap(star -> star.isLast ? 0L : star.tail.map(b -> d(star.value, b)).reduce(Long::sum)).reduce(Long::sum);
+        return stars
+                .contextMap(star -> star.isLast ? 0L : star.tail.map(b -> d(star.value, b)).reduce(Long::sum).get())
+                .reduce(Long::sum)
+                .get();
     }
 
     long d(final long[] a, final long[] b) {

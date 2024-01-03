@@ -39,7 +39,8 @@ class D15 extends AoC {
 
         return Seq.range(0, 256)
                 .flatMap(box -> map[box].mapWith(Seq.range(0, map[box].length), (lens, position) ->  (box + 1) * (position + 1) * lens.focalLength))
-                .reduce(Long::sum);
+                .reduce(Long::sum)
+                .get();
     }
 
     static int hash(final String word) {

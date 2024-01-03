@@ -191,7 +191,7 @@ public final class Arr<E> implements Iterable<E> {
      * @complexity O(1)
      */
     public E at(final int i) {
-        if (isEmpty) return null;
+        if (isEmpty) throw new IllegalStateException();
         return (i >= 0)
                 ? (E) a[(start + i % length) % a.length]
                 : (E) a[(a.length + start + length + i % length) % a.length];
@@ -201,6 +201,7 @@ public final class Arr<E> implements Iterable<E> {
      * Set new value at the given index. The index neither overflows nor underflows; it goes around.
      * Negative indexes work too: -1 is the last element, -2 is the second last, and so on.
      * If the array is empty, nothing is set.
+     *
      * @complexity O(1)
      */
     public Arr<E> set(final int i, final E value) {
@@ -290,22 +291,23 @@ public final class Arr<E> implements Iterable<E> {
      * @return The accumulated value.
      * @complexity O(n)
      */
-    public E reduce(final BiFunction<? super E, ? super E, ? extends E> reducer) {
-        if (isEmpty) return null;
+    public Opt<E> reduce(final BiFunction<? super E, ? super E, ? extends E> reducer) {
+        if (isEmpty) return Opt.empty();
         E acc = at(0);
         for (int i = 1; i < length; i++) acc = reducer.apply(acc, at(i));
-        return acc;
+        return Opt.of(acc);
     }
 
     /**
      * @return Minimum value in the array.
      * @complexity O(n)
      */
-    public E min(final Comparator<? super E> comparator) {
+    public Opt<E> min(final Comparator<? super E> comparator) {
+        if (isEmpty) return Opt.empty();
         E min = null;
         for (int i = 0; i < length; i++)
             if (min == null || comparator.compare(at(i), min) < 0) min = at(i);
-        return min;
+        return Opt.of(min);
     }
 
     /**
@@ -323,11 +325,12 @@ public final class Arr<E> implements Iterable<E> {
      * @return Maximum value in the array.
      * @complexity O(n)
      */
-    public E max(final Comparator<? super E> comparator) {
+    public Opt<E> max(final Comparator<? super E> comparator) {
+        if (isEmpty) return Opt.empty();
         E max = null;
         for (int i = 0; i < length; i++)
             if (max == null || comparator.compare(max, at(i)) < 0) max = at(i);
-        return max;
+        return Opt.of(max);
     }
 
     /**

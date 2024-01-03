@@ -32,7 +32,7 @@ class D09 extends AoC {
             seq = seq.mapWithPrev((value, previous) -> previous == null ? null : value - previous).tail;
             seq.print();
         }
-        return lastValues.reduce(Long::sum).longValue();
+        return lastValues.reduce(Long::sum).get();
     }
 
     long extrapolatePrevious(final Seq<Long> numbers) {
@@ -43,6 +43,6 @@ class D09 extends AoC {
             seq = seq.mapWithPrev((value, previous) -> previous == null ? null : value - previous).tail;
             seq.print();
         }
-        return firstValues.reduce((acc, value) -> value - acc).longValue();
+        return firstValues.reduce((acc, value) -> value - acc).get();
     }
 }

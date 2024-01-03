@@ -50,7 +50,7 @@ class D23Test {
 
     @Test
     void star2() {
-        assertThat(new D23(input).star2()).isEqualTo(0L);
+        assertThat(new D23(input).star2()).isEqualTo(6498L);
     }
 
 }

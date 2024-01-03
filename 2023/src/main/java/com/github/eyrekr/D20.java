@@ -84,7 +84,7 @@ class D20 extends AoC {
 
 
     long star2() {
-        final Module secondLast = modules.firstWhere(module -> module.out.has(TERMINAL));
+        final Module secondLast = modules.firstWhere(module -> module.out.has(TERMINAL)).get();
         final Seq<Module> modulesWhoseCyclesWeWatch = modules.where(module -> module.out.has(secondLast.name));
         final Map<Module, Long> cycleLength = new HashMap<>();
 
@@ -106,7 +106,7 @@ class D20 extends AoC {
                     }
                     if (cycleLength.size() == modulesWhoseCyclesWeWatch.length) {
                         // all cycles collected => cycles will fire up 1st time together when LCM
-                        return Seq.fromIterable(cycleLength.values()).reduce(Algebra::lcm);
+                        return Seq.fromIterable(cycleLength.values()).reduce(Algebra::lcm).get();
                     }
                 }
 

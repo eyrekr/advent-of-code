@@ -34,7 +34,7 @@ class D19 extends AoC {
     }
 
     long star1() {
-        return xmas.where(x -> runThrough(workflows, x)).map(XMAS::value).reduce(Long::sum);
+        return xmas.where(x -> runThrough(workflows, x)).map(XMAS::value).reduce(Long::sum).get();
     }
 
     long star2() {
@@ -92,7 +92,7 @@ class D19 extends AoC {
                 }
             }
         }
-        return accepted.map(State::combinations).reduce(Long::sum);
+        return accepted.map(State::combinations).reduce(Long::sum).get();
     }
 
     boolean runThrough(final Map<String, Workflow> workflows, final XMAS xmas) {
@@ -114,7 +114,7 @@ class D19 extends AoC {
         }
 
         Rule apply(final XMAS xmas) {
-            return rules.firstWhere(rule -> rule.applicable(xmas));
+            return rules.firstWhere(rule -> rule.applicable(xmas)).get();
         }
     }
 

@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
-
 /**
  * For sparse graphs.
  */
@@ -95,13 +93,12 @@ public final class Gr<T> {
 
     private long maxDistance(final V<T> u, final V<T> v, final Seq<V<T>> path) {
         if (Objects.equals(u, v)) return 0L;
-        return firstNonNull(
-                u.out
-                        .toSeq()
-                        .where(edge -> path.noneMatch(edge.v)) // no cycles
-                        .map(edge -> edge.weight + maxDistance(edge.v, v, path.addFirst(edge.v)))
-                        .max(Long::compare),
-                Long.MIN_VALUE);
+        return u.out
+                .toSeq() //immutable
+                .where(edge -> path.noneMatch(edge.v)) //no cycles
+                .map(edge -> edge.weight + maxDistance(edge.v, v, path.addFirst(edge.v)))
+                .max(Long::compare)
+                .getOrElse(Long.MIN_VALUE);
     }
 
     private static final class V<T> implements Indexed {
