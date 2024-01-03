@@ -1,11 +1,14 @@
 package com.github.eyrekr.graph;
 
 import com.github.eyrekr.common.Indexed;
+import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.mutable.Arr;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
 /**
  * For sparse graphs.
@@ -83,10 +86,22 @@ public final class Gr<T> {
 
     /**
      * @return The maximum distance in the graph from the source vertex to the target vertex (no vertex appears twice in the path).
-     * @complexity O(2 ^ n) - the problem is NP-hard
+     * @complexity O(2 ^ n) - the problem is NP-hard, we must try all possible combinations
      */
     public long maxDistance(final T source, final T target) {
-        return 0L;
+        final V<T> u = map.get(source), v = map.get(target);
+        return maxDistance(u, v, Seq.of(u));
+    }
+
+    private long maxDistance(final V<T> u, final V<T> v, final Seq<V<T>> path) {
+        if (Objects.equals(u, v)) return 0L;
+        return firstNonNull(
+                u.out
+                        .toSeq()
+                        .where(edge -> path.noneMatch(edge.v)) // no cycles
+                        .map(edge -> edge.weight + maxDistance(edge.v, v, path.addFirst(edge.v)))
+                        .max(Long::compare),
+                Long.MIN_VALUE);
     }
 
     private static final class V<T> implements Indexed {

@@ -9,7 +9,7 @@ import com.github.eyrekr.mutable.Grid.State;
 /**
  * https://adventofcode.com/2023/day/23
  * 1) 2070
- * 2)
+ * 2) 6498
  */
 class D23 extends AoC {
 
@@ -22,6 +22,15 @@ class D23 extends AoC {
 
     @Override
     long star1() {
+        return calculate(false);
+    }
+
+    @Override
+    long star2() {
+        return calculate(true);
+    }
+
+    long calculate(final boolean bidirectional) {
         final It start = grid.first('.'), end = grid.last('.');
         final Seq<It> crossroads = grid.collect(it -> !it.wall && it.neighbours().length >= 3).addFirst(end).addFirst(start);
         final Gr<Integer> graph = Gr.empty();
@@ -37,43 +46,18 @@ class D23 extends AoC {
                     distance++;
                 }
 
-                graph.addEdge(source.i, current.i, -distance);
+                graph.addEdge(source.i, current.i, distance);
+                if (bidirectional) graph.addEdge(current.i, source.i, distance);
             }
         }
 
-        grid.print();
-        // in directed acyclic graphs the MAX(path) = -MIN(-path)
-        return -graph.minDistance_BellmanFordMoore(start.i, end.i);
-    }
-
-    @Override
-    long star2() {
-        final It start = grid.first('.'), end = grid.last('.');
-        final Seq<It> crossroads = grid.collect(it -> !it.wall && it.neighbours().length >= 3).addFirst(end).addFirst(start);
-        final Gr<Integer> graph = Gr.empty();
-
-        for (final It source : crossroads) {
-            if (source.i == end.i) continue;
-            for (final It next : source.neighbours(neighbour -> neighbour.state != State.Closed && neighbour.symbolMatchesDirection)) {
-                It current = next;
-                int distance = 1;
-                while (crossroads.noneMatch(current)) {
-                    current.setState(State.Closed).set(current.direction.ch);
-                    current = current.neighbours(neighbour -> neighbour.i != source.i && neighbour.state != State.Closed).value;
-                    distance++;
-                }
-
-                graph.addEdge(source.i, current.i, distance).addEdge(current.i, source.i, distance); // bidirectional
-            }
-        }
-
-        grid.print(it-> switch(it.ch){
-            case '.' -> "@r*";
-            case '#' -> "@W#";
-            default-> "@C" + it.ch;
+        grid.print(it -> switch (it.ch) {
+            case '.' -> "@R*";
+            case '#' -> " ";
+            default -> "@C" + it.ch;
         });
         // in directed acyclic graphs the MAX(path) = -MIN(-path)
-        return graph.minDistance_BellmanFordMoore(start.i, end.i);
+        return graph.maxDistance(start.i, end.i);
     }
 
 }
