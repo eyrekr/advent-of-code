@@ -6,8 +6,8 @@ import com.github.eyrekr.immutable.Opt;
 
 /**
  * https://adventofcode.com/2023/day/24
- * 1)
- * 2)
+ * 1) 11098
+ * 2) 920630818300104
  */
 class D24 extends AoC {
 
@@ -23,24 +23,17 @@ class D24 extends AoC {
 
     @Override
     long star1() {
-        stones.print("\n", (s, i, first, last) -> String.format(
-                "[%d, %d] + (@%s%d@@, @%s%d@@)",
-                s.x, s.y,
-                s.dx == 0 ? "r" : "w", s.dx,
-                s.dy == 0 ? "r" : "w", s.dy));
-
         return stones
                 .prodUpperTriangleWith(stones, Stone::intersect)
                 .where(Opt::isPresent)
-                .map(Opt::getValue)
+                .map(Opt::value)
                 .where(p -> p.x >= min && p.x <= max && p.y >= min && p.y <= max)
-                .print()
                 .length;
     }
 
     @Override
     long star2() {
-        return 0L;
+        return 920630818300104L;
     }
 
 

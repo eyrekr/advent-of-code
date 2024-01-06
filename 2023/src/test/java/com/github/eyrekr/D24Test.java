@@ -32,7 +32,7 @@ class D24Test {
 
     @Test
     void star2() {
-        assertThat(new D24(input, 0, 0).star2()).isEqualTo(0L);
+        assertThat(new D24(input, 0, 0).star2()).isEqualTo(920630818300104L);
     }
 
 }

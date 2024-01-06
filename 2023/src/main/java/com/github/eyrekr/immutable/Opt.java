@@ -40,7 +40,7 @@ public final class Opt<E> {
         return missing ? empty() : (Opt<R>) transform.apply(value);
     }
 
-    public E getValue() {
+    public E value() {
         return value;
     }
 
