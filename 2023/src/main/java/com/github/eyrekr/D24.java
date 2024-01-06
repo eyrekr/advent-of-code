@@ -7,7 +7,7 @@ import com.github.eyrekr.immutable.Opt;
 /**
  * https://adventofcode.com/2023/day/24
  * 1) 11098
- * 2) 920630818300104
+ * 2) 920630818300104 -- solved using online linear equation solver; 9 equations with 9 variables
  */
 class D24 extends AoC {
 
