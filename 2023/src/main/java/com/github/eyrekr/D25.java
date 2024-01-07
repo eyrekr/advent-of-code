@@ -16,28 +16,28 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 /**
  * https://adventofcode.com/2023/day/25
  * 1) 613870
- *
+ * <p>
  * https://en.wikipedia.org/wiki/Karger%27s_algorithm
  */
 class D25 extends AoC {
 
     final SecureRandom random = Just.get(SecureRandom::getInstanceStrong);
-    final Seq<Seq<String>> adjacencyList;
+    final Map<String, Seq<String>> multigraph = new HashMap<>();
 
     D25(final String input) {
         super(input);
-        adjacencyList = lines.map(line -> StringUtils.split(line, " :")).map(Seq::fromArray);
+        final Seq<Seq<String>> adjacencyList = lines.map(line -> StringUtils.split(line, " :")).map(Seq::fromArray);
+        adjacencyList.each(seq -> seq.tail.each(node -> {
+            multigraph.put(seq.value, multigraph.computeIfAbsent(seq.value, key -> Seq.empty()).addFirst(node));
+            multigraph.put(node, multigraph.computeIfAbsent(node, key -> Seq.empty()).addFirst(seq.value));
+        }));
     }
 
     @Override
     long star1() {
         for (int attempt = 0; ; attempt++) {
             //work on a copy of the graph
-            final Map<String, Seq<String>> multigraph = new HashMap<>();
-            adjacencyList.each(seq -> seq.tail.each(node -> {
-                multigraph.put(seq.value, multigraph.computeIfAbsent(seq.value, key -> Seq.empty()).addFirst(node));
-                multigraph.put(node, multigraph.computeIfAbsent(node, key -> Seq.empty()).addFirst(seq.value));
-            }));
+            final Map<String, Seq<String>> multigraph = new HashMap<>(this.multigraph);
 
             //remember the sizes of the components
             final Map<String, Integer> componentSize = new HashMap<>();
