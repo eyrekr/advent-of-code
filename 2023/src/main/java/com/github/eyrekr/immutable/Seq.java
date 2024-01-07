@@ -1,5 +1,6 @@
 package com.github.eyrekr.immutable;
 
+import com.github.eyrekr.common.Numbered;
 import com.github.eyrekr.output.Out;
 import org.apache.commons.lang3.function.TriFunction;
 
@@ -144,7 +145,7 @@ public final class Seq<E> implements Iterable<E> {
         return isEmpty || seq.isEmpty ? empty() : new Seq<>(translate.apply(value, seq.value), tail.mapWith(seq.tail, translate));
     }
 
-    public <R> Seq<R> flatMap(final Function<? super E, Seq<R>> translate) { // FIXME It takes elements backwards!
+    public <R> Seq<R> flatMap(final Function<? super E, Seq<R>> translate) { // FIXME It evaluates elements from back to front!
         return reduceR(empty(), (acc, element) -> acc.addSeq(translate.apply(element)));
     }
 
@@ -210,6 +211,10 @@ public final class Seq<E> implements Iterable<E> {
         if (visited.contains(value)) return tail.unique(visited);
         visited.add(value);
         return new Seq<>(value, tail.unique(visited));
+    }
+
+    public Seq<Numbered<E>> numbered() {
+        return contextMap(seq -> new Numbered<>(length - seq.length, seq.value));
     }
 
     public Opt<E> min(final Comparator<? super E> comparator) {
