@@ -12,8 +12,7 @@ import java.util.Map;
 
 /**
  * https://adventofcode.com/2023/day/25
- * 1)
- * 2)
+ * 1) 613870
  */
 class D25 extends AoC {
 

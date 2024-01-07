@@ -29,18 +29,8 @@ class D25Test {
     }
 
     @Test
-    void sampleStar2() {
-        assertThat(new D25(sample).star2()).isEqualTo(0L);
-    }
-
-    @Test
     void star1() {
         assertThat(new D25(input).star1()).isEqualTo(0L);
-    }
-
-    @Test
-    void star2() {
-        assertThat(new D25(input).star2()).isEqualTo(0L);
     }
 
 }
