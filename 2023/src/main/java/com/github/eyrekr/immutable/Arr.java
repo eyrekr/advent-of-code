@@ -1,7 +1,9 @@
 package com.github.eyrekr.immutable;
 
+import com.github.eyrekr.common.Just;
 import com.github.eyrekr.output.Out;
 
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.function.*;
 
@@ -16,6 +18,7 @@ import java.util.function.*;
  */
 public final class Arr<E> implements Iterable<E> {
     private static final int MIN_CAPACITY = 16;
+    private static final SecureRandom RANDOM = Just.get(SecureRandom::getInstanceStrong);
 
     public final int length;
     public final boolean isEmpty;
@@ -198,6 +201,14 @@ public final class Arr<E> implements Iterable<E> {
     }
 
     /**
+     * @return Random value from the array.
+     * @complexity O(1)
+     */
+    public E random() {
+        return at(RANDOM.nextInt(length));
+    }
+
+    /**
      * Set new value at the given index. The index neither overflows nor underflows; it goes around.
      * Negative indexes work too: -1 is the last element, -2 is the second last, and so on.
      * If the array is empty, nothing is set.
@@ -209,6 +220,20 @@ public final class Arr<E> implements Iterable<E> {
         final Arr<E> arr = clone(1);
         if (i >= 0) arr.a[(arr.start + i % arr.length) % arr.a.length] = value;
         else arr.a[(arr.a.length + arr.start + arr.length + i % arr.length) % arr.a.length] = value;
+        return arr;
+    }
+
+    /**
+     * @return New array where all the occurrences of the original value are replaced with the replacement.
+     * @complexity O(N)
+     */
+    public Arr<E> replaceAll(final E original, final E replacement) {
+        if (isEmpty) return this;
+        Arr<E> arr = Arr.empty();
+        for (int i = 0; i < length; i++) {
+            final E value = at(i);
+            arr = Objects.equals(original, value) ? arr.addLast(replacement) : arr.addLast(value);
+        }
         return arr;
     }
 
