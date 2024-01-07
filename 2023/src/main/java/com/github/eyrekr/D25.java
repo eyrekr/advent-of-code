@@ -35,15 +35,6 @@ class D25 extends AoC {
 
     @Override
     long star1() {
-        return karger();
-    }
-
-    @Override
-    long star2() {
-        return 0L;
-    }
-
-    int karger() {
         for (int attempt = 0; ; attempt++) {
             //work on a copy of the adjacency matrix
             final int[][] a = new int[n][n];
