@@ -30,7 +30,7 @@ class D25Test {
 
     @Test
     void star1() {
-        assertThat(new D25(input).star1()).isEqualTo(0L);
+        assertThat(new D25(input).star1()).isEqualTo(613870L);
     }
 
 }

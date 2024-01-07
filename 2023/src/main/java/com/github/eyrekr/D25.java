@@ -1,96 +1,70 @@
 package com.github.eyrekr;
 
 import com.github.eyrekr.common.Just;
-import com.github.eyrekr.common.Numbered;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.output.Out;
 import org.apache.commons.lang3.StringUtils;
 
 import java.security.SecureRandom;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 /**
  * https://adventofcode.com/2023/day/25
  * 1) 613870
+ *
+ * https://en.wikipedia.org/wiki/Karger%27s_algorithm
  */
 class D25 extends AoC {
 
     final SecureRandom random = Just.get(SecureRandom::getInstanceStrong);
-    final int n;
-    final int[][] adjacency;
+    final Seq<Seq<String>> adjacencyList;
 
     D25(final String input) {
         super(input);
-        final Seq<Seq<String>> adjacencyList = lines.map(line -> StringUtils.split(line, " :")).map(Seq::fromArray);
-        final Map<String, Integer> map = adjacencyList.flatMap(seq -> seq).unique().numbered().toMap(Numbered::value, Numbered::i);
-
-        this.n = map.size();
-        this.adjacency = new int[n][n];
-        adjacencyList.each(seq -> {
-            final int i = map.get(seq.value);
-            seq.tail.map(map::get).each(j -> adjacency[i][j] = adjacency[j][i] = 1);
-        });
+        adjacencyList = lines.map(line -> StringUtils.split(line, " :")).map(Seq::fromArray);
     }
 
     @Override
     long star1() {
         for (int attempt = 0; ; attempt++) {
-            //work on a copy of the adjacency matrix
-            final int[][] a = new int[n][n];
-            int numberOfEdges = 0;
-            for (int i = 0; i < n * n; i++) {
-                a[i % n][i / n] = adjacency[i % n][i / n];
-                numberOfEdges += adjacency[i % n][i / n];
-            }
+            //work on a copy of the graph
+            final Map<String, Seq<String>> multigraph = new HashMap<>();
+            adjacencyList.each(seq -> seq.tail.each(node -> {
+                multigraph.put(seq.value, multigraph.computeIfAbsent(seq.value, key -> Seq.empty()).addFirst(node));
+                multigraph.put(node, multigraph.computeIfAbsent(node, key -> Seq.empty()).addFirst(seq.value));
+            }));
 
             //remember the sizes of the components
-            final int[] componentSize = new int[n];
-            Arrays.fill(componentSize, 1);
+            final Map<String, Integer> componentSize = new HashMap<>();
 
             //repeat random edge contraction until there are only 2 vertices left
-            for (int step = 0; step < n - 2; step++) {
-                //pick random edge
-                int edge = random.nextInt(numberOfEdges), k = 0;
-                while (true) {
-                    edge -= a[k % n][k / n];
-                    if (edge < 0) break;
-                    k++;
-                }
-                final int i = k % n, j = k / n;
-                //merge the two components
-                componentSize[i] += componentSize[j];
-                componentSize[j] = 0;
+            for (int n = multigraph.keySet().size(); n > 2; n--) {
+                //pick "random" edge
+                final String u = multigraph.keySet().stream().skip(random.nextInt(n)).findFirst().get();
+                final String v = multigraph.get(u).at(random.nextInt(multigraph.get(u).length));
 
                 //contract the edge
-                numberOfEdges = numberOfEdges - a[i][j] - a[j][i]; //total number of edges decreases by the number of edges between the 2 nodes
-                for (int l = 0; l < n; l++) {
-                    a[i][l] = (i == l || j == l) ? 0 : a[i][l] + a[j][l];
-                    a[l][i] = a[i][l];
-                    a[j][l] = a[l][j] = 0;
-                }
+                final String w = "V" + n;
+                final var nodesToU = multigraph.remove(u).where(node -> !Objects.equals(node, v));
+                final var nodesToV = multigraph.remove(v).where(node -> !Objects.equals(node, u));
+                nodesToU.each(node -> multigraph.put(node, multigraph.get(node).replaceAll(u, w)));
+                nodesToV.each(node -> multigraph.put(node, multigraph.get(node).replaceAll(v, w)));
+                multigraph.put(w, nodesToU.addSeq(nodesToV));
 
-                //debug
-                //Out.print("Step @r**%d**@@ that contracted edge (@c%d@@, @c%d@@) with @r**%d**@@ edges left\n", step, i, j, numberOfEdges);
-                //print(a);
+                //merge the two components
+                componentSize.put(w, firstNonNull(componentSize.remove(u), 1) + firstNonNull(componentSize.remove(v), 1));
             }
-            Out.print("%3d: %s**%s** --->", attempt + 1, numberOfEdges / 2 == 3 ? "@G" : "@R", numberOfEdges / 2);
-            int answer = 1;
-            for (int l = 0; l < n; l++)
-                if (componentSize[l] > 0) {
-                    Out.print(" %d", componentSize[l]);
-                    answer = answer * componentSize[l];
-                }
-            Out.print("\n");
+
+            final int k = multigraph.values().iterator().next().length;
+            Out.print("%3d: %s**%s** ---> %s\n", attempt + 1, k == 3 ? "@G" : "@R", k, componentSize.values().stream().map(String::valueOf).collect(Collectors.joining("x")));
 
             //we know the k-edge connectivity is 3
-            if (numberOfEdges / 2 == 3) return answer;
+            if (k == 3) return componentSize.values().stream().reduce(1, (a, b) -> a * b);
         }
-    }
-
-    void print(final int[][] a) {
-        final int n = a.length;
-        for (int i = 0; i < n * n; i++)
-            Out.print("%s%2d%s", a[i % n][i / n] == 0 ? "@W" : "@k", a[i % n][i / n], i % n == n - 1 ? "\n" : " ");
     }
 }
