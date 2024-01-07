@@ -1,9 +1,11 @@
 package com.github.eyrekr.immutable;
 
+import com.github.eyrekr.common.Just;
 import com.github.eyrekr.common.Numbered;
 import com.github.eyrekr.output.Out;
 import org.apache.commons.lang3.function.TriFunction;
 
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.function.*;
 import java.util.regex.Pattern;
@@ -15,6 +17,7 @@ import java.util.regex.Pattern;
  */
 public final class Seq<E> implements Iterable<E> {
     private static final Pattern NUMBERS = Pattern.compile("(-?\\d+)", Pattern.MULTILINE | Pattern.DOTALL);
+    private static final SecureRandom RANDOM = Just.get(SecureRandom::getInstanceStrong);
 
     public final E value;
     public final E lastValue;
@@ -92,6 +95,10 @@ public final class Seq<E> implements Iterable<E> {
 
     public E at(final long i) {
         return (i % length == 0) ? value : i > 0 ? tail.at((i % length) - 1L) : tail.at(i % length);
+    }
+
+    public E random() {
+        return at(RANDOM.nextInt(length));
     }
 
     public boolean has(final E value) {

@@ -1,11 +1,9 @@
 package com.github.eyrekr;
 
-import com.github.eyrekr.common.Just;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.output.Out;
 import org.apache.commons.lang3.StringUtils;
 
-import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -21,15 +19,14 @@ import static com.google.common.base.MoreObjects.firstNonNull;
  */
 class D25 extends AoC {
 
-    final SecureRandom random = Just.get(SecureRandom::getInstanceStrong);
-    final Map<String, Seq<String>> multigraph = new HashMap<>();
+    final Map<String, Seq<String>> graph = new HashMap<>();
 
     D25(final String input) {
         super(input);
         final Seq<Seq<String>> adjacencyList = lines.map(line -> StringUtils.split(line, " :")).map(Seq::fromArray);
         adjacencyList.each(seq -> seq.tail.each(node -> {
-            multigraph.put(seq.value, multigraph.computeIfAbsent(seq.value, key -> Seq.empty()).addFirst(node));
-            multigraph.put(node, multigraph.computeIfAbsent(node, key -> Seq.empty()).addFirst(seq.value));
+            graph.put(seq.value, graph.computeIfAbsent(seq.value, key -> Seq.empty()).addFirst(node));
+            graph.put(node, graph.computeIfAbsent(node, key -> Seq.empty()).addFirst(seq.value));
         }));
     }
 
@@ -37,7 +34,7 @@ class D25 extends AoC {
     long star1() {
         for (int attempt = 0; ; attempt++) {
             //work on a copy of the graph
-            final Map<String, Seq<String>> multigraph = new HashMap<>(this.multigraph);
+            final Map<String, Seq<String>> multigraph = new HashMap<>(this.graph);
 
             //remember the sizes of the components
             final Map<String, Integer> componentSize = new HashMap<>();
@@ -45,8 +42,8 @@ class D25 extends AoC {
             //repeat random edge contraction until there are only 2 vertices left
             for (int n = multigraph.keySet().size(); n > 2; n--) {
                 //pick "random" edge
-                final String u = multigraph.keySet().stream().skip(random.nextInt(n)).findFirst().get();
-                final String v = multigraph.get(u).at(random.nextInt(multigraph.get(u).length));
+                final String u = Seq.fromIterable(multigraph.keySet()).random();
+                final String v = multigraph.get(u).random();
 
                 //contract the edge
                 final String w = "V" + n;
