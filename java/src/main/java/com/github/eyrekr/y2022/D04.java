@@ -14,7 +14,7 @@ public class D04 {
     }
 
     long star1() {
-        return assignmentPairs.where(AssignmentPair::oneContainsAnother).length;
+        return assignmentPairs.where(AssignmentPair::contained).length;
     }
 
     long star2() {
@@ -27,7 +27,7 @@ public class D04 {
             return new AssignmentPair(new Int(l.at(0), l.at(1)), new Int(l.at(2), l.at(3)));
         }
 
-        boolean oneContainsAnother() {
+        boolean contained() {
             return i1.contains(i2) || i2.contains(i1);
         }
 
