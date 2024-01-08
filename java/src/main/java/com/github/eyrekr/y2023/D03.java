@@ -1,6 +1,5 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
 import com.github.eyrekr.mutable.Grid;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -12,12 +11,11 @@ import java.util.stream.Stream;
  * 1) 514969
  * 2) 78915902
  */
-class D03 extends AoC {
+class D03 {
 
     final Grid grid;
 
-    D03(String input) {
-        super(input);
+    D03(final String input) {
         grid = Grid.of(input);
     }
 

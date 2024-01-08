@@ -1,9 +1,8 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
 import com.github.eyrekr.immutable.Seq;
-import com.github.eyrekr.raster.Direction;
 import com.github.eyrekr.mutable.Grid;
+import com.github.eyrekr.raster.Direction;
 
 import java.util.Comparator;
 import java.util.HashSet;
@@ -18,13 +17,13 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
  * 1) 684
  * 2) 822
  */
-class D17 extends AoC {
+class D17 {
 
     final Seq<Direction> directions = Seq.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right);
-    final Grid grid = Grid.of(input);
+    final Grid grid;
 
     D17(final String input) {
-        super(input);
+        grid = Grid.of(input);
     }
 
     long star1() {

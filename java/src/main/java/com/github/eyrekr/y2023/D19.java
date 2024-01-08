@@ -1,6 +1,5 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
 import com.github.eyrekr.immutable.Seq;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
@@ -14,7 +13,7 @@ import java.util.Map;
  * 1) 350678
  * 2) 124831893423809
  */
-class D19 extends AoC {
+class D19 {
 
     static final int MIN = 1;
     static final int MAX = 4_000;
@@ -28,7 +27,6 @@ class D19 extends AoC {
     final Seq<XMAS> xmas;
 
     D19(final String input) {
-        super(input);
         final var block = input.split("\n\n");
         workflows = Seq.ofLinesFromString(block[0]).map(Workflow::from).indexBy(Workflow::name);
         xmas = Seq.ofLinesFromString(block[1]).map(XMAS::from);

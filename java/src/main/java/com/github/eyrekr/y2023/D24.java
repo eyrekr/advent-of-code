@@ -1,25 +1,24 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
 import com.github.eyrekr.immutable.Arr;
 import com.github.eyrekr.immutable.Longs;
 import com.github.eyrekr.immutable.Opt;
+import com.github.eyrekr.immutable.Seq;
 
 /**
  * https://adventofcode.com/2023/day/24
  * 1) 11098
  * 2) 920630818300104 -- solved using online linear equation solver; 9 equations with 9 variables
  */
-class D24 extends AoC {
+class D24 {
 
     final Arr<Stone> stones;
     final long min, max;
 
     D24(final String input, final long min, final long max) {
-        super(input);
         this.min = min;
         this.max = max;
-        this.stones = lines.toArr().map(Stone::from);
+        this.stones = Seq.ofLinesFromString(input).toArr().map(Stone::from);
     }
 
     long star1() {

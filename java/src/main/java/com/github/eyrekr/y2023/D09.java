@@ -1,6 +1,5 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
 import com.github.eyrekr.immutable.Seq;
 
 /**
@@ -8,13 +7,12 @@ import com.github.eyrekr.immutable.Seq;
  * 1) 2043677056
  * 2) 1062
  */
-class D09 extends AoC {
+class D09 {
 
     final Seq<Seq<Long>> sequences;
 
     D09(final String input) {
-        super(input);
-        this.sequences = lines.map(Seq::ofNumbersFromString);
+        this.sequences = Seq.ofLinesFromString(input).map(Seq::ofNumbersFromString);
     }
 
     long star1() {

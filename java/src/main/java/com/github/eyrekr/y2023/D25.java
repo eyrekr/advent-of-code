@@ -1,6 +1,5 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
 import com.github.eyrekr.immutable.Arr;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.output.Out;
@@ -18,13 +17,14 @@ import static com.google.common.base.MoreObjects.firstNonNull;
  * <p>
  * https://en.wikipedia.org/wiki/Karger%27s_algorithm
  */
-class D25 extends AoC {
+class D25 {
 
     final Map<String, Arr<String>> graph = new HashMap<>();
 
     D25(final String input) {
-        super(input);
-        final Seq<Seq<String>> adjacencyList = lines.map(line -> StringUtils.split(line, " :")).map(Seq::fromArray);
+        final Seq<Seq<String>> adjacencyList = Seq.ofLinesFromString(input)
+                .map(line -> StringUtils.split(line, " :"))
+                .map(Seq::fromArray);
         adjacencyList.each(seq -> seq.tail.each(node -> {
             graph.put(seq.value, graph.computeIfAbsent(seq.value, key -> Arr.empty()).addLast(node));
             graph.put(node, graph.computeIfAbsent(node, key -> Arr.empty()).addLast(seq.value));

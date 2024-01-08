@@ -1,6 +1,5 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
 import com.github.eyrekr.mutable.Grid;
 import com.github.eyrekr.mutable.Grid.State;
 
@@ -12,13 +11,12 @@ import java.util.Set;
  * 1) 3598
  * 2) 601441063166538
  */
-class D21 extends AoC {
+class D21 {
 
     final Grid grid;
     final long steps;
 
     D21(final String input, final long steps) {
-        super(input);
         this.steps = steps;
         grid = Grid.of(input);
     }

@@ -1,9 +1,8 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
+import com.github.eyrekr.mutable.Grid;
 import com.github.eyrekr.output.Out;
 import com.github.eyrekr.raster.Direction;
-import com.github.eyrekr.mutable.Grid;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
@@ -14,7 +13,7 @@ import java.util.function.Consumer;
  * 1) 6903
  * 2) 265
  */
-class D10 extends AoC {
+class D10 {
 
     static final Map<Character, Character> ASCII = Map.of(
             'S', '*',
@@ -28,7 +27,6 @@ class D10 extends AoC {
     final Grid grid;
 
     D10(final String input) {
-        super(input);
         this.grid = Grid.of(input).replace(ch -> ASCII.getOrDefault(ch, Grid.C0));
     }
 

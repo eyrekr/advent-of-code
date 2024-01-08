@@ -1,6 +1,5 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
 import com.github.eyrekr.immutable.Seq;
 
 /**
@@ -8,12 +7,11 @@ import com.github.eyrekr.immutable.Seq;
  * 1) 281600
  * 2) 33875953
  */
-class D06 extends AoC {
+class D06 {
 
     final Seq<Input> input;
 
     public D06(final Seq<Input> input) {
-        super("");
         this.input = input;
     }
 

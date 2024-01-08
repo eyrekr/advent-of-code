@@ -1,6 +1,6 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
+import com.github.eyrekr.immutable.Seq;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -8,10 +8,11 @@ import org.apache.commons.lang3.StringUtils;
  * 1) 54331
  * 2) 54518
  */
-class D01 extends AoC {
+class D01 {
+    final Seq<String> lines;
 
-    public D01(String input) {
-        super(input);
+    D01(final String input) {
+        lines = Seq.ofLinesFromString(input);
     }
 
     long star1() {

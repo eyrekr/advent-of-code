@@ -1,6 +1,5 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
 import com.github.eyrekr.immutable.Seq;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -15,15 +14,14 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
  * 1) 418
  * 2) 70702
  */
-class D22 extends AoC {
+class D22 {
     static final int GROUND = 0;
 
     final Seq<Brick> bricks;
     final Brick bounds;
 
     D22(final String input) {
-        super(input);
-        this.bricks = lines.carryMap(new AtomicInteger(GROUND), Brick::from).sortedBy(Brick::z0);
+        this.bricks = Seq.ofLinesFromString(input).carryMap(new AtomicInteger(GROUND), Brick::from).sortedBy(Brick::z0);
         this.bounds = bricks.reduce(
                 new Brick(0, 0, 0, 0, 0, 0, 0),
                 (volume, brick) -> new Brick(0,

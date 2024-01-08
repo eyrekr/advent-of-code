@@ -1,6 +1,5 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
 import com.github.eyrekr.immutable.Seq;
 import org.apache.commons.lang3.StringUtils;
 
@@ -9,13 +8,12 @@ import org.apache.commons.lang3.StringUtils;
  * 1) 515495
  * 2) 229349
  */
-class D15 extends AoC {
+class D15 {
 
     final Seq<String> words;
     final Seq<Lens> lenses;
 
     D15(final String input) {
-        super(input);
         this.words = Seq.fromArray(StringUtils.split(input, ','));
         this.lenses = this.words.map(Lens::from);
     }
@@ -39,7 +37,7 @@ class D15 extends AoC {
         });
 
         return Seq.range(0, 256)
-                .flatMap(box -> map[box].mapWith(Seq.range(0, map[box].length), (lens, position) ->  (box + 1) * (position + 1) * lens.focalLength))
+                .flatMap(box -> map[box].mapWith(Seq.range(0, map[box].length), (lens, position) -> (box + 1) * (position + 1) * lens.focalLength))
                 .reduce(Long::sum)
                 .get();
     }

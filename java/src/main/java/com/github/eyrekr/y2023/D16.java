@@ -1,8 +1,7 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
-import com.github.eyrekr.raster.Direction;
 import com.github.eyrekr.mutable.Grid;
+import com.github.eyrekr.raster.Direction;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -13,7 +12,7 @@ import java.util.Set;
  * 1) 7517
  * 2) 7741
  */
-class D16 extends AoC {
+class D16 {
 
     final static Instruction[] INSTRUCTIONS = new Instruction[]{
             new Instruction('-', Direction.Down, Direction.Left),
@@ -37,7 +36,6 @@ class D16 extends AoC {
     final Grid grid;
 
     D16(final String input) {
-        super(input);
         grid = Grid.of(input);
     }
 
@@ -76,7 +74,8 @@ class D16 extends AoC {
                     justPass = false;
                 }
             }
-            if (justPass) it.tryToGo(step.direction).ifPresent(next -> buffer.addLast(new Step(next.x, next.y, step.direction)));
+            if (justPass)
+                it.tryToGo(step.direction).ifPresent(next -> buffer.addLast(new Step(next.x, next.y, step.direction)));
         }
         return mask.collect('#').length;
     }

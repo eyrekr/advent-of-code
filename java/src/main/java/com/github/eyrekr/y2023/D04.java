@@ -1,6 +1,5 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
 import com.github.eyrekr.immutable.Seq;
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,13 +10,12 @@ import java.util.Arrays;
  * 1) 26426
  * 2) 6227972
  */
-class D04 extends AoC {
+class D04 {
 
     final Card[] deck;
 
-    D04(String input) {
-        super(input);
-        deck = lines.map(Card::new).toArray(Card[]::new);
+    D04(final String input) {
+        deck = Seq.ofLinesFromString(input).map(Card::new).toArray(Card[]::new);
     }
 
     long star1() {

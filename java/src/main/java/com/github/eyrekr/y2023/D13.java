@@ -1,6 +1,5 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
 import com.github.eyrekr.immutable.Seq;
 
 import java.util.Comparator;
@@ -10,12 +9,11 @@ import java.util.Comparator;
  * 1) 30535
  * 2) 30844
  */
-class D13 extends AoC {
+class D13 {
 
     final String[] grids;
 
     D13(final String input) {
-        super(input);
         grids = input.split("\n\n");
     }
 

@@ -1,8 +1,7 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
-import com.github.eyrekr.math.Algebra;
 import com.github.eyrekr.immutable.Seq;
+import com.github.eyrekr.math.Algebra;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
@@ -12,13 +11,13 @@ import java.util.Map;
  * 1) 19241
  * 2) 9606140307013
  */
-class D08 extends AoC {
+class D08 {
 
     final Seq<Character> directions;
     final Map<String, Step> map;
 
     D08(final String input) {
-        super(input);
+        final Seq<String> lines = Seq.ofLinesFromString(input);
         this.directions = Seq.ofCharactersFromString(lines.value);
         this.map = lines.tail.tail
                 .map(line -> StringUtils.split(line, " =(),"))

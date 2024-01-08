@@ -1,6 +1,5 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
 import com.github.eyrekr.immutable.Seq;
 import org.apache.commons.lang3.StringUtils;
 
@@ -9,13 +8,12 @@ import org.apache.commons.lang3.StringUtils;
  * 1) 28911
  * 2) 77366737561114
  */
-class D18 extends AoC {
+class D18 {
 
     final Seq<Step> steps;
 
     D18(final String input) {
-        super(input);
-        this.steps = lines.map(Step::of);
+        this.steps = Seq.ofLinesFromString(input).map(Step::of);
     }
 
     long star1() {

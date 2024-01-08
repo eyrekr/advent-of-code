@@ -1,8 +1,7 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
-import com.github.eyrekr.math.Algebra;
 import com.github.eyrekr.immutable.Seq;
+import com.github.eyrekr.math.Algebra;
 import com.github.eyrekr.output.Out;
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,7 +16,7 @@ import java.util.function.Consumer;
  * 1) 899848294
  * 2) 247454898168563
  */
-class D20 extends AoC {
+class D20 {
 
     static final String BROADCASTER = "broadcaster";
     static final String TERMINAL = "rx";
@@ -27,7 +26,7 @@ class D20 extends AoC {
     final Module broadcaster;
 
     D20(final String input) {
-        super(input);
+        final Seq<String> lines = Seq.ofLinesFromString(input);
         modules = lines.mapWith(Seq.range(0, lines.length), Module::from);
         moduleByName = modules.indexBy(module -> module.name);
         broadcaster = moduleByName.get(BROADCASTER);

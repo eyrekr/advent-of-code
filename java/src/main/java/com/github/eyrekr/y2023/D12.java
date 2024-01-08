@@ -1,6 +1,5 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
 import com.github.eyrekr.immutable.Seq;
 import org.apache.commons.lang3.StringUtils;
 
@@ -13,13 +12,13 @@ import java.util.function.Supplier;
  * 1) 6871
  * 2) 2043098029844
  */
-class D12 extends AoC {
+class D12 {
 
     final Seq<Row> rows;
     final Seq<Row> unfoldedRows;
 
     D12(final String input) {
-        super(input);
+        final Seq<String> lines = Seq.ofLinesFromString(input);
         rows = lines.map(Row::fromString);
         unfoldedRows = lines.map(line -> {
                     final String[] ab = StringUtils.split(line);

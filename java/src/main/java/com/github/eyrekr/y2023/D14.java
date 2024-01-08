@@ -1,6 +1,5 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
 import com.github.eyrekr.mutable.Grid;
 
 import java.util.HashMap;
@@ -11,21 +10,22 @@ import java.util.Map;
  * 1) 106186
  * 2) 106390
  */
-class D14 extends AoC {
+class D14 {
+
+    final Grid grid;
 
     D14(final String input) {
-        super(input);
+        grid = Grid.of(input);
     }
 
     long star1() {
-        final Grid grid = Grid.of(input);
         north(grid);
         return score(grid);
     }
 
     long star2() {
         final int n = 1_000_000_000;
-        Grid grid = Grid.of(input);
+        Grid grid = this.grid;
 
         final Map<String, Integer> memory = new HashMap<>();
         memory.put(grid.toString(), 0);

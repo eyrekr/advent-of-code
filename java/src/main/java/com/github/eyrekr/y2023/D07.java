@@ -1,6 +1,5 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
 import com.github.eyrekr.immutable.Seq;
 import org.apache.commons.lang3.StringUtils;
 
@@ -14,11 +13,12 @@ import static java.util.stream.Collectors.groupingBy;
  * 1) 248559379
  * 2) 249631254
  */
-class D07 extends AoC {
+class D07 {
     static final char JOKER = '*';
+    final Seq<String> lines;
 
-    D07(String input) {
-        super(input);
+    D07(final String input) {
+        lines = Seq.ofLinesFromString(input);
     }
 
     long star1() {

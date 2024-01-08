@@ -1,6 +1,5 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.AoC;
 import com.github.eyrekr.graph.Gr;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.mutable.Grid;
@@ -12,12 +11,11 @@ import com.github.eyrekr.mutable.Grid.State;
  * 1) 2070
  * 2) 6498
  */
-class D23 extends AoC {
+class D23 {
 
     final Grid grid;
 
     D23(final String input) {
-        super(input);
         this.grid = Grid.of(input, true);
     }
 
