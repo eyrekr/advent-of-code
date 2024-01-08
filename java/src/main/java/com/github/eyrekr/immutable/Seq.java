@@ -376,6 +376,10 @@ public final class Seq<E> implements Iterable<E> {
         return reduce(Arr.empty(), Arr::addLast);
     }
 
+    public com.github.eyrekr.mutable.Arr<E> toMutableArr() {
+        return reduce(com.github.eyrekr.mutable.Arr.empty(), com.github.eyrekr.mutable.Arr::addLast);
+    }
+
     public Map<E, Integer> frequency() {
         return reduce(new HashMap<>(), (map, element) -> {
             final int frequency = map.getOrDefault(element, 0);

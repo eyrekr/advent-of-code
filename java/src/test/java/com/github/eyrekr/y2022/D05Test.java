@@ -20,24 +20,23 @@ class D05Test {
             """;
 
     final String input = Out.testResource("2022/D05.txt");
-    final Seq<String>[] sampleStacks = new Seq[]{
+    final Seq<Seq<String>> sampleStacks = Seq.of(
             Seq.empty(),
             Seq.of("N", "Z"),
             Seq.of("D", "C", "M"),
-            Seq.of("P")
-    };
-    final Seq<String>[] stacks = new Seq[]{
+            Seq.of("P"));
+    final Seq<Seq<String>> stacks = Seq.of(
             Seq.empty(),
             Seq.of("F", "R", "W"), //1
             Seq.of("P", "W", "V", "D", "C", "M", "H", "T"), //2
             Seq.of("L", "N", "Z", "M", "P"), //3
             Seq.of("R", "H", "C", "J"), //4
             Seq.of("B", "T", "Q", "H", "G", "P", "C"), //5
-            Seq.of("Z" ,"F", "L", "W", "C", "G"), //6
+            Seq.of("Z", "F", "L", "W", "C", "G"), //6
             Seq.of("C", "G", "J", "Z", "Q", "L", "V", "W"), //7
             Seq.of("C", "V", "T", "W", "F", "R", "N", "P"), //8
-            Seq.of("V", "S", "R", "G", "H", "W", "J"), //9
-    };
+            Seq.of("V", "S", "R", "G", "H", "W", "J") //9
+    );
 
 
     @Test
