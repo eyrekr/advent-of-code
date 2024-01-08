@@ -22,7 +22,7 @@ class D24Test {
 
     @Test
     void sampleStar2() {
-        assertThat(new D24(sample, 0, 0).star2()).isEqualTo(0L);
+        assertThat(new D24(sample, 0, 0).star2()).isEqualTo(920630818300104L);
     }
 
     @Test
