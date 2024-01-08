@@ -30,13 +30,13 @@ class D01Test {
     }
 
     @Test
-    void sampleStar2() {
-        Assertions.assertThat(new D01(sample).star2()).isEqualTo(45000L);
+    void star1() {
+        Assertions.assertThat(new D01(input).star1()).isEqualTo(69528L);
     }
 
     @Test
-    void star1() {
-        Assertions.assertThat(new D01(input).star1()).isEqualTo(69528L);
+    void sampleStar2() {
+        Assertions.assertThat(new D01(sample).star2()).isEqualTo(45000L);
     }
 
     @Test
