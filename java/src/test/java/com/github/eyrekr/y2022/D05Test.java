@@ -51,7 +51,7 @@ class D05Test {
 
     @Test
     void sampleStar2() {
-        Assertions.assertThat(new D05(sampleStacks, sample).star2()).isEqualTo("");
+        Assertions.assertThat(new D05(sampleStacks, sample).star2()).isEqualTo("MCD");
     }
 
     @Test

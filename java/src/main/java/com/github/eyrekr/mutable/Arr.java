@@ -90,11 +90,22 @@ public final class Arr<E> implements Iterable<E> {
         return this;
     }
 
+    public Arr<E> addAllLast(final Arr<? extends E> values) {
+        values.each(this::addLast);
+        return this;
+    }
+
     public E removeLast() {
         if (length == 0) return null;
         final E value = at(-1);
         length--;
         return value;
+    }
+
+    public Arr<E> removeLast(final int n) {
+        final Arr<E> tail = Arr.empty();
+        for (int i = 0; i < n; i++) tail.addFirst(removeLast());
+        return tail;
     }
 
     public Arr<E> addFirst(final E value) {
@@ -105,6 +116,11 @@ public final class Arr<E> implements Iterable<E> {
         return this;
     }
 
+    public Arr<E> addAllFirst(final Arr<? extends E> values) {
+        values.eachReverse(this::addFirst);
+        return this;
+    }
+
     public E removeFirst() {
         final E value = at(0);
         start++;
@@ -112,8 +128,14 @@ public final class Arr<E> implements Iterable<E> {
         return value;
     }
 
+    public Arr<E> removeFirst(final int n) {
+        final Arr<E> head = Arr.empty();
+        for (int i = 0; i < n; i++) head.addLast(removeFirst());
+        return head;
+    }
+
     public E at(final int i) {
-        if (length == 0) return null;
+        if (length == 0) throw new IndexOutOfBoundsException();
         return (i >= 0)
                 ? (E) a[(start + i % length) % a.length]
                 : (E) a[(a.length + start + length + i % length) % a.length];
@@ -376,8 +398,18 @@ public final class Arr<E> implements Iterable<E> {
         return this;
     }
 
-    public Arr<E> each(final Function<? super E, ? extends E> transform) {
+    public Arr<E> transform(final Function<? super E, ? extends E> transform) {
         for (int i = 0; i < length; i++) set(i, transform.apply(at(i)));
+        return this;
+    }
+
+    public Arr<E> eachReverse(final Consumer<? super E> consumer) {
+        for (int i = length - 1; i >= 0; i--) consumer.accept(at(i));
+        return this;
+    }
+
+    public Arr<E> transformReverse(final Function<? super E, ? extends E> transform) {
+        for (int i = length - 1; i >= 0; i--) set(i, transform.apply(at(i)));
         return this;
     }
 

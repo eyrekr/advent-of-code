@@ -25,7 +25,12 @@ public class D05 {
     }
 
     String star2() {
-        return "";
+        for (final Instruction i : instructions) {
+            final Arr<String> crates = stacks.at(i.source).removeFirst(i.n);
+            stacks.at(i.target).addAllFirst(crates);
+
+        }
+        return stacks.skip(1).map(Arr::getFirst).reduce(new StringBuilder(), StringBuilder::append).toString();
     }
 
     record Instruction(int n, int source, int target) {

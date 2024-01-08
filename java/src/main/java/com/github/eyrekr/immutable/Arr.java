@@ -194,7 +194,7 @@ public final class Arr<E> implements Iterable<E> {
      * @complexity O(1)
      */
     public E at(final int i) {
-        if (isEmpty) throw new IllegalStateException();
+        if (isEmpty) throw new IndexOutOfBoundsException();
         return (i >= 0)
                 ? (E) a[(start + i % length) % a.length]
                 : (E) a[(a.length + start + length + i % length) % a.length];
