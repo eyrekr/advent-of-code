@@ -1,6 +1,7 @@
 package com.github.eyrekr.immutable;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -38,6 +39,11 @@ public final class Opt<E> {
 
     public <R> Opt<R> flatMap(final Function<? super E, Opt<? extends R>> transform) {
         return missing ? empty() : (Opt<R>) transform.apply(value);
+    }
+
+    public Opt<E> ifPresent(final Consumer<? super E> consumer) {
+        if (present) consumer.accept(value);
+        return this;
     }
 
     public E value() {

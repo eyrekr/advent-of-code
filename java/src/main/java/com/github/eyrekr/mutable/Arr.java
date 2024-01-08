@@ -178,6 +178,36 @@ public final class Arr<E> implements Iterable<E> {
         return -1;
     }
 
+    public Opt<E> findFirst(final E value) {
+        for (int i = 0; i < length; i++)
+            if (Objects.equals(at(i), value)) return Opt.of(value);
+        return Opt.empty();
+    }
+
+    public Opt<E> findFirst(final Predicate<? super E> predicate) {
+        for (int i = 0; i < length; i++)
+            if (predicate.test(at(i))) return Opt.of(at(i));
+        return Opt.empty();
+    }
+
+    public Opt<E> findLast(final E value) {
+        for (int i = length - 1; i >= 0; i--)
+            if (Objects.equals(at(i), value)) return Opt.of(value);
+        return Opt.empty();
+    }
+
+    public Opt<E> findLast(final Predicate<? super E> predicate) {
+        for (int i = length - 1; i >= 0; i--)
+            if (predicate.test(at(i))) return Opt.of(at(i));
+        return Opt.empty();
+    }
+
+    public Arr<E> replaceAll(final E value, final E replacement) {
+        for (int i = length - 1; i >= 0; i--)
+            if (Objects.equals(at(i), value)) set(i, replacement);
+        return this;
+    }
+
     public boolean atLeastOneIs(final Predicate<? super E> predicate) {
         for (int i = 0; i < length; i++)
             if (predicate.test(at(i))) return true;
