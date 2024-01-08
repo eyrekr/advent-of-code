@@ -26,21 +26,21 @@ class D01Test {
 
     @Test
     void sampleStar1() {
-        Assertions.assertThat(new D01(sample).star1()).isEqualTo(0L);
+        Assertions.assertThat(new D01(sample).star1()).isEqualTo(24000L);
     }
 
     @Test
     void sampleStar2() {
-        Assertions.assertThat(new D01(sample).star2()).isEqualTo(0L);
+        Assertions.assertThat(new D01(sample).star2()).isEqualTo(45000L);
     }
 
     @Test
     void star1() {
-        Assertions.assertThat(new D01(input).star1()).isEqualTo(0L);
+        Assertions.assertThat(new D01(input).star1()).isEqualTo(69528L);
     }
 
     @Test
     void star2() {
-        Assertions.assertThat(new D01(input).star2()).isEqualTo(0L);
+        Assertions.assertThat(new D01(input).star2()).isEqualTo(206152L);
     }
 }
