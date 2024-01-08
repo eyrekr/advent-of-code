@@ -116,6 +116,18 @@ public final class Longs implements Iterable<Long> {
     }
 
     /**
+     * @return Longs parsed from values of the array.
+     * @complexity O(n)
+     */
+    public static Longs fromStringArray(final String[] array) {
+        final long[] b = new long[Math.max(MIN_CAPACITY, array.length)];
+        for (int i = 0; i < array.length; i++) {
+            b[i] = Long.valueOf(array[i]);
+        }
+        return new Longs(b, 0, array.length, true);
+    }
+
+    /**
      * @return Array from the supplied iterable collection.
      * @complexity O(n)
      */
