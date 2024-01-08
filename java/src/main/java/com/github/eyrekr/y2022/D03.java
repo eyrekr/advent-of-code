@@ -2,35 +2,56 @@ package com.github.eyrekr.y2022;
 
 import com.github.eyrekr.immutable.Seq;
 
+import java.util.Arrays;
+
 public class D03 {
 
-    final Seq<Rucksack> rucksacks;
+    final Seq<String> rucksacks;
 
     D03(final String input) {
-        rucksacks = Seq.ofLinesFromString(input).map(Rucksack::from);
+        rucksacks = Seq.ofLinesFromString(input);
     }
 
     long star1() {
-        return rucksacks.toLongs(rucksack -> {
-                    if (rucksack.shared >= 'a' && rucksack.shared <= 'z') return rucksack.shared - 'a' + 1;
-                    if (rucksack.shared >= 'A' && rucksack.shared <= 'Z') return rucksack.shared - 'A' + 27;
-                    throw new IllegalStateException();
+        return rucksacks.map(contents -> {
+                    final String left = contents.substring(0, contents.length() / 2), right = contents.substring(contents.length() / 2);
+                    return new Histogram().and(left).and(right);
                 })
+                .toLongs(Histogram::topPriority)
                 .sum();
     }
 
     long star2() {
-        return 0L;
+        return rucksacks.batch(3)
+                .map(group -> group.reduce(new Histogram(), Histogram::and))
+                .toLongs(Histogram::topPriority)
+                .sum();
     }
 
-    record Rucksack(String left, String right, char shared) {
-        static Rucksack from(String input) {
-            final String left = input.substring(0, input.length() / 2), right = input.substring(input.length() / 2);
-            char shared = 0;
-            for (int l = 0; l < left.length(); l++)
-                for (int r = 0; r < right.length(); r++)
-                    if (left.charAt(l) == right.charAt(r)) shared = left.charAt(l);
-            return new Rucksack(left, right, shared);
+    static class Histogram {
+        final boolean[] h = new boolean[64];
+
+        {
+            Arrays.fill(h, true);
+        }
+
+        Histogram and(final String input) {
+            final boolean[] t = new boolean[64];
+            for (int i = 0; i < input.length(); i++) t[priority(input.charAt(i))] = true;
+            for (int i = 0; i < 64; i++) h[i] = h[i] && t[i];
+            return this;
+        }
+
+        int topPriority() {
+            for (int i = 0; i < h.length; i++)
+                if (h[i]) return i;
+            throw new IllegalStateException();
+        }
+
+        static int priority(final char ch) {
+            if (ch >= 'a' && ch <= 'z') return ch - 'a' + 1;
+            if (ch >= 'A' && ch <= 'Z') return ch - 'A' + 27;
+            throw new IllegalStateException("Unexpected character " + ch);
         }
     }
 }

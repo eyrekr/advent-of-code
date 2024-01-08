@@ -28,11 +28,11 @@ class D03Test {
 
     @Test
     void sampleStar2() {
-        Assertions.assertThat(new D03(sample).star2()).isEqualTo(0L);
+        Assertions.assertThat(new D03(sample).star2()).isEqualTo(70L);
     }
 
     @Test
     void star2() {
-        Assertions.assertThat(new D03(input).star2()).isEqualTo(0L);
+        Assertions.assertThat(new D03(input).star2()).isEqualTo(2363L);
     }
 }
