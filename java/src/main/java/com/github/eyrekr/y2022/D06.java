@@ -22,6 +22,22 @@ public class D06 {
     }
 
     long star2() {
-        return 0L;
+        final int[] histogram = new int[27];
+        int argmax = 0;
+        for (int i = 0; i < input.length(); i++) {
+            final int c = input.charAt(i) - 'a';
+            if (i < 14) {
+                histogram[c]++;
+                if (histogram[c] > histogram[argmax]) argmax = c;
+            } else {
+                final int d = input.charAt(i - 14) - 'a';
+                histogram[d]--;
+                histogram[c]++;
+                for (int l = 0; l < histogram.length; l++)
+                    if (histogram[l] > histogram[argmax]) argmax = l;
+                if (histogram[argmax] == 1) return i + 1;
+            }
+        }
+        return -1;
     }
 }

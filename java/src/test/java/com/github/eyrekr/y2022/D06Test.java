@@ -30,13 +30,23 @@ class D06Test {
 
     @Test
     void star1() {
-        Assertions.assertThat(new D06(input).star1()).isEqualTo(0L);
+        Assertions.assertThat(new D06(input).star1()).isEqualTo(1625L);
     }
 
-//    @Test
-//    void sampleStar2() {
-//        Assertions.assertThat(new D06(sample).star2()).isEqualTo(0L);
-//    }
+    @ParameterizedTest
+    @MethodSource("dataForSampleStar2")
+    void sampleStar2(final String line, final long expected) {
+        Assertions.assertThat(new D06(line).star2()).isEqualTo(expected);
+    }
+
+    static Stream<Arguments> dataForSampleStar2() {
+        return Stream.of(
+                Arguments.of("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 19L),
+                Arguments.of("bvwbjplbgvbhsrlpgdmjqwftvncz", 23L),
+                Arguments.of("nppdvjthqldpwncqszvftbrmjlhg", 23L),
+                Arguments.of("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 29L),
+                Arguments.of("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 26L));
+    }
 
     @Test
     void star2() {
