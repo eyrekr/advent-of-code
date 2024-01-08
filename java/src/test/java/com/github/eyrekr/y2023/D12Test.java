@@ -1,6 +1,5 @@
 package com.github.eyrekr.y2023;
 
-import com.github.eyrekr.y2023.D12;
 import com.github.eyrekr.y2023.D12.Cache;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.output.Out;
@@ -18,7 +17,7 @@ class D12Test {
             ????.######..#####. 1,6,5
             ?###???????? 3,2,1
             """;
-    final String input = Out.testResource("D12.txt");
+    final String input = Out.testResource("2023/D12.txt");
 
     @Test
     void sampleStar1() {

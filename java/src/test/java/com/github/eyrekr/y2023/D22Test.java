@@ -1,7 +1,6 @@
 package com.github.eyrekr.y2023;
 
 import com.github.eyrekr.output.Out;
-import com.github.eyrekr.y2023.D22;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +16,7 @@ class D22Test {
             0,1,6~2,1,6
             1,1,8~1,1,9
             """;
-    final String input = Out.testResource("D22.txt");
+    final String input = Out.testResource("2023/D22.txt");
 
     @Test
     void sampleStar1() {

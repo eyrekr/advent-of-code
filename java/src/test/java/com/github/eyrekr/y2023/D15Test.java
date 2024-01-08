@@ -1,7 +1,6 @@
 package com.github.eyrekr.y2023;
 
 import com.github.eyrekr.output.Out;
-import com.github.eyrekr.y2023.D15;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class D15Test {
     final String sample = "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7";
-    final String input = Out.testResource("D15.txt");
+    final String input = Out.testResource("2023/D15.txt");
 
     @Test
     void sampleStar1() {
