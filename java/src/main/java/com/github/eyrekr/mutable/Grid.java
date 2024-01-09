@@ -1,12 +1,12 @@
 package com.github.eyrekr.mutable;
 
+import com.github.eyrekr.immutable.Opt;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.output.Out;
 import com.github.eyrekr.raster.Direction;
 
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -318,13 +318,34 @@ public final class Grid implements Iterable<Grid.It> {
             return grid.it(x + direction.dx, y + direction.dy, direction);
         }
 
-        public Optional<It> tryToGo(final Direction direction) { // no passing through walls
+        public Opt<It> tryToGo(final Direction direction) {
             return switch (direction) {
-                case Up -> y > 0 ? Optional.of(grid.it(x, y - 1, direction)) : Optional.empty();
-                case Down -> y < n - 1 ? Optional.of(grid.it(x, y + 1, direction)) : Optional.empty();
-                case Left -> x > 0 ? Optional.of(grid.it(x - 1, y, direction)) : Optional.empty();
-                case Right -> x < m - 1 ? Optional.of(grid.it(x + 1, y, direction)) : Optional.empty();
-                case None -> Optional.of(this);
+                case Up -> y > 0 ? Opt.of(grid.it(x, y - 1, direction)) : Opt.empty();
+                case Down -> y < n - 1 ? Opt.of(grid.it(x, y + 1, direction)) : Opt.empty();
+                case Left -> x > 0 ? Opt.of(grid.it(x - 1, y, direction)) : Opt.empty();
+                case Right -> x < m - 1 ? Opt.of(grid.it(x + 1, y, direction)) : Opt.empty();
+                case None -> Opt.of(this);
+            };
+        }
+
+        public Opt<It> tryToContinue() {
+            return tryToGo(direction);
+        }
+
+        public Iterable<It> iterate(final Direction direction) {
+            return () -> new Iterator<>() {
+                private It it = It.this;
+
+                @Override
+                public boolean hasNext() {
+                    return it.tryToGo(direction).present;
+                }
+
+                @Override
+                public It next() {
+                    it = it.tryToGo(direction).value;
+                    return it;
+                }
             };
         }
 

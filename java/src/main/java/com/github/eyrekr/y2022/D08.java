@@ -3,6 +3,7 @@ package com.github.eyrekr.y2022;
 import com.github.eyrekr.mutable.Grid;
 import com.github.eyrekr.mutable.Grid.It;
 import com.github.eyrekr.mutable.Grid.State;
+import com.github.eyrekr.raster.Direction;
 
 public class D08 {
 
@@ -34,6 +35,18 @@ public class D08 {
     }
 
     long star2() {
-        return 0L;
+        grid.each(it -> it.setDistance(countTrees(it, Direction.Down) * countTrees(it, Direction.Up) * countTrees(it, Direction.Left) * countTrees(it, Direction.Right)));
+        grid.print(it -> it.d > 0 ? String.format("@k%3d", it.d) : "@W  0");
+        return grid.reduce(0, (max, it) -> Math.max(max, it.d));
+    }
+
+    int countTrees(final It it, final Direction direction) {
+        final int height = it.digit;
+        int trees = 0;
+        for (final It next : it.iterate(direction)) {
+            trees++;
+            if (next.digit >= height) break;
+        }
+        return trees;
     }
 }
