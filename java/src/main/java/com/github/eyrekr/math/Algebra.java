@@ -16,6 +16,10 @@ public final class Algebra {
         while ((n >> log2) != 0) log2++;
         return log2;
     }
+
+    public static int sgn(final int i) {
+        return Integer.compare(i, 0);
+    }
     //endregion
 
     //region LONG
@@ -28,7 +32,7 @@ public final class Algebra {
     }
 
     public static long sgn(final long l) {
-        return l < 0 ? -1 : l == 0 ? 0 : +1;
+        return Long.compare(l, 0);
     }
     //endregion
 }
