@@ -7,18 +7,23 @@ import org.junit.jupiter.api.Test;
 class D08Test {
 
     final String sample = """
+            30373
+            25512
+            65332
+            33549
+            35390
             """;
 
     final String input = Out.testResource("2022/D08.txt");
 
     @Test
     void sampleStar1() {
-        Assertions.assertThat(new D08(sample).star1()).isEqualTo(0L);
+        Assertions.assertThat(new D08(sample).star1()).isEqualTo(21L);
     }
 
     @Test
     void star1() {
-        Assertions.assertThat(new D08(input).star1()).isEqualTo(0L);
+        Assertions.assertThat(new D08(input).star1()).isEqualTo(1801L);
     }
 
     @Test
