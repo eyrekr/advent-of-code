@@ -26,5 +26,9 @@ public final class Algebra {
     public static long lcm(final long a, final long b) {
         return a / gcd(a, b) * b;
     }
+
+    public static long sgn(final long l) {
+        return l < 0 ? -1 : l == 0 ? 0 : +1;
+    }
     //endregion
 }

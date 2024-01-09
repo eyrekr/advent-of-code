@@ -19,6 +19,10 @@ public final class P {
         return new P(x + dx, y + dy);
     }
 
+    public P move(final Direction direction) {
+        return new P(x + direction.dx, y + direction.dy);
+    }
+
     /**
      * Using Bresenham's algorithm to calculate the shortest distance between two points.
      * https://www.baeldung.com/cs/bresenhams-line-algorithm
