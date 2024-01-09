@@ -41,11 +41,10 @@ public class D08 {
     }
 
     int countTrees(final It it, final Direction direction) {
-        final int height = it.digit;
         int trees = 0;
         for (final It next : it.iterate(direction)) {
             trees++;
-            if (next.digit >= height) break;
+            if (next.digit >= it.digit) break;
         }
         return trees;
     }
