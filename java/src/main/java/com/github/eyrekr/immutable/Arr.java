@@ -104,6 +104,14 @@ public final class Arr<E> implements Iterable<E> {
     }
 
     /**
+     * @return Array of lines from the supplied string.
+     * @complexity O(n)
+     */
+    public static Arr<String> ofLinesFromString(final String string) {
+        return fromArray(string.split("\n"));
+    }
+
+    /**
      * @return Array from the supplied iterable collection.
      * @complexity O(n)
      */

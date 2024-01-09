@@ -1,6 +1,8 @@
 package com.github.eyrekr.raster;
 
 public final class P {
+    public static final P O = new P(0, 0);
+
     public final long x;
     public final long y;
 
@@ -52,5 +54,20 @@ public final class P {
 
     public long manhattanDistance(final P that) {
         return Math.abs(this.x - that.x) + Math.abs(this.y - that.y);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return obj instanceof final P that && that.x == x && that.y == y;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (x ^ y);
+    }
+
+    @Override
+    public String toString() {
+        return "[" + x + "," + y + "]";
     }
 }

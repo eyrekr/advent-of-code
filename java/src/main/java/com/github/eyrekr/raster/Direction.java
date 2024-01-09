@@ -34,4 +34,14 @@ public enum Direction {
             case Right -> Left;
         };
     }
+
+    public static Direction fromChar(final char ch) {
+        return switch (ch) {
+            case 'U', 'u', '^', '↑' -> Direction.Up;
+            case 'D', 'd', 'v', '↓' -> Direction.Down;
+            case 'L', 'l', '<', '←' -> Direction.Left;
+            case 'R', 'r', '>', '→' -> Direction.Right;
+            default -> Direction.None;
+        };
+    }
 }
