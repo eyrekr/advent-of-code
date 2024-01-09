@@ -13,6 +13,13 @@ public class D08 {
     }
 
     long star1() {
+        Grid forest = grid;
+        for (int i = 0; i < 4; i++) forest = calculateVisibility(forest).rotateCW();
+        forest.print(it -> it.state == State.Open ? "@GX" : "@WO");
+        return forest.reduce(0L, (sum, it) -> it.state == State.Open ? sum + 1 : sum);
+    }
+
+    Grid calculateVisibility(final Grid grid) {
         for (int x = 0; x < grid.m; x++) {
             int h = -1;
             for (int y = 0; y < grid.n; y++) {
@@ -23,38 +30,7 @@ public class D08 {
                 }
             }
         }
-        for (int x = 0; x < grid.m; x++) {
-            int h = -1;
-            for (int y = grid.n - 1; y >= 0; y--) {
-                final It a = grid.it(x, y);
-                if (a.digit > h) {
-                    h = a.digit;
-                    a.setState(State.Open);
-                }
-            }
-        }
-        for (int y = 0; y < grid.n; y++) {
-            int h = -1;
-            for (int x = 0; x < grid.m; x++) {
-                final It a = grid.it(x, y);
-                if (a.digit > h) {
-                    h = a.digit;
-                    a.setState(State.Open);
-                }
-            }
-        }
-        for (int y = 0; y < grid.n; y++) {
-            int h = -1;
-            for (int x = grid.m - 1; x >= 0; x--) {
-                final It a = grid.it(x, y);
-                if (a.digit > h) {
-                    h = a.digit;
-                    a.setState(State.Open);
-                }
-            }
-        }
-        grid.print(it-> it.state==State.Open?"@GX":"@rX");
-        return grid.reduce(0L, (sum, it) -> it.state == State.Open ? sum + 1 : sum);
+        return grid;
     }
 
     long star2() {

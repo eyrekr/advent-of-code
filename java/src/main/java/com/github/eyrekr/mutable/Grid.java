@@ -22,10 +22,10 @@ public final class Grid implements Iterable<Grid.It> {
     public final State[][] state;
     public final boolean maze;
 
-    private Grid(final int m, final int n, final char[][] a, final boolean maze) {
+    private Grid(final int m, final int n, final boolean maze) {
         this.m = m;
         this.n = n;
-        this.a = a;
+        this.a = new char[m][n];
         this.d = new int[m][n];
         this.state = new State[m][n];
         this.maze = maze;
@@ -34,7 +34,7 @@ public final class Grid implements Iterable<Grid.It> {
     }
 
     public static Grid of(final int m, final int n) {
-        return new Grid(m, n, new char[m][n], false);
+        return new Grid(m, n, false);
     }
 
     public static Grid of(final String input) {
@@ -44,11 +44,11 @@ public final class Grid implements Iterable<Grid.It> {
     public static Grid of(final String input, final boolean maze) {
         final String[] lines = input.split("\n");
         final int n = lines.length, m = lines[0].length();
-        final char[][] a = new char[m][n];
+        final Grid grid = new Grid(m, n, maze);
         for (int y = 0; y < n; y++)
             for (int x = 0; x < m; x++)
-                a[x][y] = lines[y].charAt(x);
-        return new Grid(m, n, a, maze);
+                grid.a[x][y] = lines[y].charAt(x);
+        return grid;
     }
 
     public char at(int x, int y) {
@@ -80,8 +80,11 @@ public final class Grid implements Iterable<Grid.It> {
     public Grid repeat(final int factor) {
         final Grid grid = Grid.of(m * factor, n * factor);
         for (int y = 0; y < n * factor; y++)
-            for (int x = 0; x < m * factor; x++)
+            for (int x = 0; x < m * factor; x++) {
                 grid.a[x][y] = a[x % m][y % n];
+                grid.d[x][y] = d[x % m][y % n];
+                grid.state[x][y] = state[x % m][y % n];
+            }
         return grid;
     }
 
@@ -138,27 +141,36 @@ public final class Grid implements Iterable<Grid.It> {
     }
 
     public Grid transpose() {
-        final char[][] transposed = new char[n][m];
+        final Grid transposed = new Grid(n, m, maze);
         for (int y = 0; y < n; y++)
-            for (int x = 0; x < m; x++)
-                transposed[y][x] = a[x][y];
-        return new Grid(n, m, transposed, maze);
+            for (int x = 0; x < m; x++) {
+                transposed.a[y][x] = a[x][y];
+                transposed.d[y][x] = d[x][y];
+                transposed.state[y][x] = state[x][y];
+            }
+        return transposed;
     }
 
     public Grid rotateCW() { //clockwise
-        final char[][] rotated = new char[n][m];
+        final Grid rotated = new Grid(n, m, maze);
         for (int y = 0; y < n; y++)
-            for (int x = 0; x < m; x++)
-                rotated[m - 1 - y][x] = a[x][y];
-        return new Grid(n, m, rotated, maze);
+            for (int x = 0; x < m; x++) {
+                rotated.a[m - 1 - y][x] = a[x][y];
+                rotated.d[m - 1 - y][x] = d[x][y];
+                rotated.state[m - 1 - y][x] = state[x][y];
+            }
+        return rotated;
     }
 
     public Grid rotateCCW() { //counter-clockwise
-        final char[][] rotated = new char[n][m];
+        final Grid rotated = new Grid(n, m, maze);
         for (int y = 0; y < n; y++)
-            for (int x = 0; x < m; x++)
-                rotated[y][n - 1 - x] = a[x][y];
-        return new Grid(n, m, rotated, maze);
+            for (int x = 0; x < m; x++) {
+                rotated.a[y][n - 1 - x] = a[x][y];
+                rotated.d[y][n - 1 - x] = d[x][y];
+                rotated.state[y][n - 1 - x] = state[x][y];
+            }
+        return rotated;
     }
 
     public Grid replace(final Function<Character, Character> transform) {
