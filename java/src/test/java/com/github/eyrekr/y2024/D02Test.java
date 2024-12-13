@@ -34,6 +34,6 @@ class D02Test {
 
     @Test
     void star2() {
-        Assertions.assertThat(new D02(input).star2()).isEqualTo(-1L);
+        Assertions.assertThat(new D02(input).star2()).isEqualTo(528L);
     }
 }

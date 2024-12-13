@@ -362,7 +362,7 @@ public final class Longs implements Iterable<Long> {
     public <R> R reduce(final R init, final AccumulatorContextToR<R> reducer) {
         R acc = init;
         for (int i = 0; i < length; i++) {
-            acc = reducer.reduce(acc, at(i), i, i == 0, i == length - 1);
+            acc = reducer.reduce(acc, at(i), at(i + 1), at(i - 1), i, i == 0, i == length - 1);
         }
         return acc;
     }
@@ -795,7 +795,7 @@ public final class Longs implements Iterable<Long> {
 
     @FunctionalInterface
     public interface AccumulatorContextToR<R> {
-        R reduce(R accumulator, long value, int i, boolean first, boolean last);
+        R reduce(R accumulator, long value, long nextValue, long previousValue, int i, boolean first, boolean last);
     }
 
     @FunctionalInterface
