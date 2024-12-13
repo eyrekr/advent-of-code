@@ -11,8 +11,8 @@ import com.github.eyrekr.immutable.Longs;
  */
 class D02 {
 
-    static final Int AllowedAscendingDelta = new Int(1, 3);
-    static final Int AllowedDescendingDelta = new Int(-3, -1);
+    static final Int AscendingDeltas = new Int(1, 3);
+    static final Int DescendingDeltas = new Int(-3, -1);
 
     final Arr<Longs> reports;
 
@@ -21,42 +21,36 @@ class D02 {
     }
 
     long star1() {
-        return reports.where(this::safe).length;
+        return reports
+                .map(Longs::deltas)
+                .where(deltas -> deltas.allAre(AscendingDeltas::contains) || deltas.allAre(DescendingDeltas::contains))
+                .length;
     }
 
-    long star2() {
-        return reports.where(this::safeAfterDampening).length;
-    }
-
-    private boolean safe(final Longs levels) {
-        final var deltas = levels.deltas();
-        return switch (levels.ordering()) {
-            case Constant, Random -> false;
-            case Ascending -> deltas.allAre(AllowedAscendingDelta::contains);
-            case Descending -> deltas.allAre(AllowedDescendingDelta::contains);
-        };
-    }
-
-    private boolean safeAfterDampening(final Longs levels) {
-        final var deltas = levels.deltas();
-        return safeAscendingWithDampening(deltas) || safeDescendingWithDampening(deltas);
+    long star2() { // 525 too low
+        return reports
+                .map(Longs::deltas)
+                .where(deltas -> safeAscendingWithDampening(deltas) || safeDescendingWithDampening(deltas))
+                .length;
     }
 
     private boolean safeAscendingWithDampening(final Longs deltas) { // ascending
         final Arr<BadLevel> badLevels = deltas.reduce(
                 Arr.empty(),
-                (arr, value, i, first, last) -> AllowedAscendingDelta.notContains(value)
+                (arr, value, i, first, last) -> AscendingDeltas.notContains(value)
                         ? arr.addLast(new BadLevel(value, i, first, last))
                         : arr);
         return switch (badLevels.length) {
             case 0 -> true;
             case 1 -> {
-                final BadLevel a = badLevels.at(0);
-                yield a.first || a.last || a.value == 0;
+                final BadLevel bad = badLevels.at(0);
+                yield bad.first
+                        || bad.last
+                        || AscendingDeltas.contains(deltas.at(bad.i - 1) + bad.value);
             }
             case 2 -> {
                 final BadLevel a = badLevels.at(0), b = badLevels.at(1);
-                yield a.i + 1 == b.i && AllowedAscendingDelta.contains(a.value + b.value);
+                yield a.i + 1 == b.i && AscendingDeltas.contains(a.value + b.value);
             }
             default -> false;
         };
@@ -65,18 +59,20 @@ class D02 {
     private boolean safeDescendingWithDampening(final Longs deltas) { // descending
         final Arr<BadLevel> badLevels = deltas.reduce(
                 Arr.empty(),
-                (arr, value, i, first, last) -> AllowedDescendingDelta.notContains(value)
+                (arr, value, i, first, last) -> DescendingDeltas.notContains(value)
                         ? arr.addLast(new BadLevel(value, i, first, last))
                         : arr);
         return switch (badLevels.length) {
             case 0 -> true;
             case 1 -> {
-                final BadLevel a = badLevels.at(0);
-                yield a.first || a.last || a.value == 0;
+                final BadLevel bad = badLevels.at(0);
+                yield bad.first
+                        || bad.last
+                        || DescendingDeltas.contains(deltas.at(bad.i - 1) + bad.value);
             }
             case 2 -> {
                 final BadLevel a = badLevels.at(0), b = badLevels.at(1);
-                yield a.i + 1 == b.i && AllowedDescendingDelta.contains(a.value + b.value);
+                yield a.i + 1 == b.i && DescendingDeltas.contains(a.value + b.value);
             }
             default -> false;
         };
