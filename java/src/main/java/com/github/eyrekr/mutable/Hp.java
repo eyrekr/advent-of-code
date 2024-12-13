@@ -2,6 +2,10 @@ package com.github.eyrekr.mutable;
 
 import com.github.eyrekr.math.Algebra;
 
+/**
+ * Heap.
+ * WORK IN PROGRESS
+ */
 public final class Hp<E> {
     private static final int MIN_CAPACITY = 16;
 

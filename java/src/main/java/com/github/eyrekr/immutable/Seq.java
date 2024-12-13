@@ -184,6 +184,10 @@ public final class Seq<E> implements Iterable<E> {
         return isEmpty ? this : predicate.test(value) ? new Seq<>(value, tail.where(predicate)) : tail.where(predicate);
     }
 
+    public Seq<E> contextWhere(final Predicate<Seq<? super E>> predicate) {
+        return isEmpty ? empty() : predicate.test(this) ? new Seq<>(value, tail.contextWhere(predicate)) : tail.contextWhere(predicate);
+    }
+
     public Opt<E> firstWhere(final Predicate<? super E> predicate) {
         return isEmpty ? Opt.empty() : predicate.test(value) ? Opt.of(value) : tail.firstWhere(predicate);
     }
