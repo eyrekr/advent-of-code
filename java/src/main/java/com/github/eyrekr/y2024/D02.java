@@ -5,7 +5,7 @@ import com.github.eyrekr.immutable.Longs;
 
 /**
  * https://adventofcode.com/2024/day/2
- * 1)
+ * 1) 483
  * 2)
  */
 class D02 {
@@ -16,7 +16,16 @@ class D02 {
     }
 
     long star1() {
-        return -1;
+        return reports.where(this::safe).length;
+    }
+
+    private boolean safe(final Longs levels) {
+        final var differences = levels.deltas();
+        return switch (levels.ordering()) {
+            case Constant, Random -> false;
+            case Ascending -> differences.min() >= 1 && differences.max() <= 3;
+            case Descending -> differences.min() >= -3 && differences.max() <= -1;
+        };
     }
 
     long star2() {

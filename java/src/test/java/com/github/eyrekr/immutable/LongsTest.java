@@ -540,5 +540,37 @@ class LongsTest {
         assertThat(Longs.of(1, 2, 3, 4).toSet()).isEqualTo(Set.of(1L, 2L, 3L, 4L));
     }
 
+    @Test
+    void ordering() {
+        assertThat(Longs.empty().ordering()).isEqualTo(Longs.Order.Constant);
+        assertThat(Longs.of(1).ordering()).isEqualTo(Longs.Order.Constant);
+        assertThat(Longs.of(1, 1).ordering()).isEqualTo(Longs.Order.Constant);
+        assertThat(Longs.of(1, 1, 1, 1, 1).ordering()).isEqualTo(Longs.Order.Constant);
 
+        assertThat(Longs.of(1, -1).ordering()).isEqualTo(Longs.Order.Descending);
+        assertThat(Longs.of(1, 0, 0, 0, 0).ordering()).isEqualTo(Longs.Order.Descending);
+        assertThat(Longs.of(1, 1, 0, 0, 0).ordering()).isEqualTo(Longs.Order.Descending);
+        assertThat(Longs.of(0, -1, -2, -3, -4).ordering()).isEqualTo(Longs.Order.Descending);
+
+        assertThat(Longs.of(-1, 1).ordering()).isEqualTo(Longs.Order.Ascending);
+        assertThat(Longs.of(0, 1, 1, 1, 1).ordering()).isEqualTo(Longs.Order.Ascending);
+        assertThat(Longs.of(0, 0, 1, 1, 1).ordering()).isEqualTo(Longs.Order.Ascending);
+        assertThat(Longs.of(0, 1, 2, 3, 4).ordering()).isEqualTo(Longs.Order.Ascending);
+
+        assertThat(Longs.of(0, 1, 0).ordering()).isEqualTo(Longs.Order.Random);
+        assertThat(Longs.of(0, -1, 0).ordering()).isEqualTo(Longs.Order.Random);
+        assertThat(Longs.of(0, 1, 2, 3, 0).ordering()).isEqualTo(Longs.Order.Random);
+        assertThat(Longs.of(0, -1, -2, -3, 0).ordering()).isEqualTo(Longs.Order.Random);
+    }
+
+    @Test
+    void deltas() {
+        assertThat(Longs.empty().deltas()).isEqualTo(Longs.empty());
+        assertThat(Longs.of(1).deltas()).isEqualTo(Longs.empty());
+        assertThat(Longs.of(1, 1, 1, 1).deltas()).isEqualTo(Longs.of(0, 0, 0));
+        assertThat(Longs.of(1, 2).deltas()).isEqualTo(Longs.of(1));
+        assertThat(Longs.of(1, 2, 4, 7).deltas()).isEqualTo(Longs.of(1, 2, 3));
+        assertThat(Longs.of(1, 0, 1, 0).deltas()).isEqualTo(Longs.of(-1, 1, -1));
+        assertThat(Longs.of(1, -1, 1, 1).deltas()).isEqualTo(Longs.of(-2, 2, 0));
+    }
 }

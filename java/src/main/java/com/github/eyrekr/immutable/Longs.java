@@ -430,12 +430,35 @@ public final class Longs implements Iterable<Long> {
     }
 
     /**
+     * @return Order of the values.
+     * @complexity O(n)
+     */
+    public Order ordering() {
+        Order order = Order.Constant;
+        for (int i = 0; i < length - 1; i++) {
+            final long l = at(i), r = at(i + 1);
+            if (l < r) {
+                order = switch (order) {
+                    case Ascending, Constant -> Order.Ascending;
+                    case Descending, Random -> Order.Random;
+                };
+            } else if (l > r) {
+                order = switch (order) {
+                    case Descending, Constant -> Order.Descending;
+                    case Ascending, Random -> Order.Random;
+                };
+            }
+            if (order == Order.Random) break;
+        }
+        return order;
+    }
+
+    /**
      * @return New array with the values sorted in the ascending order.
      * @complexity O(n log n)
      */
     public Longs sorted() {
         final Longs arr = clone(1);
-        arr.print();
         Arrays.sort(arr.a, 0, length);
         return arr;
     }
@@ -632,8 +655,9 @@ public final class Longs implements Iterable<Long> {
     }
 
     /**
-     * @complexity O(n)
      * Perform an operation with each value of this array.
+     *
+     * @complexity O(n)
      */
     public Longs each(final LongToVoid consumer) {
         for (int i = 0; i < length; i++) {
@@ -641,6 +665,14 @@ public final class Longs implements Iterable<Long> {
             consumer.apply(value);
         }
         return this;
+    }
+
+    /**
+     * @return New array with differences between each two consecutive values.
+     * @complexity O(n)
+     */
+    public Longs deltas() {
+        return mapWith(removeFirst(), (value, next) -> next - value);
     }
 
     public Longs print() {
@@ -771,6 +803,10 @@ public final class Longs implements Iterable<Long> {
     @FunctionalInterface
     public interface LongLongToInt {
         int apply(long a, long b);
+    }
+
+    public enum Order {
+        Random, Ascending, Descending, Constant
     }
 
     private class It implements Iterator<Long> {
