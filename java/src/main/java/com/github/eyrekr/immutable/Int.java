@@ -31,7 +31,7 @@ public final class Int {
         return a <= x && x <= b;
     }
 
-    public boolean noContains(final long x) {
+    public boolean notContains(final long x) {
         return x < a || b < x;
     }
 }

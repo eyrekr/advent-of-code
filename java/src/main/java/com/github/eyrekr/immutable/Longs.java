@@ -345,10 +345,24 @@ public final class Longs implements Iterable<Long> {
      * @return The accumulated value.
      * @complexity O(n)
      */
-    public <R> R reduce(final R init, final AccumulatedLongToR<R> reducer) {
+    public <R> R reduce(final R init, final AccumulatorLongToR<R> reducer) {
         R acc = init;
         for (int i = 0; i < length; i++) {
             acc = reducer.reduce(acc, at(i));
+        }
+        return acc;
+    }
+
+    /**
+     * @param init    Initial value for the accumulator.
+     * @param reducer Function combining the accumulator with the values of the array.
+     * @return The accumulated value.
+     * @complexity O(n)
+     */
+    public <R> R reduce(final R init, final AccumulatorContextToR<R> reducer) {
+        R acc = init;
+        for (int i = 0; i < length; i++) {
+            acc = reducer.reduce(acc, at(i), i, i == 0, i == length - 1);
         }
         return acc;
     }
@@ -775,8 +789,13 @@ public final class Longs implements Iterable<Long> {
     }
 
     @FunctionalInterface
-    public interface AccumulatedLongToR<R> {
+    public interface AccumulatorLongToR<R> {
         R reduce(R accumulator, long value);
+    }
+
+    @FunctionalInterface
+    public interface AccumulatorContextToR<R> {
+        R reduce(R accumulator, long value, int i, boolean first, boolean last);
     }
 
     @FunctionalInterface
