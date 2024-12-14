@@ -6,6 +6,7 @@ import com.github.eyrekr.output.Out;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.function.*;
+import java.util.regex.Matcher;
 
 /**
  * Auto-expandable immutable array of elements.
@@ -126,6 +127,12 @@ public final class Arr<E> implements Iterable<E> {
     public static <T> Arr<T> fromIterator(final Iterator<T> iterator) {
         Arr<T> array = new Arr<>();
         while (iterator.hasNext()) array = array.addLast(iterator.next());
+        return array;
+    }
+
+    public static Arr<String> fromMatcher(final Matcher matcher) {
+        Arr<String> array = new Arr<>();
+        while (matcher.find()) array = array.addLast(matcher.group(0));
         return array;
     }
 
