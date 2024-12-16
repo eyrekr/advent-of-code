@@ -65,16 +65,30 @@ public class AocTest {
     protected static class Builder {
 
         Star[] stars = new Star[]{new Star(), new Star()};
-        Star star = stars[0];
+        Star star = null;
         Constructor constructor = Constructor.undefined;
 
         private Builder(final Class<?> tClass) {
             input(readInputForClass(tClass));
         }
 
+        public Builder all() {
+            this.star = null;
+            return this;
+        }
+
+        public Builder all(final String sampleInput) {
+            this.star = null;
+            return sampleInput(sampleInput);
+        }
+
         public Builder star1() {
             this.star = stars[0];
             return this;
+        }
+
+        public Builder star1(final long sampleOutput, final long solution) {
+            return star1().sampleOutput(sampleOutput).solution(solution);
         }
 
         public Builder star1(final String sampleInput, final long sampleOutput, final long solution) {
@@ -86,29 +100,35 @@ public class AocTest {
             return this;
         }
 
+        public Builder star2(final long sampleOutput, final long solution) {
+            return star2().sampleOutput(sampleOutput).solution(solution);
+        }
+
         public Builder star2(final String sampleInput, final long sampleOutput, final long solution) {
             return star2().sampleInput(sampleInput).sampleOutput(sampleOutput).solution(solution);
         }
 
         public Builder sampleInput(final String value) {
-            star.sampleInput = value;
-            if (star == stars[0] && stars[1].sampleInput.isBlank()) stars[1].sampleInput = value;
+            if (star == null) for (final var star : stars) star.sampleInput = value;
+            else star.sampleInput = value;
             return this;
         }
 
         public Builder sampleOutput(final long value) {
-            star.sampleOutput = value;
+            if (star == null) for (final var star : stars) star.sampleOutput = value;
+            else star.sampleOutput = value;
             return this;
         }
 
         public Builder input(final String value) {
-            star.input = value;
-            if (star == stars[0] && stars[1].input.isBlank()) stars[1].input = value;
+            if (star == null) for (final var star : stars) star.input = value;
+            else star.input = value;
             return this;
         }
 
         public Builder output(final long value) {
-            star.output = value;
+            if (star == null) for (final var star : stars) star.output = value;
+            else star.output = value;
             return this;
         }
 
