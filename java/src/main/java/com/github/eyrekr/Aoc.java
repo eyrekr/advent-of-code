@@ -2,11 +2,11 @@ package com.github.eyrekr;
 
 public class Aoc {
 
-    long star1() {
+    public long star1() {
         return -1L;
     }
 
-    long star2() {
+    public long star2() {
         return -1L;
     }
 }
