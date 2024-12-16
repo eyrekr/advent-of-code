@@ -20,6 +20,7 @@ public class AocTest {
         this.setup = builder.build();
     }
 
+    //region TESTS
     @Test
     void star1_sample() {
         final var aoc = setup.constructor.aoc(setup.star1.sample.input);
@@ -44,18 +45,23 @@ public class AocTest {
         final var aoc = setup.constructor.aoc(setup.star2.real.input);
         Assertions.assertThat(aoc.star2()).isEqualTo(setup.star2.real.output);
     }
+    //endregion
 
+
+    //region STATIC HELPER METHODS
     public static Builder builderFor(final Class<?> tClass) {
         return new Builder(tClass);
     }
-
 
     private static String readInputForClass(final Class<?> tClass) {
         final var matcher = pattern.matcher(tClass.getName());
         if (matcher.find()) return Out.testResource(String.format("%s/D%s.txt", matcher.group(1), matcher.group(2)));
         throw new IllegalStateException(tClass.getName());
     }
+    //endregion
 
+
+    //region BUILDER
     protected static class Builder {
 
         Star[] stars = new Star[]{new Star(), new Star()};
@@ -71,8 +77,8 @@ public class AocTest {
             return this;
         }
 
-        public Builder star1(final String sampleInput, final long sampleOutput, final long output) {
-            return star1().sampleInput(sampleInput).sampleOutput(sampleOutput).output(output);
+        public Builder star1(final String sampleInput, final long sampleOutput, final long solution) {
+            return star1().sampleInput(sampleInput).sampleOutput(sampleOutput).solution(solution);
         }
 
         public Builder star2() {
@@ -80,8 +86,8 @@ public class AocTest {
             return this;
         }
 
-        public Builder star2(final String sampleInput, final long sampleOutput, final long output) {
-            return star2().sampleInput(sampleInput).sampleOutput(sampleOutput).output(output);
+        public Builder star2(final String sampleInput, final long sampleOutput, final long solution) {
+            return star2().sampleInput(sampleInput).sampleOutput(sampleOutput).solution(solution);
         }
 
         public Builder sampleInput(final String value) {
@@ -104,6 +110,10 @@ public class AocTest {
         public Builder output(final long value) {
             star.output = value;
             return this;
+        }
+
+        public Builder solution(final long value) {
+            return output(value);
         }
 
         public Builder constructor(final Constructor constructor) {
@@ -129,7 +139,10 @@ public class AocTest {
             long output = -1L;
         }
     }
+    //endregion
 
+
+    //region SETUP
     record Setup(Star star1, Star star2, Constructor constructor) {
     }
 
@@ -138,5 +151,5 @@ public class AocTest {
 
     record Data(String input, long output) {
     }
-
+    //endregion
 }

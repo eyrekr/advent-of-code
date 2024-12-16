@@ -1,13 +1,10 @@
 package com.github.eyrekr.y2024;
 
+import com.github.eyrekr.Aoc;
 import com.github.eyrekr.immutable.Seq;
 
-/**
- * https://adventofcode.com/2024/day/1
- * 1) 1834060
- * 2) 21607792
- */
-class D01 {
+class D01 extends Aoc {
+
     final Seq<Long> leftList;
     final Seq<Long> rightList;
 
@@ -17,14 +14,16 @@ class D01 {
         rightList = numbers.contextWhere(it -> it.length % 2 == 1);
     }
 
-    long star1() {
+    @Override
+    public long star1() {
         return leftList.sorted().reduceWith(
                 rightList.sorted(),
                 0L,
                 (sum, leftValue, rightValue) -> sum + Math.abs(leftValue - rightValue));
     }
 
-    long star2() {
+    @Override
+    public long star2() {
         final var histogram = rightList.frequency();
         return leftList.reduce(
                 0L,

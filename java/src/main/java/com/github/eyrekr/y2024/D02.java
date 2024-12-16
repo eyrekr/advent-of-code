@@ -5,11 +5,6 @@ import com.github.eyrekr.immutable.Arr;
 import com.github.eyrekr.immutable.Int;
 import com.github.eyrekr.immutable.Longs;
 
-/**
- * https://adventofcode.com/2024/day/2
- * 1) 483
- * 2) 528
- */
 class D02 extends Aoc {
 
     static final Int AscendingDeltas = new Int(1, 3);

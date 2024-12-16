@@ -7,11 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Pattern;
 
-/**
- * https://adventofcode.com/2024/day/3
- * 1) 174336360
- * 2) 88802350
- */
 class D03 extends Aoc {
 
     final Pattern pattern = Pattern.compile("(mul\\(\\d{1,3},\\d{1,3}\\))", Pattern.MULTILINE);
