@@ -2,6 +2,7 @@ package com.github.eyrekr.immutable;
 
 import com.github.eyrekr.common.Just;
 import com.github.eyrekr.output.Out;
+import org.apache.commons.lang3.StringUtils;
 
 import java.security.SecureRandom;
 import java.util.*;
@@ -130,6 +131,11 @@ public final class Arr<E> implements Iterable<E> {
         return array;
     }
 
+    /**
+     * @return Array using the supplied matcher.
+     * <code>matcher.group(0)</code> is collected as the value.
+     * @complexity O(n)
+     */
     public static Arr<String> fromMatcher(final Matcher matcher) {
         Arr<String> array = new Arr<>();
         while (matcher.find()) array = array.addLast(matcher.group(0));
@@ -638,9 +644,14 @@ public final class Arr<E> implements Iterable<E> {
 
     @Override
     public String toString() {
+        return toString(" ");
+    }
+
+    public String toString(final String separator) {
+        final boolean separatorNotEmpty = StringUtils.isNotEmpty(separator);
         final StringBuilder builder = new StringBuilder();
         for (int i = 0; i < length; i++) {
-            if (i > 0) builder.append(' ');
+            if (separatorNotEmpty && i > 0) builder.append(separator);
             builder.append(at(i));
         }
         return builder.toString();
