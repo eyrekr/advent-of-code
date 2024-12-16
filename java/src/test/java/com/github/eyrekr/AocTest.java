@@ -6,17 +6,17 @@ import org.junit.jupiter.api.Test;
 
 import java.util.regex.Pattern;
 
-public class DxxTest {
+public class AocTest {
 
     private static final Pattern pattern = Pattern.compile("y(\\d{4})\\.D(\\d{2})");
 
     final Setup setup;
 
-    protected DxxTest(final Setup setup) {
+    protected AocTest(final Setup setup) {
         this.setup = setup;
     }
 
-    protected DxxTest(final Builder builder) {
+    protected AocTest(final Builder builder) {
         this.setup = builder.build();
     }
 
@@ -71,9 +71,17 @@ public class DxxTest {
             return this;
         }
 
+        public Builder star1(final String sampleInput, final long sampleOutput, final long output) {
+            return star1().sampleInput(sampleInput).sampleOutput(sampleOutput).output(output);
+        }
+
         public Builder star2() {
             this.star = stars[1];
             return this;
+        }
+
+        public Builder star2(final String sampleInput, final long sampleOutput, final long output) {
+            return star2().sampleInput(sampleInput).sampleOutput(sampleOutput).output(output);
         }
 
         public Builder sampleInput(final String value) {
@@ -105,10 +113,10 @@ public class DxxTest {
 
         public Setup build() {
             return new Setup(
-                    new DxxTest.Star(
+                    new AocTest.Star(
                             new Data(stars[0].sampleInput, stars[0].sampleOutput),
                             new Data(stars[0].input, stars[0].output)),
-                    new DxxTest.Star(
+                    new AocTest.Star(
                             new Data(stars[1].sampleInput, stars[1].sampleOutput),
                             new Data(stars[1].input, stars[1].output)),
                     constructor);

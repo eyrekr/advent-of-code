@@ -1,8 +1,8 @@
 package com.github.eyrekr.y2024;
 
-import com.github.eyrekr.DxxTest;
+import com.github.eyrekr.AocTest;
 
-class D03Test extends DxxTest {
+class D03Test extends AocTest {
 
     D03Test() {
         super(builderFor(D03Test.class)

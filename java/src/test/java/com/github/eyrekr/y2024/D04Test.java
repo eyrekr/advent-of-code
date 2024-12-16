@@ -1,8 +1,8 @@
 package com.github.eyrekr.y2024;
 
-import com.github.eyrekr.DxxTest;
+import com.github.eyrekr.AocTest;
 
-class D04Test extends DxxTest {
+class D04Test extends AocTest {
 
     static final String sample = """
             MMMSXXMASM

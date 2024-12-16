@@ -1,5 +1,6 @@
 package com.github.eyrekr.y2024;
 
+import com.github.eyrekr.Aoc;
 import com.github.eyrekr.immutable.Arr;
 import com.github.eyrekr.immutable.Int;
 import com.github.eyrekr.immutable.Longs;
@@ -9,7 +10,7 @@ import com.github.eyrekr.immutable.Longs;
  * 1) 483
  * 2) 528
  */
-class D02 {
+class D02 extends Aoc {
 
     static final Int AscendingDeltas = new Int(1, 3);
     static final Int DescendingDeltas = new Int(-3, -1);
@@ -20,14 +21,16 @@ class D02 {
         reports = Arr.ofLinesFromString(input).map(Longs::fromString);
     }
 
-    long star1() {
+    @Override
+    public long star1() {
         return reports
                 .map(Longs::deltas)
                 .where(deltas -> deltas.allAre(AscendingDeltas::contains) || deltas.allAre(DescendingDeltas::contains))
                 .length;
     }
 
-    long star2() { // 525 too low ->
+    @Override
+    public long star2() {
         return reports
                 .map(Longs::deltas)
                 .where(deltas -> safeAscendingWithDampening(deltas) || safeDescendingWithDampening(deltas))
