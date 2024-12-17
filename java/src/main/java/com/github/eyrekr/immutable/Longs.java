@@ -56,9 +56,7 @@ public final class Longs implements Iterable<Long> {
     public Longs clone(final double factor) {
         final int n = Math.max(MIN_CAPACITY, Math.max(a.length, (int) (a.length * factor)));
         final long[] b = new long[n];
-        for (int i = 0; i < length; i++) {
-            b[i] = at(i);
-        }
+        for (int i = 0; i < length; i++) b[i] = at(i);
         return new Longs(b, 0, length, true);
     }
 
@@ -87,11 +85,7 @@ public final class Longs implements Iterable<Long> {
     public static Longs of(final long value, final long... values) {
         Longs arr = new Longs();
         arr = arr.addLast(value);
-        if (values != null) {
-            for (final long v : values) {
-                arr = arr.addLast(v);
-            }
-        }
+        if (values != null) for (final long v : values) arr = arr.addLast(v);
         return arr;
     }
 
@@ -109,9 +103,7 @@ public final class Longs implements Iterable<Long> {
      */
     public static Longs fromIntArray(final int[] array) {
         final long[] b = new long[Math.max(MIN_CAPACITY, array.length)];
-        for (int i = 0; i < array.length; i++) {
-            b[i] = array[i];
-        }
+        for (int i = 0; i < array.length; i++) b[i] = array[i];
         return new Longs(b, 0, array.length, true);
     }
 
@@ -121,9 +113,7 @@ public final class Longs implements Iterable<Long> {
      */
     public static Longs fromStringArray(final String[] array) {
         final long[] b = new long[Math.max(MIN_CAPACITY, array.length)];
-        for (int i = 0; i < array.length; i++) {
-            b[i] = Long.valueOf(array[i]);
-        }
+        for (int i = 0; i < array.length; i++) b[i] = Long.valueOf(array[i]);
         return new Longs(b, 0, array.length, true);
     }
 
@@ -141,10 +131,7 @@ public final class Longs implements Iterable<Long> {
      */
     public static Longs fromIterator(final Iterator<Long> iterator) {
         Longs array = new Longs();
-        while (iterator.hasNext()) {
-            final long l = iterator.next();
-            array = array.addLast(l);
-        }
+        while (iterator.hasNext()) array = array.addLast(iterator.next());
         return array;
     }
 
@@ -154,9 +141,7 @@ public final class Longs implements Iterable<Long> {
     public static Longs fromString(final String string) {
         final var matcher = NUMBERS.matcher(string);
         Longs arr = Longs.empty();
-        while (matcher.find()) {
-            arr = arr.addLast(Long.parseLong(matcher.group()));
-        }
+        while (matcher.find()) arr = arr.addLast(Long.parseLong(matcher.group()));
         return arr;
     }
 
@@ -167,9 +152,7 @@ public final class Longs implements Iterable<Long> {
     public static Longs range(final long startInclusive, final long endExclusive) {
         int n = (int) (endExclusive - startInclusive);
         Longs array = new Longs(new long[n], 0, 0, true);
-        for (long value = startInclusive; value < endExclusive; value++) {
-            array = array.addLast(value);
-        }
+        for (long value = startInclusive; value < endExclusive; value++) array = array.addLast(value);
         return array;
     }
 
@@ -195,9 +178,7 @@ public final class Longs implements Iterable<Long> {
      */
     public Longs addLast(final Longs values) {
         Longs tmp = this;
-        for (int i = 0; i < values.length; i++) {
-            tmp = tmp.addLast(values.at(i));
-        }
+        for (int i = 0; i < values.length; i++) tmp = tmp.addLast(values.at(i));
         return tmp;
     }
 
@@ -258,11 +239,7 @@ public final class Longs implements Iterable<Long> {
      * @complexity O(n)
      */
     public boolean has(final long value) {
-        for (int i = 0; i < length; i++) {
-            if (at(i) == value) {
-                return true;
-            }
-        }
+        for (int i = 0; i < length; i++) if (at(i) == value) return true;
         return false;
     }
 
@@ -271,11 +248,7 @@ public final class Longs implements Iterable<Long> {
      * @complexity O(n)
      */
     public boolean atLeastOneIs(final LongToBool predicate) {
-        for (int i = 0; i < length; i++) {
-            if (predicate.test(at(i))) {
-                return true;
-            }
-        }
+        for (int i = 0; i < length; i++) if (predicate.test(at(i))) return true;
         return false;
     }
 
@@ -292,11 +265,7 @@ public final class Longs implements Iterable<Long> {
      * @complexity O(n)
      */
     public boolean allMatch(final long value) {
-        for (int i = 0; i < length; i++) {
-            if (at(i) != value) {
-                return false;
-            }
-        }
+        for (int i = 0; i < length; i++) if (at(i) != value) return false;
         return true;
     }
 
@@ -305,11 +274,7 @@ public final class Longs implements Iterable<Long> {
      * @complexity O(n)
      */
     public boolean allAre(final LongToBool predicate) {
-        for (int i = 0; i < length; i++) {
-            if (!predicate.test(at(i))) {
-                return false;
-            }
-        }
+        for (int i = 0; i < length; i++) if (!predicate.test(at(i))) return false;
         return true;
     }
 
@@ -318,11 +283,7 @@ public final class Longs implements Iterable<Long> {
      * @complexity O(n)
      */
     public boolean noneMatch(final long value) {
-        for (int i = 0; i < length; i++) {
-            if (at(i) == value) {
-                return false;
-            }
-        }
+        for (int i = 0; i < length; i++) if (at(i) == value) return false;
         return true;
     }
 
@@ -331,11 +292,7 @@ public final class Longs implements Iterable<Long> {
      * @complexity O(n)
      */
     public boolean noneIs(final LongToBool predicate) {
-        for (int i = 0; i < length; i++) {
-            if (predicate.test(at(i))) {
-                return false;
-            }
-        }
+        for (int i = 0; i < length; i++) if (predicate.test(at(i))) return false;
         return true;
     }
 
@@ -347,9 +304,7 @@ public final class Longs implements Iterable<Long> {
      */
     public <R> R reduce(final R init, final AccumulatorLongToR<R> reducer) {
         R acc = init;
-        for (int i = 0; i < length; i++) {
-            acc = reducer.reduce(acc, at(i));
-        }
+        for (int i = 0; i < length; i++) acc = reducer.reduce(acc, at(i));
         return acc;
     }
 
@@ -361,9 +316,8 @@ public final class Longs implements Iterable<Long> {
      */
     public <R> R reduce(final R init, final AccumulatorContextToR<R> reducer) {
         R acc = init;
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++)
             acc = reducer.reduce(acc, at(i), at(i + 1), at(i - 1), i, i == 0, i == length - 1);
-        }
         return acc;
     }
 
@@ -373,9 +327,7 @@ public final class Longs implements Iterable<Long> {
      */
     public long sum() {
         long sum = 0L;
-        for (int i = 0; i < length; i++) {
-            sum += at(i);
-        }
+        for (int i = 0; i < length; i++) sum += at(i);
         return sum;
     }
 
@@ -386,9 +338,7 @@ public final class Longs implements Iterable<Long> {
     public long prod() {
         if (isEmpty) return 0L;
         long prod = 1L;
-        for (int i = 0; i < length; i++) {
-            prod *= at(i);
-        }
+        for (int i = 0; i < length; i++) prod *= at(i);
         return prod;
     }
 
@@ -398,9 +348,7 @@ public final class Longs implements Iterable<Long> {
      */
     public long min() {
         long min = Long.MAX_VALUE;
-        for (int i = 0; i < length; i++) {
-            min = Math.min(min, at(i));
-        }
+        for (int i = 0; i < length; i++) min = Math.min(min, at(i));
         return min;
     }
 
@@ -410,9 +358,7 @@ public final class Longs implements Iterable<Long> {
      */
     public long max() {
         long max = Long.MIN_VALUE;
-        for (int i = 0; i < length; i++) {
-            max = Math.max(max, at(i));
-        }
+        for (int i = 0; i < length; i++) max = Math.max(max, at(i));
         return max;
     }
 
@@ -424,11 +370,15 @@ public final class Longs implements Iterable<Long> {
         Longs array = new Longs();
         for (int i = 0; i < length; i++) {
             final long value = at(i);
-            if (predicate.test(value)) {
-                array = array.addLast(value);
-            }
+            if (predicate.test(value)) array = array.addLast(value);
         }
         return array;
+    }
+
+    public long countWhere(final LongToBool predicate) {
+        long count = 0L;
+        for (int i = 0; i < length; i++) if (predicate.test(at(i))) count++;
+        return count;
     }
 
     /**
@@ -437,9 +387,7 @@ public final class Longs implements Iterable<Long> {
      */
     public Longs reversed() {
         final Longs arr = clone(1);
-        for (int i = 0; i < length; i++) {
-            arr.a[i] = at(length - i - 1);
-        }
+        for (int i = 0; i < length; i++) arr.a[i] = at(length - i - 1);
         return arr;
     }
 
@@ -534,9 +482,7 @@ public final class Longs implements Iterable<Long> {
      */
     public Longs first(final int n) {
         Longs arr = new Longs();
-        for (int i = 0; i < length && i < n; i++) {
-            arr = arr.addLast(at(i));
-        }
+        for (int i = 0; i < length && i < n; i++) arr = arr.addLast(at(i));
         return arr;
     }
 
@@ -546,9 +492,7 @@ public final class Longs implements Iterable<Long> {
      */
     public Longs last(final int n) {
         Longs arr = new Longs();
-        for (int i = Math.max(0, length - n); i < length; i++) {
-            arr = arr.addLast(at(i));
-        }
+        for (int i = Math.max(0, length - n); i < length; i++) arr = arr.addLast(at(i));
         return arr;
     }
 
@@ -558,9 +502,7 @@ public final class Longs implements Iterable<Long> {
      */
     public Longs skip(final int n) {
         Longs arr = new Longs();
-        for (int i = n; i < length; i++) {
-            arr = arr.addLast(at(i));
-        }
+        for (int i = n; i < length; i++) arr = arr.addLast(at(i));
         return arr;
     }
 
@@ -572,11 +514,8 @@ public final class Longs implements Iterable<Long> {
         Longs arr = new Longs();
         for (int i = 0; i < length; i++) {
             final long value = at(i);
-            if (predicate.test(value)) {
-                arr = arr.addLast(value);
-            } else {
-                break;
-            }
+            if (predicate.test(value)) arr = arr.addLast(value);
+            else break;
         }
         return arr;
     }
@@ -590,12 +529,8 @@ public final class Longs implements Iterable<Long> {
         boolean skip = true;
         for (int i = 0; i < length; i++) {
             final long value = at(i);
-            if (skip && !predicate.test(value)) {
-                skip = false;
-            }
-            if (!skip) {
-                arr = arr.addLast(value);
-            }
+            if (skip && !predicate.test(value)) skip = false;
+            if (!skip) arr = arr.addLast(value);
         }
         return arr;
     }
@@ -607,9 +542,7 @@ public final class Longs implements Iterable<Long> {
      */
     public Longs map(final LongToLong transform) {
         Longs arr = new Longs();
-        for (int i = 0; i < length; i++) {
-            arr = arr.addLast(transform.apply(at(i)));
-        }
+        for (int i = 0; i < length; i++) arr = arr.addLast(transform.apply(at(i)));
         return arr;
     }
 
@@ -619,9 +552,7 @@ public final class Longs implements Iterable<Long> {
      */
     public Longs mapWith(final Longs other, final LongLongToLong transform) {
         Longs arr = new Longs();
-        for (int i = 0; i < Math.min(length, other.length); i++) {
-            arr = arr.addLast(transform.apply(at(i), other.at(i)));
-        }
+        for (int i = 0; i < Math.min(length, other.length); i++) arr = arr.addLast(transform.apply(at(i), other.at(i)));
         return arr;
     }
 
@@ -631,11 +562,9 @@ public final class Longs implements Iterable<Long> {
      */
     public Longs prodWith(final Longs other, final LongLongToLong transform) {
         Longs arr = new Longs();
-        for (int i = 0; i < length; i++) {
-            for (int j = 0; j < other.length; j++) {
+        for (int i = 0; i < length; i++)
+            for (int j = 0; j < other.length; j++)
                 arr = arr.addLast(transform.apply(at(i), other.at(j)));
-            }
-        }
         return arr;
     }
 
@@ -645,11 +574,9 @@ public final class Longs implements Iterable<Long> {
      */
     public Longs prodUpperTriangleWith(final Longs other, final LongLongToLong transform) {
         Longs arr = new Longs();
-        for (int i = 0; i < length; i++) {
-            for (int j = i + 1; j < other.length; j++) {
+        for (int i = 0; i < length; i++)
+            for (int j = i + 1; j < other.length; j++)
                 arr = arr.addLast(transform.apply(at(i), other.at(j)));
-            }
-        }
         return arr;
     }
 
@@ -661,9 +588,7 @@ public final class Longs implements Iterable<Long> {
         Longs arr = new Longs();
         for (int i = 0; i < length; i++) {
             final Longs sub = transform.apply(at(i));
-            for (int j = 0; j < sub.length; j++) {
-                arr = arr.addLast(sub.at(j));
-            }
+            for (int j = 0; j < sub.length; j++) arr = arr.addLast(sub.at(j));
         }
         return arr;
     }
@@ -674,10 +599,7 @@ public final class Longs implements Iterable<Long> {
      * @complexity O(n)
      */
     public Longs each(final LongToVoid consumer) {
-        for (int i = 0; i < length; i++) {
-            final long value = at(i);
-            consumer.apply(value);
-        }
+        for (int i = 0; i < length; i++) consumer.apply(at(i));
         return this;
     }
 
@@ -709,9 +631,7 @@ public final class Longs implements Iterable<Long> {
     public String toString() {
         final StringBuilder builder = new StringBuilder();
         for (int i = 0; i < length; i++) {
-            if (i > 0) {
-                builder.append(' ');
-            }
+            if (i > 0) builder.append(' ');
             builder.append(at(i));
         }
         return builder.toString();
@@ -720,9 +640,7 @@ public final class Longs implements Iterable<Long> {
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof Longs that && that.length == this.length) {
-            for (int i = 0; i < length; i++) {
-                if (this.at(i) != that.at(i)) return false;
-            }
+            for (int i = 0; i < length; i++) if (this.at(i) != that.at(i)) return false;
             return true;
         }
         return false;
@@ -741,25 +659,19 @@ public final class Longs implements Iterable<Long> {
 
     public long[] toArray() {
         final long[] b = new long[length];
-        for (int i = 0; i < length; i++) {
-            b[i] = at(i);
-        }
+        for (int i = 0; i < length; i++) b[i] = at(i);
         return b;
     }
 
     public int[] toIntArray() {
         final int[] b = new int[length];
-        for (int i = 0; i < length; i++) {
-            b[i] = (int) at(i);
-        }
+        for (int i = 0; i < length; i++) b[i] = (int) at(i);
         return b;
     }
 
     public Set<Long> toSet() {
         final Set<Long> set = new HashSet<>();
-        for (int i = 0; i < length; i++) {
-            set.add(at(i));
-        }
+        for (int i = 0; i < length; i++) set.add(at(i));
         return set;
     }
 

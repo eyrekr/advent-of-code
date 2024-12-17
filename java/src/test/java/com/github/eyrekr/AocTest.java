@@ -4,6 +4,7 @@ import com.github.eyrekr.output.Out;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 public class AocTest {
@@ -23,27 +24,36 @@ public class AocTest {
     //region TESTS
     @Test
     void star1_sample() {
-        final var aoc = setup.constructor.aoc(setup.star1.sample.input);
-        Assertions.assertThat(aoc.star1()).isEqualTo(setup.star1.sample.output);
+        test(setup.star1.sample, Aoc::star1);
     }
 
     @Test
     void star1() {
-        final var aoc = setup.constructor.aoc(setup.star1.real.input);
-        Assertions.assertThat(aoc.star1()).isEqualTo(setup.star1.real.output);
+        test(setup.star1.real, Aoc::star1);
     }
 
     @Test
     void star2_sample() {
-        final var aoc = setup.constructor.aoc(setup.star2.sample.input);
-        Assertions.assertThat(aoc.star2()).isEqualTo(setup.star2.sample.output);
-
+        test(setup.star2.sample, Aoc::star2);
     }
 
     @Test
     void star2() {
-        final var aoc = setup.constructor.aoc(setup.star2.real.input);
-        Assertions.assertThat(aoc.star2()).isEqualTo(setup.star2.real.output);
+        test(setup.star2.real, Aoc::star2);
+    }
+
+    private void test(final Data data, final Function<Aoc, Long> star) {
+        final var t0 = System.nanoTime();
+        final var aoc = setup.constructor.aoc(data.input);
+        final var t1 = System.nanoTime();
+        final var output = star.apply(aoc);
+        final var t2 = System.nanoTime();
+        Out.print(
+                "@c%,dms@@ + @c%,dms@@ = @c%,dms@@",
+                (t1 - t0) / 1_000_000,
+                (t2 - t1) / 1_000_000,
+                (t2 - t0) / 1_000_000);
+        Assertions.assertThat(output).isEqualTo(data.output);
     }
     //endregion
 
