@@ -324,6 +324,10 @@ public final class Grid implements Iterable<Grid.It> {
                 case Down -> y < n - 1 ? Opt.of(grid.it(x, y + 1, direction)) : Opt.empty();
                 case Left -> x > 0 ? Opt.of(grid.it(x - 1, y, direction)) : Opt.empty();
                 case Right -> x < m - 1 ? Opt.of(grid.it(x + 1, y, direction)) : Opt.empty();
+                case UpLeft -> y > 0 && x > 0 ? Opt.of(grid.it(x - 1, y - 1, direction)) : Opt.empty();
+                case UpRight -> y > 0 && x < m - 1 ? Opt.of(grid.it(x + 1, y - 1, direction)) : Opt.empty();
+                case DownLeft -> y < n - 1 && x > 0 ? Opt.of(grid.it(x - 1, y + 1, direction)) : Opt.empty();
+                case DownRight -> y < n - 1 && x < m - 1 ? Opt.of(grid.it(x + 1, y + 1, direction)) : Opt.empty();
                 case None -> Opt.of(this);
             };
         }
@@ -358,6 +362,15 @@ public final class Grid implements Iterable<Grid.It> {
 
         public Seq<It> neighbours(final Predicate<It> predicate) {
             return neighbours().where(predicate);
+        }
+
+        public boolean checkAhead(final Direction direction, final String symbols) {
+            Opt<It> it = Opt.of(this);
+            for (final char symbol : symbols.toCharArray()) {
+                if (it.missing || it.value.ch != symbol) return false;
+                it = it.value.tryToGo(direction);
+            }
+            return true;
         }
 
         public It set(final char ch) {

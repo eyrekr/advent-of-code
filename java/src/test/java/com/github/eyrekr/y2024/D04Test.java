@@ -21,6 +21,6 @@ class D04Test extends AocTest {
         super(builderFor(D04Test.class)
                 .constructor(D04::new)
                 .sampleInput(sample)
-                .star1(18L, -1L));
+                .star1(18L, 2573L));
     }
 }

@@ -192,6 +192,10 @@ public final class Seq<E> implements Iterable<E> {
         return isEmpty ? Opt.empty() : predicate.test(value) ? Opt.of(value) : tail.firstWhere(predicate);
     }
 
+    public int countWhere(final Predicate<? super E> predicate) {
+        return isEmpty ? 0 : predicate.test(value) ? tail.countWhere(predicate) + 1 : tail.countWhere(predicate);
+    }
+
     public Seq<E> reverse() {
         return reduce(empty(), (acc, element) -> new Seq<>(element, acc));
     }
