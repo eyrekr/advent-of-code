@@ -404,6 +404,30 @@ public final class Arr<E> implements Iterable<E> {
     }
 
     /**
+     * @return Number of values that satisfy the predicate.
+     * @complexity O(n)
+     */
+    public long countWhere(final Predicate<? super E> predicate) {
+        long count = 0L;
+        for (int i = 0; i < length; i++) if (predicate.test(at(i))) count++;
+        return count;
+    }
+
+    /**
+     * @return Two new arrays, one with the value that satisfy the predicate and the other with values that don't.
+     * @complexity O(n)
+     */
+    public Partition<E> partitionBy(final Predicate<? super E> predicate) {
+        Arr<E> matching = new Arr<>(), rest = new Arr<>();
+        for (int i = 0; i < length; i++) {
+            final E value = at(i);
+            if (predicate.test(value)) matching = matching.addLast(value);
+            else rest = rest.addLast(value);
+        }
+        return new Partition<>(matching, rest);
+    }
+
+    /**
      * @return New array with the values in reversed order.
      * @complexity O(n)
      */
@@ -527,15 +551,23 @@ public final class Arr<E> implements Iterable<E> {
         return arr;
     }
 
-
     /**
      * @return New array with values transformed using the supplied function.
      * @complexity O(n)
      */
     public <R> Arr<R> map(final Function<? super E, ? extends R> transform) {
         Arr<R> arr = new Arr<>();
-        for (int i = 0; i < length; i++)
-            arr = arr.addLast(transform.apply(at(i)));
+        for (int i = 0; i < length; i++) arr = arr.addLast(transform.apply(at(i)));
+        return arr;
+    }
+
+    /**
+     * @return New array of longs with values transformed using the supplied function.
+     * @complexity O(n)
+     */
+    public Longs mapToLongs(final Function<? super E, Long> transform) {
+        Longs arr = Longs.empty();
+        for (int i = 0; i < length; i++) arr = arr.addLast(transform.apply(at(i)));
         return arr;
     }
 
@@ -545,8 +577,7 @@ public final class Arr<E> implements Iterable<E> {
      */
     public <F, R> Arr<R> mapWith(final Arr<F> other, final BiFunction<? super E, ? super F, ? extends R> transform) {
         Arr<R> arr = new Arr<>();
-        for (int i = 0; i < Math.min(length, other.length); i++)
-            arr = arr.addLast(transform.apply(at(i), other.at(i)));
+        for (int i = 0; i < Math.min(length, other.length); i++) arr = arr.addLast(transform.apply(at(i), other.at(i)));
         return arr;
     }
 
@@ -693,5 +724,8 @@ public final class Arr<E> implements Iterable<E> {
     @FunctionalInterface
     public interface ContextFunction<E, R> {
         R apply(E e, int i, boolean first, boolean last);
+    }
+
+    public record Partition<E>(Arr<E> matching, Arr<E> rest) {
     }
 }

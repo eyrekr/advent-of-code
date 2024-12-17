@@ -10,18 +10,19 @@ import java.util.Set;
 class D05 extends Aoc {
 
     final Set<Long> order;
-    final Arr<Longs> pages;
+    final Arr.Partition<Longs> pages;
 
     D05(final String input) {
         final var block = StringUtils.splitByWholeSeparator(input, "\n\n");
         order = Arr.ofLinesFromString(block[0]).map(D05::code).toSet();
-        pages = Arr.ofLinesFromString(block[1]).map(Longs::fromString);
+        pages = Arr.ofLinesFromString(block[1])
+                .map(Longs::fromString)
+                .partitionBy(numbers -> numbers.prodUpperTriangleWith(numbers, (a, b) -> code(b, a)).noneIs(order::contains));
     }
 
     @Override
     public long star1() {
-        return pages
-                .where(numbers -> numbers.prodUpperTriangleWith(numbers, (a, b) -> code(b, a)).noneIs(order::contains))
+        return pages.matching()
                 .map(numbers -> numbers.at(numbers.length / 2))
                 .reduce(0L, Long::sum);
     }

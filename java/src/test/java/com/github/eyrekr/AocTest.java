@@ -48,17 +48,41 @@ public class AocTest {
         final var t1 = System.nanoTime();
         final var output = star.apply(aoc);
         final var t2 = System.nanoTime();
-        Out.print(
-                "@c%,dms@@ + @c%,dms@@ = @c%,dms@@\n",
-                (t1 - t0) / 1_000_000,
-                (t2 - t1) / 1_000_000,
-                (t2 - t0) / 1_000_000);
+        if (data.output == output) {
+            Out.print(
+                    """
+                            @c%s@@ + @c%s@@ = @c%s@@
+                            solution: @g%,d@@                
+                            """,
+                    nanosToHumanReadableFormat(t1 - t0),
+                    nanosToHumanReadableFormat(t2 - t1),
+                    nanosToHumanReadableFormat(t2 - t0),
+                    output);
+        } else {
+            Out.print(
+                    """
+                            @c%s@@ + @c%s@@ = @c%s@@
+                            solution: @r%,d@@   expected: @g%,d@@                
+                            """,
+                    nanosToHumanReadableFormat(t1 - t0),
+                    nanosToHumanReadableFormat(t2 - t1),
+                    nanosToHumanReadableFormat(t2 - t0),
+                    output,
+                    data.output);
+        }
         Assertions.assertThat(output).isEqualTo(data.output);
     }
     //endregion
 
 
     //region STATIC HELPER METHODS
+    private String nanosToHumanReadableFormat(final long nanos) {
+        if (nanos / 1_000 == 0) return nanos + "ns";
+        if (nanos / 1_000_000 == 0) return (nanos / 1_000) + "µs";
+        if (nanos / 1_000_000_000 == 0) return (nanos / 1_000_000) + "ms";
+        return (nanos / 1_000_000_000) + "s";
+    }
+
     public static Builder builderFor(final Class<?> tClass) {
         return new Builder(tClass);
     }

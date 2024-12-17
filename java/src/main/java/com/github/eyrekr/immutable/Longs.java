@@ -375,10 +375,28 @@ public final class Longs implements Iterable<Long> {
         return array;
     }
 
+    /**
+     * @return Number of values that satisfy the predicate.
+     * @complexity O(n)
+     */
     public long countWhere(final LongToBool predicate) {
         long count = 0L;
         for (int i = 0; i < length; i++) if (predicate.test(at(i))) count++;
         return count;
+    }
+
+    /**
+     * @return Two new arrays, one with the value that satisfy the predicate and the other with values that don't.
+     * @complexity O(n)
+     */
+    public Partition partitionBy(final LongToBool predicate) {
+        Longs matching = new Longs(), rest = new Longs();
+        for (int i = 0; i < length; i++) {
+            final long value = at(i);
+            if (predicate.test(value)) matching = matching.addLast(value);
+            else rest = rest.addLast(value);
+        }
+        return new Partition(matching, rest);
     }
 
     /**
@@ -738,6 +756,9 @@ public final class Longs implements Iterable<Long> {
 
     public enum Order {
         Random, Ascending, Descending, Constant
+    }
+
+    public record Partition(Longs matching, Longs rest) {
     }
 
     private class It implements Iterator<Long> {
