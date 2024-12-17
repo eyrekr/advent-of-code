@@ -21,9 +21,8 @@ class D05 extends Aoc {
     @Override
     public long star1() {
         return pages
-                .where(numbers-> numbers.prodUpperTriangleWith(numbers, (a,b)->code(b,a)).noneIs(order::contains))
-                .print("\n")
-                .map(numbers -> numbers.at(numbers.length/2))
+                .where(numbers -> numbers.prodUpperTriangleWith(numbers, (a, b) -> code(b, a)).noneIs(order::contains))
+                .map(numbers -> numbers.at(numbers.length / 2))
                 .reduce(0L, Long::sum);
     }
 
