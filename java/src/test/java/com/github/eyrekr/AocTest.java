@@ -49,7 +49,7 @@ public class AocTest {
         final var output = star.apply(aoc);
         final var t2 = System.nanoTime();
         Out.print(
-                "@c%,dms@@ + @c%,dms@@ = @c%,dms@@",
+                "@c%,dms@@ + @c%,dms@@ = @c%,dms@@\n",
                 (t1 - t0) / 1_000_000,
                 (t2 - t1) / 1_000_000,
                 (t2 - t0) / 1_000_000);
