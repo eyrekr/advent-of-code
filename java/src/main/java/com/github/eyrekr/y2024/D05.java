@@ -27,7 +27,21 @@ class D05 extends Aoc {
                 .reduce(0L, Long::sum);
     }
 
-    static long code(final String line) { // 75|47
+    @Override
+    public long star2() {
+        return pages.rest()
+                .map(this::reorder)
+                .map(numbers -> numbers[numbers.length / 2])
+                .reduce(0L, Long::sum);
+    }
+
+    long[] reorder(final Longs longs) {
+        final var arr = longs.toArray();
+
+        return arr;
+    }
+
+    static long code(final String line) {
         final var number = StringUtils.split(line, '|');
         return code(Long.parseLong(number[0]), Long.parseLong(number[1]));
     }

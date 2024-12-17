@@ -461,7 +461,7 @@ public final class Longs implements Iterable<Long> {
         return arr;
     }
 
-    public static void quicksort(final long[] a, final int begin, final int end, final LongLongToInt comparator) {
+    private static void quicksort(final long[] a, final int begin, final int end, final LongLongToInt comparator) {
         final long pivot = a[begin + end / 2];
         int l = begin, r = end;
         do {
