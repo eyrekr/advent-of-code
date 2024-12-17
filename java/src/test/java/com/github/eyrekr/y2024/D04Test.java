@@ -4,7 +4,7 @@ import com.github.eyrekr.AocTest;
 
 class D04Test extends AocTest {
 
-    static final String sample = """
+    static final String sample1 = """
             MMMSXXMASM
             MSAMXMSMSA
             AMXSXMAAMM
@@ -16,11 +16,23 @@ class D04Test extends AocTest {
             MAMMMXMMMM
             MXMXAXMASX
             """;
+    static final String sample2 = """
+            .M.S......
+            ..A..MSMS.
+            .M.S.MAA..
+            ..A.ASMSM.
+            .M.S.M....
+            ..........
+            S.S.S.S.S.
+            .A.A.A.A..
+            M.M.M.M.M.
+            ..........
+            """;
 
     D04Test() {
         super(builderFor(D04Test.class)
                 .constructor(D04::new)
-                .sampleInput(sample)
-                .star1(18L, 2573L));
+                .star1(sample1, 18L, 2573L)
+                .star2(sample2, 9L, 1850L));
     }
 }
