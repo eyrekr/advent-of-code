@@ -31,14 +31,16 @@ class D05 extends Aoc {
     public long star2() {
         return pages.rest()
                 .map(this::reorder)
-                .map(numbers -> numbers[numbers.length / 2])
+                .map(numbers -> numbers.at(numbers.length / 2))
                 .reduce(0L, Long::sum);
     }
 
-    long[] reorder(final Longs longs) {
-        final var arr = longs.toArray();
-
-        return arr;
+    Longs reorder(final Longs longs) {
+        return longs.sortedBy((a,b) -> {
+            if (order.contains(code(a, b))) return -1; // a < b
+            if (order.contains(code(b, a))) return 1;  // b < a
+            return 0;
+        });
     }
 
     static long code(final String line) {

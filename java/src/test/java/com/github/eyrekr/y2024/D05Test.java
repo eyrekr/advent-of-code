@@ -40,6 +40,6 @@ class D05Test extends AocTest {
                 .constructor(D05::new)
                 .sampleInput(sample)
                 .star1(143L, 6498L)
-                .star2(123L, -1L));
+                .star2(123L, 5017L));
     }
 }
