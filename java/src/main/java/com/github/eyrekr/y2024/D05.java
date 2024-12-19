@@ -23,16 +23,16 @@ class D05 extends Aoc {
     @Override
     public long star1() {
         return pages.matching()
-                .map(numbers -> numbers.at(numbers.length / 2))
-                .reduce(0L, Long::sum);
+                .mapToLongs(numbers -> numbers.at(numbers.length / 2))
+                .sum();
     }
 
     @Override
     public long star2() {
         return pages.rest()
                 .map(this::reorder)
-                .map(numbers -> numbers.at(numbers.length / 2))
-                .reduce(0L, Long::sum);
+                .mapToLongs(numbers -> numbers.at(numbers.length / 2))
+                .sum();
     }
 
     Longs reorder(final Longs longs) {
