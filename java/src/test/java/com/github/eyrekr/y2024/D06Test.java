@@ -22,6 +22,6 @@ class D06Test extends AocTest {
                 .constructor(D06::new)
                 .sampleInput(sample)
                 .star1(41L, 5444L)
-                .star2(-1L, -1L));
+                .star2(6L, -1L));
     }
 }
