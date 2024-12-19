@@ -23,7 +23,7 @@ class D04 extends Aoc {
 
         return grid.reduce(
                 0L,
-                (sum, it) -> sum + directions.countWhere(direction -> it.checkAhead(direction, "XMAS")));
+                (sum, it) -> sum + directions.countWhere(direction -> it.checkThisAndAhead(direction, "XMAS")));
     }
 
     @Override

@@ -13,7 +13,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public final class Grid implements Iterable<Grid.It> {
+
     public static final char C0 = '\0';
+    public static final char WALL = '#';
 
     public final int m;
     public final int n;
@@ -64,7 +66,7 @@ public final class Grid implements Iterable<Grid.It> {
     }
 
     public It it(final int x, final int y, final Direction direction) {
-        if (x < 0 || y < 0 || x >= m || y >= n) throw new IndexOutOfBoundsException();
+        if (x < 0 || y < 0 || x >= m || y >= n) return null;
         final char ch = a[x][y];
         final char[] ch4 = new char[]{at(x, y - 1), at(x - 1, y), at(x + 1, y), at(x, y + 1)};
         final char[] ch8 = new char[]{at(x - 1, y - 1), at(x, y - 1), at(x + 1, y - 1), at(x - 1, y), at(x + 1, y), at(x - 1, y + 1), at(x, y + 1), at(x + 1, y + 1)};
@@ -74,7 +76,7 @@ public final class Grid implements Iterable<Grid.It> {
                 y * m + x, x, y, m, n, ch, d[x][y], state[x][y],
                 ch4, ch8, digit, direction,
                 x == 0 && y == 0, x == m - 1 && y == n - 1, x == 0, x == m - 1,
-                ch == '#');
+                ch == WALL);
     }
 
     public Grid repeat(final int factor) {
@@ -123,13 +125,25 @@ public final class Grid implements Iterable<Grid.It> {
         return null;
     }
 
+    public long count(final Predicate<It> predicate) {
+        return reduce(0L, (count, it) -> predicate.test(it) ? count + 1 : count);
+    }
+
+    public long count(final char ch) {
+        long count = 0L;
+        for (int y = 0; y < n; y++)
+            for (int x = 0; x < m; x++)
+                if (a[x][y] == ch) count++;
+        return count;
+    }
+
     public Seq<It> collect(final Predicate<It> predicate) {
         Seq<It> seq = Seq.empty();
         for (int i = m * n - 1; i >= 0; i--) {
             final It it = it(i);
             if (predicate.test(it)) seq = seq.addFirst(it);
         }
-        return seq.reverse();
+        return seq.reverse(); // FIXME Why reverse() when we walk the grid from the end?
     }
 
     public Seq<It> collect(final char ch) {
@@ -364,11 +378,28 @@ public final class Grid implements Iterable<Grid.It> {
             return neighbours().where(predicate);
         }
 
+        public char lookAhead(final Direction direction) {
+            return neighbours8[direction.i8];
+        }
+
+        public boolean checkAhead(final Direction direction, final char ch) {
+            return neighbours8[direction.i8] == ch;
+        }
+
         public boolean checkAhead(final Direction direction, final String symbols) {
-            Opt<It> it = Opt.of(this);
+            It it = go(direction);
             for (final char symbol : symbols.toCharArray()) {
-                if (it.missing || it.value.ch != symbol) return false;
-                it = it.value.tryToGo(direction);
+                if (it == null || it.ch != symbol) return false;
+                it = it.go(direction);
+            }
+            return true;
+        }
+
+        public boolean checkThisAndAhead(final Direction direction, final String symbols) {
+            It it = this;
+            for (final char symbol : symbols.toCharArray()) {
+                if (it == null || it.ch != symbol) return false;
+                it = it.go(direction);
             }
             return true;
         }

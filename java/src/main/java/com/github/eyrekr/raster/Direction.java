@@ -1,25 +1,27 @@
 package com.github.eyrekr.raster;
 
 public enum Direction {
-    None(0, 0, '×'),
+    None(0, 0, '×', -1),
 
-    Up(0, -1, '↑'),
-    Down(0, +1, '↓'),
-    Left(-1, 0, '←'),
-    Right(+1, 0, '→'),
+    Up(0, -1, '↑', 1),
+    Down(0, +1, '↓', 6),
+    Left(-1, 0, '←', 3),
+    Right(+1, 0, '→', 4),
 
-    UpLeft(-1, -1, '↖'),
-    UpRight(+1, -1, '↗'),
-    DownLeft(-1, +1, '↙'),
-    DownRight(+1, +1, '↘');
+    UpLeft(-1, -1, '↖', 0),
+    UpRight(+1, -1, '↗', 2),
+    DownLeft(-1, +1, '↙', 5),
+    DownRight(+1, +1, '↘', 7);
 
     public final int dx, dy;
     public final char ch;
+    public final int i8;
 
-    Direction(int dx, int dy, char ch) {
+    Direction(final int dx, final int dy, final char ch, final int i8) {
         this.dx = dx;
         this.dy = dy;
         this.ch = ch;
+        this.i8 = i8;
     }
 
     public boolean isOpposite(final Direction direction) {
@@ -48,6 +50,34 @@ public enum Direction {
             case DownLeft -> UpRight;
             case DownRight -> UpLeft;
 
+        };
+    }
+
+    public Direction turn90DegreesRight() {
+        return switch (this) {
+            case None -> None;
+            case Up -> Right;
+            case Down -> Left;
+            case Left -> Up;
+            case Right -> Down;
+            case UpLeft -> UpRight;
+            case UpRight -> DownRight;
+            case DownLeft -> UpLeft;
+            case DownRight -> DownLeft;
+        };
+    }
+
+    public Direction turn90DegreesLeft() {
+        return switch (this) {
+            case None -> None;
+            case Up -> Left;
+            case Down -> Right;
+            case Left -> Down;
+            case Right -> Up;
+            case UpLeft -> DownLeft;
+            case UpRight -> UpLeft;
+            case DownLeft -> DownRight;
+            case DownRight -> UpRight;
         };
     }
 
