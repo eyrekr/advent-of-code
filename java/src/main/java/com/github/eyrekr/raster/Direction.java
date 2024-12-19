@@ -1,27 +1,29 @@
 package com.github.eyrekr.raster;
 
 public enum Direction {
-    None(0, 0, '×', -1),
+    None(0, 0, '×', -1, 1),
 
-    Up(0, -1, '↑', 1),
-    Down(0, +1, '↓', 6),
-    Left(-1, 0, '←', 3),
-    Right(+1, 0, '→', 4),
+    Up(0, -1, '↑', 1, 1 << 1),
+    Down(0, +1, '↓', 6, 1 << 2),
+    Left(-1, 0, '←', 3, 1 << 3),
+    Right(+1, 0, '→', 4, 1 << 4),
 
-    UpLeft(-1, -1, '↖', 0),
-    UpRight(+1, -1, '↗', 2),
-    DownLeft(-1, +1, '↙', 5),
-    DownRight(+1, +1, '↘', 7);
+    UpLeft(-1, -1, '↖', 0, 1 << 5),
+    UpRight(+1, -1, '↗', 2, 1 << 6),
+    DownLeft(-1, +1, '↙', 5, 1 << 7),
+    DownRight(+1, +1, '↘', 7, 1 << 8);
 
     public final int dx, dy;
     public final char ch;
-    public final int i8;
+    public final int i8; // index in the neighbour in neighbours8 in this direction
+    public final int flag;
 
-    Direction(final int dx, final int dy, final char ch, final int i8) {
+    Direction(final int dx, final int dy, final char ch, final int i8, final int flag) {
         this.dx = dx;
         this.dy = dy;
         this.ch = ch;
         this.i8 = i8;
+        this.flag = flag;
     }
 
     public boolean isOpposite(final Direction direction) {
