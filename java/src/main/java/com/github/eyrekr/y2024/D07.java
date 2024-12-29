@@ -15,7 +15,15 @@ class D07 extends Aoc {
     @Override
     public long star1() {
         return equations
-                .where(Equation::solvable)
+                .where(equation -> solve1(equation.value, equation.numbers.peek(), equation.numbers.removeFirst()))
+                .mapToLongs(Equation::value)
+                .sum();
+    }
+
+    @Override
+    public long star2() {
+        return equations
+                .where(equation -> solve2(equation.value, equation.numbers.peek(), equation.numbers.removeFirst()))
                 .mapToLongs(Equation::value)
                 .sum();
     }
@@ -25,17 +33,34 @@ class D07 extends Aoc {
             final var longs = Longs.fromString(line);
             return new Equation(longs.peek(), longs.removeFirst());
         }
-
-        boolean solvable() {
-            return solve(value, numbers.peek(), numbers.removeFirst());
-        }
     }
 
-    private static boolean solve(final long expected, final long actual, final Longs numbers) {
-        if (numbers.isEmpty) return expected == actual;
-        if (expected < actual) return false;
+    static boolean solve1(final long expected, final long accumulator, final Longs numbers) {
+        if (numbers.isEmpty) return expected == accumulator;
+        if (expected < accumulator) return false;
+
         final var head = numbers.peek();
         final var rest = numbers.removeFirst();
-        return solve(expected, actual * head, rest) || solve(expected, actual + head, rest);
+        return solve1(expected, accumulator * head, rest) || solve1(expected, accumulator + head, rest);
+    }
+
+    static boolean solve2(final long expected, final long accumulator, final Longs numbers) {
+        if (numbers.isEmpty) return expected == accumulator;
+        if (expected < accumulator) return false;
+
+        final var head = numbers.peek();
+        final var rest = numbers.removeFirst();
+        return solve2(expected, accumulator * head, rest)
+                || solve2(expected, accumulator + head, rest)
+                || solve2(expected, concat(accumulator, head), rest);
+    }
+
+    static long concat(final long a, final long b) { // 17|520 -> 17520
+        long multiplier = 1, remainder = b >= 0 ? b : -b;
+        while (remainder > 0) {
+            multiplier *= 10;
+            remainder /= 10;
+        }
+        return a * multiplier + b;
     }
 }

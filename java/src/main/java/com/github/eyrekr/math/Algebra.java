@@ -34,5 +34,11 @@ public final class Algebra {
     public static long sgn(final long l) {
         return Long.compare(l, 0);
     }
+
+    public static long log2(final long l) {
+        long log2 = 0;
+        while ((l >> log2) != 0) log2++;
+        return log2;
+    }
     //endregion
 }
