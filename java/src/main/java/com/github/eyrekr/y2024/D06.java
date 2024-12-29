@@ -10,7 +10,7 @@ class D06 extends Aoc {
 
     interface Symbol {
         char Up = '^';
-        char Track = 'X';
+        char Mark = 'X';
         char Wall = '#';
         char Empty = '.';
         char Obstacle = 'O';
@@ -21,57 +21,56 @@ class D06 extends Aoc {
 
     D06(final String input) {
         this.grid = Grid2.fromString(input);
-        guard = grid.start().scanUntil(it -> it.is(Symbol.Up)).turn(Direction.Up);
+        guard = grid.scan(it -> it.is(Symbol.Up)).set(Direction.Up).it();
     }
 
     @Override
     public long star1() {
         guard.duplicate().goWhile(it -> {
-            if (it.outside) return false;
+            if (it.outside()) return false;
             while (it.la(Symbol.Wall)) it.turnRight();
-            it.set(Symbol.Track);
+            it.set(Symbol.Mark);
             return true;
         });
-        return grid.start().count(it -> it.is(Symbol.Track));
+        return grid.scan(it -> it.is(Symbol.Mark)).count();
     }
 
     @Override
     public long star2() {
         guard.duplicate().goWhile(it -> {
-            if (it.outside) return false;
+            if (it.outside()) return false;
             while (it.la(Symbol.Wall)) it.turnRight();
-            if (it.x != guard.x || it.y != guard.y) it.set(Symbol.Track);
+            if (it.x != guard.x || it.y != guard.y) it.set(Symbol.Mark);
             return true;
         });
 
-        final var path = grid.start().collect(it -> it.is(Symbol.Track));
+        final var guardPath = grid.scan(it -> it.is(Symbol.Mark)).collect();
 
-        for (final var obstacle : path) {
+        for (final var obstacle : guardPath) {
             obstacle.set(Symbol.Wall);
 
             final var visited = new HashSet<Location>();
-            final var end = guard.duplicate().goWhile(it -> {
-                if (it.outside) return false;
+            final var pathEnded = guard.duplicate().goWhile(it -> {
+                if (it.outside()) return false;
                 while (it.la(Symbol.Wall)) it.turnRight();
 
-                final var location = Location.from(it);
+                final var location = new Location(it);
                 if (visited.contains(location)) return false;
                 visited.add(location);
 
                 return true;
             });
 
-            if (end.inside) obstacle.set(Symbol.Obstacle);
+            if (pathEnded.inside()) obstacle.set(Symbol.Obstacle);
             else obstacle.set(Symbol.Empty);
         }
 
-        return grid.start().count(it -> it.is(Symbol.Obstacle));
+        return grid.scan(it -> it.is(Symbol.Obstacle)).count();
     }
 
-
     record Location(int x, int y, Direction direction) {
-        static Location from(final Grid2.It it) {
-            return new Location(it.x, it.y, it.direction);
+        Location(final Grid2.It it) {
+            this(it.x, it.y, it.direction);
         }
     }
 }

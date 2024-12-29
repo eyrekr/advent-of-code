@@ -2,9 +2,11 @@ package com.github.eyrekr.mutable;
 
 import com.github.eyrekr.output.Out;
 import com.github.eyrekr.raster.Direction;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class Grid2 {
@@ -25,18 +27,18 @@ public class Grid2 {
         this.state = new State[m][n];
     }
 
-    private Grid2(final Grid2 source) {
-        this.m = source.m;
-        this.n = source.n;
+    private Grid2(final Grid2 grid) {
+        this.m = grid.m;
+        this.n = grid.n;
         this.a = new char[m][n];
         this.d = new long[m][n];
         this.state = new State[m][n];
 
         for (int y = 0; y < n; y++)
             for (int x = 0; x < m; x++) {
-                a[x][y] = source.a[x][y];
-                d[x][y] = source.d[x][y];
-                state[x][y] = source.state[x][y];
+                a[x][y] = grid.a[x][y];
+                d[x][y] = grid.d[x][y];
+                state[x][y] = grid.state[x][y];
             }
     }
 
@@ -58,20 +60,28 @@ public class Grid2 {
         return new Grid2(this);
     }
 
-    public char at(int x, int y) {
+    public char at(final int x, final int y) {
         return x >= 0 && x < m && y >= 0 && y < n ? a[x][y] : VOID;
     }
 
-    public It it(int x, int y) {
-        return new It(x, y);
+    public It it() {
+        return new It(0, 0, Direction.Right);
     }
 
-    public It start() {
-        return new It(0, 0).turn(Direction.RightDown);
+    public It it(final int x, final int y, final Direction direction) {
+        return new It(x, y, direction);
     }
 
-    public It center() {
-        return new It(m / 2, n / 2);
+    public Sc scan() {
+        return new Sc(0, 0, Direction.RightDown, unused -> true);
+    }
+
+    public Sc scan(final Predicate<Sc> predicate) {
+        return new Sc(0, 0, Direction.RightDown, predicate);
+    }
+
+    public Sc scan(final int x, final int y, final Direction direction, final Predicate<Sc> predicate) {
+        return new Sc(x, y, direction, predicate);
     }
 
     public Grid2 print() {
@@ -84,54 +94,173 @@ public class Grid2 {
         return this;
     }
 
-    public final class It {
+    public final class Sc {
+
         public int x;
         public int y;
-        public Direction direction = Direction.None;
-        public boolean inside;
-        public boolean outside;
-        public int i; // index
+        public Direction direction;
+        public Predicate<Sc> predicate;
 
-        private It(final int x, final int y) {
-            goTo(x, y);
+        private Sc(final int x, final int y, final Direction direction, final Predicate<Sc> predicate) {
+            this.x = x;
+            this.y = y;
+            this.direction = direction;
+            this.predicate = predicate;
+            first();
+        }
+
+        private Sc(final Sc other) {
+            this.x = other.x;
+            this.y = other.y;
+            this.direction = other.direction;
+            this.predicate = other.predicate;
+            first();
+        }
+
+        public Sc first() {
+            if (!predicate.test(this)) next();
+            return this;
+        }
+
+        public It it() {
+            return new It(x, y, direction);
+        }
+
+        public Sc duplicate() {
+            return new Sc(this);
+        }
+
+        public boolean inside() {
+            return x >= 0 && x < m && y >= 0 && y < n;
+        }
+
+        public boolean outside() {
+            return !inside();
+        }
+
+        public char symbol() {
+            return inside() ? a[x][y] : VOID;
+        }
+
+        public boolean is(final char ch) {
+            return inside() && a[x][y] == ch;
+        }
+
+        public boolean isOneOf(final char... chars) {
+            return inside() && ArrayUtils.contains(chars, a[x][y]);
+        }
+
+        public boolean is(final long d) {
+            return inside() && Grid2.this.d[x][y] == d;
+        }
+
+        public boolean is(final State state) {
+            return inside() && Grid2.this.state[x][y] == state;
+        }
+
+        public Sc set(final char ch) {
+            if (inside()) Grid2.this.a[x][y] = ch;
+            return this;
+        }
+
+        public Sc set(final long d) {
+            if (inside()) Grid2.this.d[x][y] = d;
+            return this;
+        }
+
+        public Sc set(final State state) {
+            if (inside()) Grid2.this.state[x][y] = state;
+            return this;
+        }
+
+        public Sc set(final Direction direction) {
+            this.direction = direction;
+            return this;
+        }
+
+        public Sc to(final int x, final int y) {
+            this.x = x;
+            this.y = y;
+            return this;
+        }
+
+        public Sc next() {
+            do {
+                final Sc next = switch (direction) {
+                    case Right, RightDown, RightUp -> x < m - 1 ? to(x + direction.dx, y) : to(0, y + direction.dy);
+                    case Left, LeftDown, LeftUp -> x > 0 ? to(x + direction.dx, y) : to(m - 1, y + direction.dy);
+                    case Up, UpLeft, UpRight -> y > 0 ? to(x, y + direction.dy) : to(x + direction.dx, n - 1);
+                    case Down, DownLeft, DownRight -> y < n - 1 ? to(x, y + direction.dy) : to(x + direction.dx, 0);
+                    case None -> throw new IllegalStateException("no direction");
+                };
+            } while (inside() && !predicate.test(this));
+            return this;
+        }
+
+        public Sc each(final Consumer<Sc> consumer) {
+            for (first(); inside(); next()) consumer.accept(this);
+            return this;
+        }
+
+        public <R> R reduce(final R initialValue, final BiFunction<R, Sc, R> reducer) {
+            R value = initialValue;
+            for (first(); inside(); next()) value = reducer.apply(value, this);
+            return value;
+        }
+
+        public Arr<Sc> collect() {
+            final Arr<Sc> array = Arr.empty();
+            for (first(); inside(); next()) array.addLast(duplicate());
+            return array;
+        }
+
+        public long count() {
+            long value = 0L;
+            for (first(); inside(); next()) value++;
+            return value;
+        }
+    }
+
+    public final class It {
+
+        public int x;
+        public int y;
+        public Direction direction;
+
+        private It(final int x, final int y, final Direction direction) {
+            this.x = x;
+            this.y = y;
+            this.direction = direction;
         }
 
         private It(final It it) {
             this.x = it.x;
             this.y = it.y;
             this.direction = it.direction;
-            this.inside = it.inside;
-            this.outside = it.outside;
-            this.i = it.i;
         }
 
         public It duplicate() {
             return new It(this);
         }
 
-        public It goTo(final int x, final int y) {
-            this.x = x;
-            this.y = y;
-            this.inside = x >= 0 && x < m && y >= 0 && y < n;
-            this.outside = !inside;
-            this.i = y * m + x;
-            return this;
+        public boolean inside() {
+            return x >= 0 && x < m && y >= 0 && y < n;
         }
 
-        public char symbol() {
-            return at(x, y);
+        public boolean outside() {
+            return !inside();
         }
 
         public boolean is(final char ch) {
-            return inside && a[x][y] == ch;
+            return inside() && Grid2.this.a[x][y] == ch;
         }
 
         public boolean is(final long d) {
-            return inside && Grid2.this.d[x][y] == d;
+            return inside() && Grid2.this.d[x][y] == d;
         }
 
         public boolean is(final State state) {
-            return inside && Grid2.this.state[x][y] == state;
+            return inside() && Grid2.this.state[x][y] == state;
         }
 
         public char la() {
@@ -146,9 +275,35 @@ public class Grid2 {
             return at(x + direction.dx, y + direction.dy);
         }
 
+        public It set(final char ch) {
+            if (inside()) Grid2.this.a[x][y] = ch;
+            return this;
+        }
+
+        public It set(final long d) {
+            if (inside()) Grid2.this.d[x][y] = d;
+            return this;
+        }
+
+        public It set(final State state) {
+            if (inside()) Grid2.this.state[x][y] = state;
+            return this;
+        }
+
+        public It set(final Direction direction) {
+            this.direction = direction;
+            return this;
+        }
+
+        public It to(final int x, final int y) {
+            this.x = x;
+            this.y = y;
+            return this;
+        }
+
         public It go() {
             if (direction == Direction.None) throw new IllegalStateException("no direction");
-            return goTo(x + direction.dx, y + direction.dy);
+            return to(x + direction.dx, y + direction.dy);
         }
 
         public It goWhile(final Predicate<It> condition) {
@@ -161,74 +316,13 @@ public class Grid2 {
             return this;
         }
 
-        public It scan() {
-            return switch (direction) {
-                case Right, RightUp, RightDown -> x < m - 1 ? goTo(x + direction.dx, y) : goTo(0, y + direction.dy);
-                case Left, LeftUp, LeftDown -> x > 0 ? goTo(x + direction.dx, y) : goTo(m - 1, y + direction.dy);
-                case Up, UpLeft, UpRight -> y > 0 ? goTo(x, y + direction.dy) : goTo(x + direction.dx, n - 1);
-                case Down, DownLeft, DownRight -> y < n - 1 ? goTo(x, y + direction.dy) : goTo(x + direction.dx, 0);
-                case None -> throw new IllegalStateException("no direction");
-            };
-        }
-
-        public It scanWhile(final Predicate<It> condition) {
-            while (condition.test(this)) scan();
-            return this;
-        }
-
-        public It scanUntil(final Predicate<It> condition) {
-            while (!condition.test(this)) scan();
-            return this;
-        }
-
-        public <R> R reduce(final R initialValue, final BiFunction<R, It, R> reducer) {
-            R value = initialValue;
-            while (inside) {
-                value = reducer.apply(value, this);
-                scan();
-            }
-            return value;
-        }
-
-        public Arr<It> collect(final Predicate<It> condition) {
+        public Arr<It> collectWhile(final Predicate<It> condition) {
             final Arr<It> array = Arr.empty();
-            while (inside) {
-                if (condition.test(this)) array.addLast(duplicate());
-                scan();
+            while (condition.test(this)) {
+                array.addLast(duplicate());
+                go();
             }
             return array;
-        }
-
-        public long count(final Predicate<It> condition) {
-            long value = 0L;
-            while (inside) {
-                if (condition.test(this)) value++;
-                scan();
-            }
-            return value;
-        }
-
-        public It set(final char ch) {
-            if (outside) return this;
-            Grid2.this.a[x][y] = ch;
-            return this;
-        }
-
-        public It set(final long d) {
-            if (outside) return this;
-            Grid2.this.d[x][y] = d;
-            return this;
-        }
-
-        public It set(final State state) {
-            if (outside) return this;
-            Grid2.this.state[x][y] = state;
-            return this;
-        }
-
-        public It turn(final Direction direction) {
-            this.direction = direction;
-            return this;
         }
 
         public It turnRight() {
