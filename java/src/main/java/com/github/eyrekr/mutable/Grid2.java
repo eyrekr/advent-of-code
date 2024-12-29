@@ -190,6 +190,15 @@ public class Grid2 {
             return value;
         }
 
+        public Arr<It> collect(final Predicate<It> condition) {
+            final Arr<It> array = Arr.empty();
+            while (inside) {
+                if (condition.test(this)) array.addLast(duplicate());
+                scan();
+            }
+            return array;
+        }
+
         public long count(final Predicate<It> condition) {
             long value = 0L;
             while (inside) {

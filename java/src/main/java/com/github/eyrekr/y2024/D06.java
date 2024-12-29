@@ -1,7 +1,6 @@
 package com.github.eyrekr.y2024;
 
 import com.github.eyrekr.Aoc;
-import com.github.eyrekr.mutable.Arr;
 import com.github.eyrekr.mutable.Grid2;
 import com.github.eyrekr.raster.Direction;
 
@@ -38,13 +37,15 @@ class D06 extends Aoc {
 
     @Override
     public long star2() {
-        star1();
+        guard.duplicate().goWhile(it -> {
+            if (it.outside) return false;
+            while (it.la(Symbol.Wall)) it.turnRight();
+            if (it.x != guard.x || it.y != guard.y) it.set(Symbol.Track);
+            return true;
+        });
 
-        final var path = grid.start().reduce(
-                Arr.<Grid2.It>empty(),
-                (arr, it) -> it.is(Symbol.Track) ? arr.addLast(it.duplicate()) : arr);
+        final var path = grid.start().collect(it -> it.is(Symbol.Track));
 
-        long result = 0;
         for (final var obstacle : path) {
             obstacle.set(Symbol.Wall);
 
@@ -60,12 +61,11 @@ class D06 extends Aoc {
                 return true;
             });
 
-            if (end.inside) result++;
-
-            obstacle.set(Symbol.Empty);
+            if (end.inside) obstacle.set(Symbol.Obstacle);
+            else obstacle.set(Symbol.Empty);
         }
 
-        return result;
+        return grid.start().count(it -> it.is(Symbol.Obstacle));
     }
 
 
