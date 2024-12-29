@@ -2,7 +2,7 @@ package com.github.eyrekr.y2022;
 
 import com.github.eyrekr.mutable.Grid;
 import com.github.eyrekr.mutable.Grid.It;
-import com.github.eyrekr.mutable.Grid.State;
+import com.github.eyrekr.mutable.State;
 import com.github.eyrekr.raster.Direction;
 
 public class D08 {

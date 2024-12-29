@@ -4,7 +4,7 @@ import com.github.eyrekr.graph.Gr;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.mutable.Grid;
 import com.github.eyrekr.mutable.Grid.It;
-import com.github.eyrekr.mutable.Grid.State;
+import com.github.eyrekr.mutable.State;
 
 /**
  * https://adventofcode.com/2023/day/23

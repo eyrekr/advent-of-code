@@ -1,7 +1,7 @@
 package com.github.eyrekr.y2023;
 
 import com.github.eyrekr.mutable.Grid;
-import com.github.eyrekr.mutable.Grid.State;
+import com.github.eyrekr.mutable.State;
 
 import java.util.HashSet;
 import java.util.Set;

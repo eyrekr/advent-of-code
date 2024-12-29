@@ -338,10 +338,11 @@ public final class Grid implements Iterable<Grid.It> {
                 case Down -> y < n - 1 ? Opt.of(grid.it(x, y + 1, direction)) : Opt.empty();
                 case Left -> x > 0 ? Opt.of(grid.it(x - 1, y, direction)) : Opt.empty();
                 case Right -> x < m - 1 ? Opt.of(grid.it(x + 1, y, direction)) : Opt.empty();
-                case UpLeft -> y > 0 && x > 0 ? Opt.of(grid.it(x - 1, y - 1, direction)) : Opt.empty();
-                case UpRight -> y > 0 && x < m - 1 ? Opt.of(grid.it(x + 1, y - 1, direction)) : Opt.empty();
-                case DownLeft -> y < n - 1 && x > 0 ? Opt.of(grid.it(x - 1, y + 1, direction)) : Opt.empty();
-                case DownRight -> y < n - 1 && x < m - 1 ? Opt.of(grid.it(x + 1, y + 1, direction)) : Opt.empty();
+                case UpLeft, LeftUp -> y > 0 && x > 0 ? Opt.of(grid.it(x - 1, y - 1, direction)) : Opt.empty();
+                case UpRight, RightUp -> y > 0 && x < m - 1 ? Opt.of(grid.it(x + 1, y - 1, direction)) : Opt.empty();
+                case DownLeft, LeftDown -> y < n - 1 && x > 0 ? Opt.of(grid.it(x - 1, y + 1, direction)) : Opt.empty();
+                case DownRight, RightDown ->
+                        y < n - 1 && x < m - 1 ? Opt.of(grid.it(x + 1, y + 1, direction)) : Opt.empty();
                 case None -> Opt.of(this);
             };
         }
@@ -429,7 +430,4 @@ public final class Grid implements Iterable<Grid.It> {
             return Objects.hash(grid, i);
         }
     }
-
-    public enum State {Unseen, Open, Closed}
-
 }

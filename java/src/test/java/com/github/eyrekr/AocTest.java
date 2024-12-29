@@ -2,11 +2,15 @@ package com.github.eyrekr;
 
 import com.github.eyrekr.output.Out;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AocTest {
 
     private static final Pattern pattern = Pattern.compile("y(\\d{4})\\.D(\\d{2})");
@@ -23,21 +27,25 @@ public class AocTest {
 
     //region TESTS
     @Test
+    @Order(1)
     void star1_sample() {
         test(setup.star1.sample, Aoc::star1);
     }
 
     @Test
+    @Order(2)
     void star1() {
         test(setup.star1.real, Aoc::star1);
     }
 
     @Test
+    @Order(3)
     void star2_sample() {
         test(setup.star2.sample, Aoc::star2);
     }
 
     @Test
+    @Order(4)
     void star2() {
         test(setup.star2.real, Aoc::star2);
     }
@@ -52,7 +60,7 @@ public class AocTest {
             Out.print(
                     """
                             @c%s@@ + @c%s@@ = @c%s@@
-                            solution: @g%,d@@                
+                            solution: @g%,d@@
                             """,
                     nanosToHumanReadableFormat(t1 - t0),
                     nanosToHumanReadableFormat(t2 - t1),
@@ -62,7 +70,7 @@ public class AocTest {
             Out.print(
                     """
                             @c%s@@ + @c%s@@ = @c%s@@
-                            solution: @r%,d@@   expected: @g%,d@@                
+                            solution: @r%,d@@   expected: @g%,d@@
                             """,
                     nanosToHumanReadableFormat(t1 - t0),
                     nanosToHumanReadableFormat(t2 - t1),
