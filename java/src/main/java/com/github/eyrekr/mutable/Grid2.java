@@ -62,6 +62,10 @@ public class Grid2 {
         return x >= 0 && x < m && y >= 0 && y < n ? a[x][y] : VOID;
     }
 
+    public It it(int x, int y) {
+        return new It(x, y);
+    }
+
     public It start() {
         return new It(0, 0).turn(Direction.RightDown);
     }

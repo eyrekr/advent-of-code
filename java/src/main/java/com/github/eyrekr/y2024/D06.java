@@ -18,55 +18,69 @@ class D06 extends Aoc {
     }
 
     final Grid2 grid;
+    final Grid2.It guard;
 
     D06(final String input) {
         this.grid = Grid2.fromString(input);
+        guard = grid.start().scanUntil(it -> it.is(Symbol.Up)).turn(Direction.Up);
     }
 
     @Override
     public long star1() {
-        grid.start().scanUntil(it -> it.is(Symbol.Up))
-                .turn(Direction.Up)
-                .goWhile(it -> {
-                    it.set(Symbol.Track);
-                    if (it.la(Symbol.Wall)) it.turnRight();
-                    return it.inside;
-                });
+        guard.goWhile(it -> {
+            it.set(Symbol.Track);
+            if (it.la(Symbol.Wall)) it.turnRight();
+            return it.inside;
+        });
         return grid.start().count(it -> it.is(Symbol.Track));
     }
 
     @Override
-    public long star2() { // 1899 - 1965 ; 1901 to taky neni
+    public long star2() {
+        record Point(int x, int y) {
+        }
+        final Set<Point> path = new HashSet<>();
+        guard.deepCopy().goWhile(it -> {
+            if (it.outside) return false;
+            if (guard.x != it.x || guard.y != it.y) path.add(new Point(it.x, it.y));
+            while (it.la(Symbol.Wall)) it.turnRight();
+            return true;
+        });
+
+        long obstacles = 0;
+        for (final Point p : path) {
+            final var obstacle = grid.it(p.x, p.y);
+            obstacle.set(Symbol.Wall);
+            if (hasCycle()) obstacles++;
+            obstacle.set(Symbol.Empty);
+        }
+        return obstacles;
+    }
+
+    private boolean hasCycle() {
         record Location(int x, int y, Direction direction) {
+            static Location from(final Grid2.It it) {
+                return new Location(it.x, it.y, it.direction);
+            }
         }
 
-        grid.start().scanUntil(it -> it.is(Symbol.Up))
-                .turn(Direction.Up)
-                .goWhile(it -> {
-                    if (it.la(Symbol.Wall)) it.turnRight();
-                    /*if (it.la(Symbol.Empty))*/
-                    {
-                        final Grid2.It obstacle = it.deepCopy().go();
-                        final char symbol = obstacle.symbol();
-                        obstacle.set(Symbol.Wall);
+        final Set<Location> visited = new HashSet<>();
+        return guard.deepCopy().goUntil(it -> {
+            if (it.outside) return true;
 
-                        final Set<Location> visited = new HashSet<>();
-                        final Grid2.It end = it.deepCopy().goUntil(forked -> {
-                            if (forked.outside) return true;
-                            if (forked.la(Symbol.Wall)) forked.turnRight();
-                            final Location location = new Location(forked.x, forked.y, forked.direction);
-                            final boolean knownLocation = visited.contains(location);
-                            visited.add(location);
-                            return knownLocation;
-                        });
+            final var l1 = Location.from(it);
+            if (visited.contains(l1)) return true;
+            else visited.add(l1);
 
-                        if (end.inside) obstacle.set(Symbol.Track);
-                        else obstacle.set(symbol);
-                    }
+            while (it.la(Symbol.Wall)) {
+                it.turnRight();
 
-                    return it.inside;
-                });
+                var l2 = Location.from(it);
+                if (visited.contains(l2)) return true;
+                else visited.add(l2);
+            }
 
-        return grid.print().start().count(it -> it.is(Symbol.Track));
+            return false;
+        }).inside;
     }
 }
