@@ -54,7 +54,7 @@ public class Grid2 {
         return grid;
     }
 
-    public Grid2 deepCopy() {
+    public Grid2 duplicate() {
         return new Grid2(this);
     }
 
@@ -105,7 +105,7 @@ public class Grid2 {
             this.i = it.i;
         }
 
-        public It deepCopy() {
+        public It duplicate() {
             return new It(this);
         }
 
