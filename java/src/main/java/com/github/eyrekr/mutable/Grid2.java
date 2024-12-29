@@ -65,7 +65,11 @@ public class Grid2 {
     }
 
     public It it() {
-        return new It(0, 0, Direction.Right);
+        return new It(0, 0, Direction.None);
+    }
+
+    public It it(final int x, final int y) {
+        return new It(x, y, Direction.None);
     }
 
     public It it(final int x, final int y, final Direction direction) {
