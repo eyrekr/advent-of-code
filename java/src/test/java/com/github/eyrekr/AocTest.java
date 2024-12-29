@@ -60,7 +60,7 @@ public class AocTest {
             Out.print(
                     """
                             @c%s@@ + @c%s@@ = @c%s@@
-                            solution: @g%,d@@
+                            solution: @g%d@@
                             """,
                     nanosToHumanReadableFormat(t1 - t0),
                     nanosToHumanReadableFormat(t2 - t1),
@@ -70,7 +70,7 @@ public class AocTest {
             Out.print(
                     """
                             @c%s@@ + @c%s@@ = @c%s@@
-                            solution: @r%,d@@   expected: @g%,d@@
+                            solution: @r%d@@   expected: @g%d@@
                             """,
                     nanosToHumanReadableFormat(t1 - t0),
                     nanosToHumanReadableFormat(t2 - t1),
