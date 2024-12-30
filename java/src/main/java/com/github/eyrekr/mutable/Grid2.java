@@ -305,6 +305,12 @@ public class Grid2 {
             return this;
         }
 
+        public It by(final int dx, final int dy) {
+            this.x += dx;
+            this.y += dy;
+            return this;
+        }
+
         public It go() {
             if (direction == Direction.None) throw new IllegalStateException("no direction");
             return to(x + direction.dx, y + direction.dy);
