@@ -78,8 +78,8 @@ public class AocTest {
         final long answer = constructor.aoc(input).star1();
         report(star1, sampleAnswer, answer, System.nanoTime() - t0);
 
-        assertThat(sampleAnswer).isEqualTo(star1.sampleAnswer);
-        assertThat(answer).isEqualTo(star1.answer);
+        assertThat(sampleAnswer).as("star 1 - sample").isEqualTo(star1.sampleAnswer);
+        assertThat(answer).as("star 1").isEqualTo(star1.answer);
     }
 
     @Test
@@ -91,16 +91,15 @@ public class AocTest {
         final long answer = constructor.aoc(input).star2();
         report(star2, sampleAnswer, answer, System.nanoTime() - t0);
 
-        assertThat(sampleAnswer).isEqualTo(star2.sampleAnswer);
-        assertThat(answer).isEqualTo(star2.answer);
+        assertThat(sampleAnswer).as("star 2 - sample").isEqualTo(star2.sampleAnswer);
+        assertThat(answer).as("star 2").isEqualTo(star2.answer);
     }
 
     private void report(final Star star, final long sampleAnswer, final long answer, final long duration) {
         final boolean sampleAnswerCorrect = star.sampleAnswer == sampleAnswer;
         final boolean answerCorrect = star.answer == answer;
-        Out.print("""
-                %-3s  %s%s  %s%16d  %s%16d  @c%8s@@
-                """,
+        Out.print(
+                "%-3s  %s%s  %s%16d  %s%16d  @c%8s@@\n",
                 day,
                 sampleAnswerCorrect && answerCorrect ? "@Y" : "@K",
                 star == star1 ? "★ " : "★★",
