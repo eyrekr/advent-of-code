@@ -80,6 +80,10 @@ public class EGrid<E> {
         return new It(x, y, direction);
     }
 
+    public It it(final int x, final int y, final int dx, final int dy) {
+        return new It(x, y, dx, dy);
+    }
+
     public Sc scan() {
         return new Sc(0, 0, Direction.RightDown, unused -> true);
     }
@@ -246,18 +250,28 @@ public class EGrid<E> {
 
         public int x;
         public int y;
-        public Direction direction;
+        public int dx;
+        public int dy;
+
+        private It(final int x, final int y, final int dx, final int dy) {
+            this.x = x;
+            this.y = y;
+            this.dx = dx;
+            this.dy = dy;
+        }
 
         private It(final int x, final int y, final Direction direction) {
             this.x = x;
             this.y = y;
-            this.direction = direction;
+            this.dx = direction.dx;
+            this.dy = direction.dy;
         }
 
         private It(final It it) {
             this.x = it.x;
             this.y = it.y;
-            this.direction = it.direction;
+            this.dx = it.dx;
+            this.dy = it.dy;
         }
 
         public It duplicate() {
@@ -289,15 +303,19 @@ public class EGrid<E> {
         }
 
         public char la() {
-            return at(x + direction.dx, y + direction.dy);
+            return at(x + dx, y + dy);
         }
 
         public boolean la(final char ch) {
-            return at(x + direction.dx, y + direction.dy) == ch;
+            return at(x + dx, y + dy) == ch;
         }
 
         public char la(final Direction direction) {
             return at(x + direction.dx, y + direction.dy);
+        }
+
+        public char la(final int dx, final int dy) {
+            return at(x + dx, y + dy);
         }
 
         public It set(final char ch) {
@@ -316,7 +334,8 @@ public class EGrid<E> {
         }
 
         public It set(final Direction direction) {
-            this.direction = direction;
+            this.dx = direction.dx;
+            this.dy = direction.dy;
             return this;
         }
 
@@ -336,14 +355,16 @@ public class EGrid<E> {
         }
 
         public It by(final int dx, final int dy) {
-            this.x += dx;
-            this.y += dy;
+            this.dx = dx;
+            this.dy = dy;
             return this;
         }
 
         public It go() {
-            if (direction == Direction.None) throw new IllegalStateException("no direction");
-            return to(x + direction.dx, y + direction.dy);
+            if (dx == 0 && dy == 0) throw new IllegalStateException("no direction");
+            this.x += dx;
+            this.y += dy;
+            return this;
         }
 
         public It goWhile(final Predicate<It> condition) {
@@ -356,22 +377,17 @@ public class EGrid<E> {
             return this;
         }
 
-        public Arr<It> collectWhile(final Predicate<It> condition) {
-            final Arr<It> array = Arr.empty();
-            while (condition.test(this)) {
-                array.addLast(duplicate());
-                go();
-            }
-            return array;
-        }
-
         public It turnRight() {
-            this.direction = direction.turn90DegreesRight();
+            final int rdx = -dy, rdy = dx;
+            this.dx = rdx;
+            this.dy = rdy;
             return this;
         }
 
         public It turnLeft() {
-            this.direction = direction.turn90DegreesLeft();
+            final int ldx = dy, ldy = -dx;
+            this.dx = ldx;
+            this.dy = ldy;
             return this;
         }
     }

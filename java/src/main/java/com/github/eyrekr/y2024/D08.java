@@ -45,7 +45,7 @@ class D08 extends Aoc {
                 for (final Antenna b : antennas)
                     if (a != b) {
                         final int dx = a.x - b.x, dy = a.y - b.y;
-                        for (final var it = grid.it(a.x, a.y); it.inside(); it.by(dx, dy))
+                        for (final var it = grid.it(a.x, a.y, dx, dy); it.inside(); it.go())
                             it.set(Symbol.Antinode);
                     }
         });

@@ -21,7 +21,7 @@ class D06 extends Aoc {
 
     D06(final String input) {
         this.grid = EGrid.fromString(input);
-        guard = grid.scan(it -> it.is(Symbol.Up)).set(Direction.Up).it();
+        guard = grid.scan(it -> it.is(Symbol.Up)).it().set(Direction.Up);
     }
 
     @Override
@@ -68,9 +68,9 @@ class D06 extends Aoc {
         return grid.scan(it -> it.is(Symbol.Obstacle)).count();
     }
 
-    record Location(int x, int y, Direction direction) {
+    record Location(int x, int y, int dx, int dy) {
         Location(final EGrid.It it) {
-            this(it.x, it.y, it.direction);
+            this(it.x, it.y, it.dx, it.dy);
         }
     }
 }
