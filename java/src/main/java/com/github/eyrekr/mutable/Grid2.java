@@ -9,7 +9,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class Grid2<E> {
+public class Grid2 {
 
     public static final char Void = '\0';
 
