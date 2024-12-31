@@ -18,10 +18,8 @@ class D06Test extends AocTest {
             """;
 
     D06Test() {
-        super(builderFor(D06Test.class)
-                .constructor(D06::new)
-                .sampleInput(sample)
-                .star1(41L, 5444L)
-                .star2(6L, 1946L));
+        super(D06::new,
+                new Star(sample, 41L, 5444L),
+                new Star(sample, 6L, 1946L));
     }
 }

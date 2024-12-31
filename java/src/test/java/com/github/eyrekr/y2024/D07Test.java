@@ -17,10 +17,8 @@ class D07Test extends AocTest {
             """;
 
     D07Test() {
-        super(builderFor(D07Test.class)
-                .constructor(D07::new)
-                .sampleInput(sample)
-                .star1(3749L, 20281182715321L)
-                .star2(11387L, 159490400628354L));
+        super(D07::new,
+                new Star(sample, 3749L, 20281182715321L),
+                new Star(sample, 11387L, 159490400628354L));
     }
 }

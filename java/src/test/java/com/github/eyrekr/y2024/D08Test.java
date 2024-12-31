@@ -20,10 +20,8 @@ class D08Test extends AocTest {
             """;
 
     D08Test() {
-        super(builderFor(D08Test.class)
-                .constructor(D08::new)
-                .sampleInput(sample)
-                .star1(14L, 376L)
-                .star2(34L, 1352L));
+        super(D08::new,
+                new Star(sample, 14L, 376L),
+                new Star(sample, 34L, 1352L));
     }
 }

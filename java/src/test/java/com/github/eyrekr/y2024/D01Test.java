@@ -14,10 +14,8 @@ class D01Test extends AocTest {
             """;
 
     D01Test() {
-        super(builderFor(D01Test.class)
-                .constructor(D01::new)
-                .sampleInput(sample)
-                .star1(11L, 1834060L)
-                .star2(31L, 21607792L));
+        super(D01::new,
+                new Star(sample, 11L, 1834060L),
+                new Star(sample, 31L, 21607792L));
     }
 }
