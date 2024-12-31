@@ -6,7 +6,8 @@ class D09Test extends AocTest {
 
     D09Test() {
         super(D09::new,
-                new Star("2333133121414131402", 1928L, 6344673854800L),
-                new Star("2333133121414131402", 2858L, -1L));
+                "2333133121414131402",
+                new Star(1928L, 6344673854800L),
+                new Star(2858L, -1L));
     }
 }
