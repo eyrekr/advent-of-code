@@ -2,7 +2,7 @@ package com.github.eyrekr.y2024;
 
 import com.github.eyrekr.Aoc;
 import com.github.eyrekr.mutable.Arr;
-import com.github.eyrekr.mutable.Grid2;
+import com.github.eyrekr.mutable.EGrid;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,11 +14,11 @@ class D08 extends Aoc {
         char Antinode = '#';
     }
 
-    final Grid2<?> grid;
+    final EGrid<?> grid;
     final Map<Character, Arr<Antenna>> antennasByFrequency = new HashMap<>();
 
     D08(final String input) {
-        grid = Grid2.fromString(input);
+        grid = EGrid.fromString(input);
         grid.scan(it -> !it.is(Symbol.Empty))
                 .each(it -> antennasByFrequency.computeIfAbsent(it.symbol(), unused -> Arr.empty())
                         .addLast(new Antenna(it)));
@@ -53,7 +53,7 @@ class D08 extends Aoc {
     }
 
     record Antenna(int x, int y) {
-        Antenna(Grid2.Sc it) {
+        Antenna(EGrid.Sc it) {
             this(it.x, it.y);
         }
     }

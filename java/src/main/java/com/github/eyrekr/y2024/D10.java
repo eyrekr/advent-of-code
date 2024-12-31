@@ -1,7 +1,7 @@
 package com.github.eyrekr.y2024;
 
 import com.github.eyrekr.Aoc;
-import com.github.eyrekr.mutable.Grid2;
+import com.github.eyrekr.mutable.EGrid;
 import com.github.eyrekr.raster.Direction;
 
 import java.util.*;
@@ -14,10 +14,10 @@ class D10 extends Aoc {
     }
 
     final Direction[] directions = new Direction[]{Direction.Up, Direction.Down, Direction.Left, Direction.Right};
-    final Grid2<Collection<Integer>> grid;
+    final EGrid<Collection<Integer>> grid;
 
     D10(final String input) {
-        grid = Grid2.fromString(input);
+        grid = EGrid.fromString(input);
     }
 
     @Override
@@ -37,7 +37,7 @@ class D10 extends Aoc {
     }
 
     @Override
-    public long star2() { // not the best approach, but it runs in 2ms
+    public long star2() { // not the best approach, but it still runs in 2ms
         grid.scan().each(sc -> sc.store(sc.is(Symbol.Peak) ? List.of(sc.id()) : new ArrayList<>()));
 
         for (final char ch : "876543210".toCharArray()) {

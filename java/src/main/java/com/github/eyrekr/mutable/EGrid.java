@@ -9,7 +9,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class Grid2<E> {
+public class EGrid<E> {
 
     public static final char Void = '\0';
 
@@ -20,7 +20,7 @@ public class Grid2<E> {
     public final State[][] state;
     public final Object[][] e;
 
-    private Grid2(final int m, final int n) {
+    private EGrid(final int m, final int n) {
         this.m = m;
         this.n = n;
         this.a = new char[m][n];
@@ -29,7 +29,7 @@ public class Grid2<E> {
         this.e = new Object[m][n];
     }
 
-    private Grid2(final Grid2<? extends E> grid) {
+    private EGrid(final EGrid<? extends E> grid) {
         this.m = grid.m;
         this.n = grid.n;
         this.a = new char[m][n];
@@ -46,22 +46,22 @@ public class Grid2<E> {
             }
     }
 
-    public static <T> Grid2<T> empty(final int m, final int n) {
-        return new Grid2<>(m, n);
+    public static <T> EGrid<T> empty(final int m, final int n) {
+        return new EGrid<>(m, n);
     }
 
-    public static <T> Grid2<T> fromString(final String input) {
+    public static <T> EGrid<T> fromString(final String input) {
         final String[] lines = StringUtils.split(input, "\n");
         final int n = lines.length, m = lines[0].length();
-        final Grid2<T> grid = new Grid2<>(m, n);
+        final EGrid<T> grid = new EGrid<>(m, n);
         for (int y = 0; y < n; y++)
             for (int x = 0; x < m; x++)
                 grid.a[x][y] = lines[y].charAt(x);
         return grid;
     }
 
-    public Grid2<E> duplicate() {
-        return new Grid2<>(this);
+    public EGrid<E> duplicate() {
+        return new EGrid<>(this);
     }
 
     public char at(final int x, final int y) {
@@ -92,7 +92,7 @@ public class Grid2<E> {
         return new Sc(x, y, direction, predicate);
     }
 
-    public Grid2<E> print() {
+    public EGrid<E> print() {
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < m; x++) {
                 Out.print("" + a[x][y]);
@@ -163,25 +163,25 @@ public class Grid2<E> {
         }
 
         public boolean is(final long d) {
-            return inside() && Grid2.this.d[x][y] == d;
+            return inside() && EGrid.this.d[x][y] == d;
         }
 
         public boolean is(final State state) {
-            return inside() && Grid2.this.state[x][y] == state;
+            return inside() && EGrid.this.state[x][y] == state;
         }
 
         public Sc set(final char ch) {
-            if (inside()) Grid2.this.a[x][y] = ch;
+            if (inside()) EGrid.this.a[x][y] = ch;
             return this;
         }
 
         public Sc set(final long d) {
-            if (inside()) Grid2.this.d[x][y] = d;
+            if (inside()) EGrid.this.d[x][y] = d;
             return this;
         }
 
         public Sc set(final State state) {
-            if (inside()) Grid2.this.state[x][y] = state;
+            if (inside()) EGrid.this.state[x][y] = state;
             return this;
         }
 
@@ -191,11 +191,11 @@ public class Grid2<E> {
         }
 
         public E load() {
-            return inside() ? (E) Grid2.this.e[x][y] : null;
+            return inside() ? (E) EGrid.this.e[x][y] : null;
         }
 
         public Sc store(final E e) {
-            if (inside()) Grid2.this.e[x][y] = e;
+            if (inside()) EGrid.this.e[x][y] = e;
             return this;
         }
 
@@ -277,15 +277,15 @@ public class Grid2<E> {
         }
 
         public boolean is(final char ch) {
-            return inside() && Grid2.this.a[x][y] == ch;
+            return inside() && EGrid.this.a[x][y] == ch;
         }
 
         public boolean is(final long d) {
-            return inside() && Grid2.this.d[x][y] == d;
+            return inside() && EGrid.this.d[x][y] == d;
         }
 
         public boolean is(final State state) {
-            return inside() && Grid2.this.state[x][y] == state;
+            return inside() && EGrid.this.state[x][y] == state;
         }
 
         public char la() {
@@ -301,17 +301,17 @@ public class Grid2<E> {
         }
 
         public It set(final char ch) {
-            if (inside()) Grid2.this.a[x][y] = ch;
+            if (inside()) EGrid.this.a[x][y] = ch;
             return this;
         }
 
         public It set(final long d) {
-            if (inside()) Grid2.this.d[x][y] = d;
+            if (inside()) EGrid.this.d[x][y] = d;
             return this;
         }
 
         public It set(final State state) {
-            if (inside()) Grid2.this.state[x][y] = state;
+            if (inside()) EGrid.this.state[x][y] = state;
             return this;
         }
 
@@ -321,11 +321,11 @@ public class Grid2<E> {
         }
 
         public E load() {
-            return inside() ? (E) Grid2.this.e[x][y] : null;
+            return inside() ? (E) EGrid.this.e[x][y] : null;
         }
 
         public It store(final E e) {
-            if (inside()) Grid2.this.e[x][y] = e;
+            if (inside()) EGrid.this.e[x][y] = e;
             return this;
         }
 

@@ -1,7 +1,7 @@
 package com.github.eyrekr.y2024;
 
 import com.github.eyrekr.Aoc;
-import com.github.eyrekr.mutable.Grid2;
+import com.github.eyrekr.mutable.EGrid;
 import com.github.eyrekr.raster.Direction;
 
 import java.util.HashSet;
@@ -16,11 +16,11 @@ class D06 extends Aoc {
         char Obstacle = 'O';
     }
 
-    final Grid2<?> grid;
-    final Grid2<?>.It guard;
+    final EGrid<?> grid;
+    final EGrid<?>.It guard;
 
     D06(final String input) {
-        this.grid = Grid2.fromString(input);
+        this.grid = EGrid.fromString(input);
         guard = grid.scan(it -> it.is(Symbol.Up)).set(Direction.Up).it();
     }
 
@@ -69,7 +69,7 @@ class D06 extends Aoc {
     }
 
     record Location(int x, int y, Direction direction) {
-        Location(final Grid2.It it) {
+        Location(final EGrid.It it) {
             this(it.x, it.y, it.direction);
         }
     }
