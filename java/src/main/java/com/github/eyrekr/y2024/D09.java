@@ -4,7 +4,7 @@ import com.github.eyrekr.Aoc;
 
 class D09 extends Aoc {
 
-    static final int VOID = -1;
+    static final int Empty = -1;
     final int[] denseMap;
 
     D09(final String input) {
@@ -32,7 +32,7 @@ class D09 extends Aoc {
         int j = 0;
         for (int i = 0; i < denseMap.length; i++)
             for (int k = 0; k < denseMap[i]; k++)
-                inflatedMap[j++] = i % 2 == 0 ? i / 2 : VOID;
+                inflatedMap[j++] = i % 2 == 0 ? i / 2 : Empty;
 
         return inflatedMap;
     }
@@ -40,10 +40,10 @@ class D09 extends Aoc {
     static int[] moveLeft(final int[] map) {
         int l = 0, r = map.length - 1;
         while (true) {
-            while (map[l] != VOID && l < r) l++;
+            while (map[l] != Empty && l < r) l++;
             if (l >= r) break;
             map[l] = map[r];
-            map[r] = VOID;
+            map[r] = Empty;
             r--;
         }
         return map;
@@ -52,7 +52,7 @@ class D09 extends Aoc {
     static long checksum(final int[] map) {
         long checksum = 0;
         for (int i = 0; i < map.length; i++)
-            if (map[i] != VOID) checksum += (long) i * map[i];
+            if (map[i] != Empty) checksum += (long) i * map[i];
         return checksum;
     }
 }

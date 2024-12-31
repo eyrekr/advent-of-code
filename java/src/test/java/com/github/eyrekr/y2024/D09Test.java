@@ -5,9 +5,9 @@ import com.github.eyrekr.AocTest;
 class D09Test extends AocTest {
 
     D09Test() {
-        super(D09::new,
-                "2333133121414131402",
-                new Star(1928L, 6344673854800L),
-                new Star(2858L, -1L));
+        constructor(D09::new);
+        sample("2333133121414131402");
+        star1(1928L, 6344673854800L);
+        star2(2858L, -1L);
     }
 }

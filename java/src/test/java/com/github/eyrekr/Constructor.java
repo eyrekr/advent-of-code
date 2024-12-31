@@ -4,7 +4,7 @@ package com.github.eyrekr;
 public interface Constructor {
     Aoc aoc(String input);
 
-    Constructor undefined = unused -> {
+    Constructor Undefined = unused -> {
         throw new IllegalStateException();
     };
 }

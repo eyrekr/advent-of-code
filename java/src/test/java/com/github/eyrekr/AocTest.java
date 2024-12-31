@@ -13,57 +13,90 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AocTest {
 
-    private static final Pattern pattern = Pattern.compile("y(\\d{4})\\.D(\\d{2})");
+    private final Pattern pattern = Pattern.compile("y(\\d{4})\\.D(\\d{2})");
 
-    final Constructor constructor;
-    final Star star1, star2;
+    final String year;
+    final String day;
     final String input;
 
-    protected AocTest(final Constructor constructor, final Star star1, final Star star2) {
-        this.constructor = constructor;
-        this.star1 = star1;
-        this.star2 = star2;
+    private Constructor constructor = Constructor.Undefined;
+    private Star star1 = new Star();
+    private Star star2 = new Star();
+
+    protected AocTest() {
         final var matcher = pattern.matcher(getClass().getName());
-        if (matcher.find())
-            this.input = Out.testResource(String.format("%s/D%s.txt", matcher.group(1), matcher.group(2)));
-        else throw new IllegalStateException(getClass().getName());
+        if (matcher.find()) {
+            year = matcher.group(1);
+            day = matcher.group(2);
+            input = Out.testResource(String.format("%s/D%s.txt", year, day));
+        } else throw new IllegalStateException(getClass().getName());
     }
 
-    protected AocTest(final Constructor constructor, final String testInput, final Star star1, final Star star2) {
-        this(
-                constructor,
-                star1.testInput == null ? new Star(testInput, star1.testOutput, star1.output) : star1,
-                star2.testInput == null ? new Star(testInput, star2.testOutput, star2.output) : star2);
+    protected AocTest constructor(final Constructor constructor) {
+        this.constructor = constructor;
+        return this;
+    }
+
+    protected AocTest sample(final String sampleForBothStars) {
+        star1.sample = sampleForBothStars;
+        star2.sample = sampleForBothStars;
+        return this;
+    }
+
+    protected AocTest star1(final String sample, final long sampleAnswer, final long answer) {
+        star1.sample = sample;
+        star1.sampleAnswer = sampleAnswer;
+        star1.answer = answer;
+        return this;
+    }
+
+    protected AocTest star1(final long sampleAnswer, final long answer) {
+        star1.sampleAnswer = sampleAnswer;
+        star1.answer = answer;
+        return this;
+    }
+
+    protected AocTest star2(final String sample, final long sampleAnswer, final long answer) {
+        star2.sample = sample;
+        star2.sampleAnswer = sampleAnswer;
+        star2.answer = answer;
+        return this;
+    }
+
+    protected AocTest star2(final long sampleAnswer, final long answer) {
+        star2.sampleAnswer = sampleAnswer;
+        star2.answer = answer;
+        return this;
     }
 
     @Test
     @Order(1)
     void star1() {
-        final long testOutput = constructor.aoc(star1.testInput).star1();
+        final long sampleAnswer = constructor.aoc(star1.sample).star1();
 
         final long t0 = System.nanoTime();
-        final long output = constructor.aoc(input).star1();
+        final long answer = constructor.aoc(input).star1();
         final String duration = format(System.nanoTime() - t0);
 
-        Out.print("%s Star 1  test:%d  answer:%d   %s\n", getClass().getSimpleName().substring(0, 3), testOutput, output, duration);
+        Out.print("%s Star 1  sample:%d  answer:%d   %s\n", day, sampleAnswer, answer, duration);
 
-        assertThat(testOutput).isEqualTo(star1.testOutput);
-        assertThat(output).isEqualTo(star1.output);
+        assertThat(sampleAnswer).isEqualTo(star1.sampleAnswer);
+        assertThat(answer).isEqualTo(star1.answer);
     }
 
     @Test
     @Order(2)
     void star2() {
-        final long testOutput = constructor.aoc(star2.testInput).star2();
+        final long sampleAnswer = constructor.aoc(star2.sample).star2();
 
         final long t0 = System.nanoTime();
-        final long output = constructor.aoc(input).star2();
+        final long answer = constructor.aoc(input).star2();
         final String duration = format(System.nanoTime() - t0);
 
-        Out.print("%s Star 2  test:%d  answer:%d   %s\n", getClass().getSimpleName().substring(0, 3), testOutput, output, duration);
+        Out.print("%s Star 2  sample:%d  answer:%d   %s\n", day, sampleAnswer, answer, duration);
 
-        assertThat(testOutput).isEqualTo(star2.testOutput);
-        assertThat(output).isEqualTo(star2.output);
+        assertThat(sampleAnswer).isEqualTo(star2.sampleAnswer);
+        assertThat(answer).isEqualTo(star2.answer);
     }
 
 
@@ -74,13 +107,9 @@ public class AocTest {
         return (nanos / 1_000_000_000) + "s";
     }
 
-    public record Star(String testInput, long testOutput, long output) {
-        public Star(final long testOutput, final long output) {
-            this(null, testOutput, output);
-        }
-
-        public Star(final long testOutput) {
-            this(null, testOutput, -1L);
-        }
+    private static class Star {
+        String sample = "";
+        long sampleAnswer = -1L;
+        long answer = -1L;
     }
 }
