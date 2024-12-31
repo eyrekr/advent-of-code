@@ -20,8 +20,8 @@ public class AocTest {
     final String input;
 
     private Constructor constructor = Constructor.Undefined;
-    private Star star1 = new Star();
-    private Star star2 = new Star();
+    private final Star star1 = new Star();
+    private final Star star2 = new Star();
 
     protected AocTest() {
         final var matcher = pattern.matcher(getClass().getName());
@@ -76,9 +76,7 @@ public class AocTest {
 
         final long t0 = System.nanoTime();
         final long answer = constructor.aoc(input).star1();
-        final String duration = format(System.nanoTime() - t0);
-
-        Out.print("%s Star 1  sample:%d  answer:%d   %s\n", day, sampleAnswer, answer, duration);
+        report(star1, sampleAnswer, answer, System.nanoTime() - t0);
 
         assertThat(sampleAnswer).isEqualTo(star1.sampleAnswer);
         assertThat(answer).isEqualTo(star1.answer);
@@ -91,12 +89,21 @@ public class AocTest {
 
         final long t0 = System.nanoTime();
         final long answer = constructor.aoc(input).star2();
-        final String duration = format(System.nanoTime() - t0);
-
-        Out.print("%s Star 2  sample:%d  answer:%d   %s\n", day, sampleAnswer, answer, duration);
+        report(star2, sampleAnswer, answer, System.nanoTime() - t0);
 
         assertThat(sampleAnswer).isEqualTo(star2.sampleAnswer);
         assertThat(answer).isEqualTo(star2.answer);
+    }
+
+    private void report(final Star star, final long sampleAnswer, final long answer, final long duration) {
+        Out.print("""
+                %-3s  %s  %16d  %16d  %8s
+                """,
+                day,
+                star == star1 ? "★ " : "★★",
+                sampleAnswer,
+                answer,
+                format(duration));
     }
 
 
