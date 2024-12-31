@@ -15,7 +15,12 @@ class D09 extends Aoc {
 
     @Override
     public long star1() {
-        return checksum(defragment(inflate(denseMap)));
+        return checksum(moveLeft(inflate(denseMap)));
+    }
+
+    @Override
+    public long star2() {
+        return checksum(moveLeft(inflate(denseMap)));
     }
 
     static int[] inflate(final int[] denseMap) {
@@ -32,7 +37,7 @@ class D09 extends Aoc {
         return inflatedMap;
     }
 
-    static int[] defragment(final int[] map) {
+    static int[] moveLeft(final int[] map) {
         int l = 0, r = map.length - 1;
         while (true) {
             while (map[l] != VOID) l++;
