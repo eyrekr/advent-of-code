@@ -96,12 +96,17 @@ public class AocTest {
     }
 
     private void report(final Star star, final long sampleAnswer, final long answer, final long duration) {
+        final boolean sampleAnswerCorrect = star.sampleAnswer == sampleAnswer;
+        final boolean answerCorrect = star.answer == answer;
         Out.print("""
-                %-3s  %s  %16d  %16d  %8s
+                %-3s  %s%s  %s%16d  %s%16d  @c%8s@@
                 """,
                 day,
+                sampleAnswerCorrect && answerCorrect ? "@Y" : "@K",
                 star == star1 ? "★ " : "★★",
+                sampleAnswerCorrect ? "@G" : "@R",
                 sampleAnswer,
+                answerCorrect ? "@G" : "@R",
                 answer,
                 format(duration));
     }
