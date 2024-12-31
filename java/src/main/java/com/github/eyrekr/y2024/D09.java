@@ -20,7 +20,7 @@ class D09 extends Aoc {
 
     @Override
     public long star2() {
-        return checksum(moveLeft(inflate(denseMap)));
+        return -1L;
     }
 
     static int[] inflate(final int[] denseMap) {
@@ -40,7 +40,7 @@ class D09 extends Aoc {
     static int[] moveLeft(final int[] map) {
         int l = 0, r = map.length - 1;
         while (true) {
-            while (map[l] != VOID) l++;
+            while (map[l] != VOID && l < r) l++;
             if (l >= r) break;
             map[l] = map[r];
             map[r] = VOID;
@@ -54,13 +54,5 @@ class D09 extends Aoc {
         for (int i = 0; i < map.length; i++)
             if (map[i] != VOID) checksum += (long) i * map[i];
         return checksum;
-    }
-
-    static int[] print(final int[] map) {
-        for (int i = 0; i < map.length; i++)
-            if (map[i] == VOID) System.out.print("_");
-            else System.out.print(map[i]);
-        System.out.println();
-        return map;
     }
 }

@@ -23,7 +23,7 @@ class D08Test extends AocTest {
         super(builderFor(D08Test.class)
                 .constructor(D08::new)
                 .sampleInput(sample)
-                .star1(sample, 14L, 376L)
+                .star1(14L, 376L)
                 .star2(34L, 1352L));
     }
 }
