@@ -16,6 +16,6 @@ class D10Test extends AocTest {
                 01329801
                 10456732
                 """);
-        star1(36L, -1L);
+        star1(36L, 574L);
     }
 }

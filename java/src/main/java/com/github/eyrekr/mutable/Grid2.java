@@ -9,15 +9,16 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class Grid2 {
+public class Grid2<E> {
 
-    public static final char VOID = '\0';
+    public static final char Void = '\0';
 
     public final int m;
     public final int n;
     public final char[][] a;
     public final long[][] d;
     public final State[][] state;
+    //public final E[][] e;
 
     private Grid2(final int m, final int n) {
         this.m = m;
@@ -61,7 +62,7 @@ public class Grid2 {
     }
 
     public char at(final int x, final int y) {
-        return x >= 0 && x < m && y >= 0 && y < n ? a[x][y] : VOID;
+        return x >= 0 && x < m && y >= 0 && y < n ? a[x][y] : Void;
     }
 
     public It it() {
@@ -142,8 +143,12 @@ public class Grid2 {
             return !inside();
         }
 
+        public int id() {
+            return y * m + x;
+        }
+
         public char symbol() {
-            return inside() ? a[x][y] : VOID;
+            return inside() ? a[x][y] : Void;
         }
 
         public boolean is(final char ch) {
@@ -253,6 +258,10 @@ public class Grid2 {
 
         public boolean outside() {
             return !inside();
+        }
+
+        public int id() {
+            return y * m + x;
         }
 
         public boolean is(final char ch) {
