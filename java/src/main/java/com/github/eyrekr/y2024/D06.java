@@ -16,8 +16,8 @@ class D06 extends Aoc {
         char Obstacle = 'O';
     }
 
-    final Grid2 grid;
-    final Grid2.It guard;
+    final Grid2<?> grid;
+    final Grid2<?>.It guard;
 
     D06(final String input) {
         this.grid = Grid2.fromString(input);

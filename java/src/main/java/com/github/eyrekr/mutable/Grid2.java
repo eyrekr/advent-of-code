@@ -9,7 +9,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class Grid2 {
+public class Grid2<E> {
 
     public static final char Void = '\0';
 
@@ -18,7 +18,7 @@ public class Grid2 {
     public final char[][] a;
     public final long[][] d;
     public final State[][] state;
-    //public final E[][] e;
+    public final Object[][] e;
 
     private Grid2(final int m, final int n) {
         this.m = m;
@@ -26,39 +26,42 @@ public class Grid2 {
         this.a = new char[m][n];
         this.d = new long[m][n];
         this.state = new State[m][n];
+        this.e = new Object[m][n];
     }
 
-    private Grid2(final Grid2 grid) {
+    private Grid2(final Grid2<? extends E> grid) {
         this.m = grid.m;
         this.n = grid.n;
         this.a = new char[m][n];
         this.d = new long[m][n];
         this.state = new State[m][n];
+        this.e = new Object[m][n];
 
         for (int y = 0; y < n; y++)
             for (int x = 0; x < m; x++) {
                 a[x][y] = grid.a[x][y];
                 d[x][y] = grid.d[x][y];
                 state[x][y] = grid.state[x][y];
+                e[x][y] = grid.e[x][y];
             }
     }
 
-    public static Grid2 empty(final int m, final int n) {
-        return new Grid2(m, n);
+    public static <T> Grid2<T> empty(final int m, final int n) {
+        return new Grid2<>(m, n);
     }
 
-    public static Grid2 fromString(final String input) {
+    public static <T> Grid2<T> fromString(final String input) {
         final String[] lines = StringUtils.split(input, "\n");
         final int n = lines.length, m = lines[0].length();
-        final Grid2 grid = new Grid2(m, n);
+        final Grid2<T> grid = new Grid2<>(m, n);
         for (int y = 0; y < n; y++)
             for (int x = 0; x < m; x++)
                 grid.a[x][y] = lines[y].charAt(x);
         return grid;
     }
 
-    public Grid2 duplicate() {
-        return new Grid2(this);
+    public Grid2<E> duplicate() {
+        return new Grid2<>(this);
     }
 
     public char at(final int x, final int y) {
@@ -89,7 +92,7 @@ public class Grid2 {
         return new Sc(x, y, direction, predicate);
     }
 
-    public Grid2 print() {
+    public Grid2<E> print() {
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < m; x++) {
                 Out.print("" + a[x][y]);
@@ -184,6 +187,15 @@ public class Grid2 {
 
         public Sc set(final Direction direction) {
             this.direction = direction;
+            return this;
+        }
+
+        public E load() {
+            return inside() ? (E) Grid2.this.e[x][y] : null;
+        }
+
+        public Sc store(final E e) {
+            if (inside()) Grid2.this.e[x][y] = e;
             return this;
         }
 
@@ -305,6 +317,15 @@ public class Grid2 {
 
         public It set(final Direction direction) {
             this.direction = direction;
+            return this;
+        }
+
+        public E load() {
+            return inside() ? (E) Grid2.this.e[x][y] : null;
+        }
+
+        public It store(final E e) {
+            if (inside()) Grid2.this.e[x][y] = e;
             return this;
         }
 

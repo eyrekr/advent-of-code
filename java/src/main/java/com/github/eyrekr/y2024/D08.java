@@ -14,7 +14,7 @@ class D08 extends Aoc {
         char Antinode = '#';
     }
 
-    final Grid2 grid;
+    final Grid2<?> grid;
     final Map<Character, Arr<Antenna>> antennasByFrequency = new HashMap<>();
 
     D08(final String input) {
