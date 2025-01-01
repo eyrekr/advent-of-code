@@ -9,36 +9,27 @@ import java.util.Map;
 
 class D11 extends Aoc {
 
-    final Longs stones;
+    final Line line;
 
     D11(final String input) {
-        stones = Longs.fromString(input);
+        final var stones = Longs.fromString(input);
+        line = new Line(stones.frequency());
     }
 
     @Override
     public long star1() {
-        var line = new Line(stones.frequency());
-        for (int i = 0; i < 25; i++) line = line.blink();
+        for (int i = 0; i < 25; i++) line.blink();
         return line.sum;
     }
 
     @Override
     public long star2() {
-        var line = new Line(stones.frequency());
-        for (int i = 0; i < 75; i++) line = line.blink();
+        for (int i = 0; i < 75; i++) line.blink();
         return line.sum;
     }
 
-    static Longs blink(final long n) {
-        if (n == 0) return Longs.of(1L);
-        final int d = Algebra.decimalDigits(n);
-        if (d % 2 == 1) return Longs.of(n * 2024);
-        final long power = Algebra.E10[d / 2];
-        return Longs.of(n / power, n % power);
-    }
-
     static class Line {
-        final Map<Long, Long> stoneCount;
+        Map<Long, Long> stoneCount;
         long sum = 0L;
 
         Line(final Map<Long, Long> stoneCount) {
@@ -47,11 +38,13 @@ class D11 extends Aoc {
 
         Line blink() {
             final Line line = new Line(new HashMap<>());
-            stoneCount.forEach(line::stoneChange);
-            return line;
+            stoneCount.forEach(line::changeOneStone);
+            stoneCount = line.stoneCount;
+            sum = line.sum;
+            return this;
         }
 
-        void stoneChange(final long value, final long count) {
+        void changeOneStone(final long value, final long count) {
             if (value == 0) update(1, count);
             else {
                 final int d = Algebra.decimalDigits(value);

@@ -8,6 +8,6 @@ class D11Test extends AocTest {
         constructor(D11::new);
         sample("125 17");
         star1(55312L, 187738L);
-        star2(-1L, -1L);
+        star2(65601038650482L, 223767210249237L);
     }
 }
