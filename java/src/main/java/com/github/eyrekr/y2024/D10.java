@@ -37,7 +37,7 @@ class D10 extends Aoc {
     }
 
     @Override
-    public long star2() { // not the best approach, but it still runs in 2ms
+    public long star2() { // not the best approach, but it still runs in 2ms // FIXME Should be enough only to remember the length, no need to keep the whole list!
         grid.scan().each(sc -> sc.store(sc.is(Symbol.Peak) ? List.of(sc.id()) : new ArrayList<>()));
 
         for (final char ch : "876543210".toCharArray()) {

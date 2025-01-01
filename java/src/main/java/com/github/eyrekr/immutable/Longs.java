@@ -699,6 +699,16 @@ public final class Longs implements Iterable<Long> {
         return arr;
     }
 
+    public Map<Long, Long> frequency() {
+        final Map<Long, Long> frequencies = new HashMap<>();
+        for (int i = 0; i < length; i++) {
+            final long value = at(i);
+            final long count = frequencies.getOrDefault(value, 0L) + 1;
+            frequencies.put(value, count);
+        }
+        return frequencies;
+    }
+
     @FunctionalInterface
     public interface RichLongToString {
         String format(long value, int i, boolean first, boolean last);
