@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class EGrid<E> {
@@ -106,9 +107,16 @@ public class EGrid<E> {
 
     public EGrid<E> print() {
         for (int y = 0; y < n; y++) {
-            for (int x = 0; x < m; x++) {
-                Out.print("" + a[x][y]);
-            }
+            for (int x = 0; x < m; x++) Out.print("" + a[x][y]);
+            Out.print("\n");
+        }
+        return this;
+    }
+
+    public EGrid<E> print(final Function<It, String> formatter) {
+        final It it = new It(0, 0, Direction.None);
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < m; x++) Out.print(formatter.apply(it.to(x, y)));
             Out.print("\n");
         }
         return this;
@@ -298,6 +306,18 @@ public class EGrid<E> {
             return y * m + x;
         }
 
+        public char ch() {
+            return inside() ? EGrid.this.a[x][y] : Void;
+        }
+
+        public long d() {
+            return inside() ? EGrid.this.d[x][y] : 0L;
+        }
+
+        public State state() {
+            return inside() ? EGrid.this.state[x][y] : null;
+        }
+
         public boolean is(final char ch) {
             return inside() && EGrid.this.a[x][y] == ch;
         }
@@ -333,6 +353,16 @@ public class EGrid<E> {
 
         public It set(final long d) {
             if (inside()) EGrid.this.d[x][y] = d;
+            return this;
+        }
+
+        public It inc() {
+            if (inside()) EGrid.this.d[x][y] = EGrid.this.d[x][y] + 1;
+            return this;
+        }
+
+        public It inc(final long d) {
+            if (inside()) EGrid.this.d[x][y] = EGrid.this.d[x][y] + d;
             return this;
         }
 

@@ -1,6 +1,7 @@
 package com.github.eyrekr;
 
 import com.github.eyrekr.output.Out;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -72,7 +73,9 @@ public class AocTest {
     @Test
     @Order(1)
     void star1() {
-        final long sampleAnswer = constructor.aoc(star1.sample).star1();
+        final long sampleAnswer = StringUtils.isNotBlank(star1.sample)
+                ? constructor.aoc(star1.sample).star1()
+                : star1.sampleAnswer;
 
         final long t0 = System.nanoTime();
         final long answer = constructor.aoc(input).star1();
@@ -85,7 +88,9 @@ public class AocTest {
     @Test
     @Order(2)
     void star2() {
-        final long sampleAnswer = constructor.aoc(star2.sample).star2();
+        final long sampleAnswer = StringUtils.isNotBlank(star2.sample)
+                ? constructor.aoc(star2.sample).star2()
+                : star2.sampleAnswer;
 
         final long t0 = System.nanoTime();
         final long answer = constructor.aoc(input).star2();

@@ -490,6 +490,16 @@ public final class Arr<E> implements Iterable<E> {
         return seq;
     }
 
+    public Map<E, Long> frequencies() {
+        final Map<E, Long> frequencies = new HashMap<>();
+        for (int i = 0; i < length; i++) {
+            final E value = at(i);
+            final long count = frequencies.getOrDefault(value, 0L) + 1;
+            frequencies.put(value, count);
+        }
+        return frequencies;
+    }
+
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();

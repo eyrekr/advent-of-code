@@ -1,5 +1,7 @@
 package com.github.eyrekr.raster;
 
+import com.github.eyrekr.math.Algebra;
+
 public enum Direction {
     None(0, 0, '×', -1, 1),
 
@@ -139,5 +141,12 @@ public enum Direction {
             case 'R', 'r', '>', '→' -> Direction.Right;
             default -> Direction.None;
         };
+    }
+
+    public static Direction from(final long dx, final long dy) {
+        final int x = Algebra.sgn(dx), y = Algebra.sgn(dy);
+        for (final Direction direction : Direction.values())
+            if (direction.dx == x && direction.dy == y) return direction;
+        return Direction.None;
     }
 }
