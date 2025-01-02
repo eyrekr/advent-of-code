@@ -24,5 +24,6 @@ class D13Test extends AocTest {
                 Prize: X=18641, Y=10279
                 """);
         star1(480L, 39748L);
+        star2(875318608908L, 74478585072604L);
     }
 }

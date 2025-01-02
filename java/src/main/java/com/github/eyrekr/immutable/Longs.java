@@ -376,6 +376,32 @@ public final class Longs implements Iterable<Long> {
     }
 
     /**
+     * @return New array with the positive values only.
+     * @complexity O(n)
+     */
+    public Longs positiveValuesOnly() {
+        Longs array = new Longs();
+        for (int i = 0; i < length; i++) {
+            final long value = at(i);
+            if (value > 0) array = array.addLast(value);
+        }
+        return array;
+    }
+
+    /**
+     * @return New array with the negative values only.
+     * @complexity O(n)
+     */
+    public Longs negativeValuesOnly() {
+        Longs array = new Longs();
+        for (int i = 0; i < length; i++) {
+            final long value = at(i);
+            if (value < 0) array = array.addLast(value);
+        }
+        return array;
+    }
+
+    /**
      * @return Number of values that satisfy the predicate.
      * @complexity O(n)
      */
