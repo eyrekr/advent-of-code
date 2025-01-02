@@ -6,8 +6,6 @@ import com.github.eyrekr.immutable.Int;
 import com.github.eyrekr.immutable.Longs;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Objects;
-
 class D13 extends Aoc {
 
     final Int domain = new Int(0, 100);
