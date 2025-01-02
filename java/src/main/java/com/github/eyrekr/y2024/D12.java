@@ -20,14 +20,14 @@ class D12 extends Aoc {
     public long star1() {
         return grid
                 .scan(sc -> sc.is(State.Unseen))
-                .reduce(0L, (sum, sc) -> sum + flood(sc, Fence.StandardPerimeter));
+                .reduce(0L, (sum, sc) -> sum + flood(sc, Fence.StandardPrice));
     }
 
     @Override
     public long star2() {
         return grid
                 .scan(sc -> sc.is(State.Unseen))
-                .reduce(0L, (sum, sc) -> sum + flood(sc, Fence.DiscountPerimeter));
+                .reduce(0L, (sum, sc) -> sum + flood(sc, Fence.DiscountedPrice));
     }
 
     long flood(final EGrid.Sc start, final Fence fence) {
@@ -39,7 +39,7 @@ class D12 extends Aoc {
             if (!it.is(State.Unseen)) continue;
             it.set(State.Closed);
             area++;
-            perimeter += fence.perimeter(
+            perimeter += fence.price(
                     it.la(Direction.UpLeft) == plant,
                     it.la(Direction.Up) == plant,
                     it.la(Direction.UpRight) == plant,
@@ -59,11 +59,12 @@ class D12 extends Aoc {
 
     @FunctionalInterface
     interface Fence {
-        Fence StandardPerimeter = (a, b, c, d, e, f, g, h) ->
+        Fence StandardPrice = (a, b, c, d, e, f, g, h) ->
                 (b ? 0 : 1) + (d ? 0 : 1) + (e ? 0 : 1) + (g ? 0 : 1);
-        Fence DiscountPerimeter = (a, b, c, d, e, f, g, h) ->
-                (b || !a && !b && d ? 0 : 1) + (g || d && !f && !g ? 0 : 1) + (d || !a && b && !d ? 0 : 1) + (e || b && !c && !e ? 0 : 1);
+        // prolongation of fence in the same direction is not counted
+        Fence DiscountedPrice = (a, b, c, d, e, f, g, h) ->
+                (b || !a && d ? 0 : 1) + (d || !a && b ? 0 : 1) + (e || b && !c ? 0 : 1) + (g || d && !f ? 0 : 1);
 
-        long perimeter(boolean a, boolean b, boolean c, boolean d, boolean e, boolean f, boolean g, boolean h);
+        long price(boolean a, boolean b, boolean c, boolean d, boolean e, boolean f, boolean g, boolean h);
     }
 }
