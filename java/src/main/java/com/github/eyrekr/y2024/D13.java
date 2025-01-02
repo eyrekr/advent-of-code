@@ -34,7 +34,7 @@ class D13 extends Aoc {
                 throw new IllegalStateException(String.format("A[%d,%d]  B=[%d,%d] are colinear", ax, ay, bx, by));
             final long b = (y * ax - x * ay) / d, a = (x - b * bx) / ax;
             if (a * ax + b * bx != x || a * ay + b * by != y) return -1; // solution does not exist
-            return a < limit && b < limit ? 3 * a + b : -1;
+            return 0 <= a && a < limit && 0 <= b && b < limit ? 3 * a + b : -1;
         }
     }
 
