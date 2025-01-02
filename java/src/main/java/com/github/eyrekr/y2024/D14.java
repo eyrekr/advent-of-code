@@ -3,12 +3,7 @@ package com.github.eyrekr.y2024;
 import com.github.eyrekr.Aoc;
 import com.github.eyrekr.immutable.Arr;
 import com.github.eyrekr.immutable.Longs;
-import com.github.eyrekr.output.Out;
 
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 
 /*
@@ -54,6 +49,9 @@ class D14 extends Aoc {
     interface Space {
         long Width = 101L;
         long Height = 103L;
+        byte Empty = 0;
+        byte Robot = '*';
+        int Line = "*******************************".length();
     }
 
     final Arr<Robot> robots;
@@ -78,21 +76,20 @@ class D14 extends Aoc {
     public long star2() {
         final int n = (int) (Space.Width * Space.Height);
         final byte[] buffer = new byte[n];
-        for (int step = 1; step < 10_000; step++) {
-            final long seconds = step;
-            Arrays.fill(buffer, (byte) ' ');
 
+        long step = 0;
+        while (true) {
+            Arrays.fill(buffer, Space.Empty);
+
+            final long seconds = step;
             robots.map(robot -> robot.move(seconds)).each(robot -> {
                 final int x = (int) (robot.y * Space.Width + robot.x);
-                buffer[x] = '*';
+                buffer[x] = Space.Robot;
             });
 
-            flush(("\n\n" + seconds + "\n").getBytes(StandardCharsets.UTF_8));
-            for (long k = Space.Width - 1; k < Space.Height * Space.Width; k += Space.Width)
-                buffer[(int) k] = (byte) '\n';
-            flush(buffer);
+            if (robotsAligned(buffer)) return step;
+            step++;
         }
-        return -1L;
     }
 
     record Robot(long x, long y, long dx, long dy) {
@@ -123,15 +120,12 @@ class D14 extends Aoc {
         return mod < 0 ? mod + k : mod;
     }
 
-    static void flush(final byte[] bytes) {
-        try {
-            Files.write(
-                    Paths.get("D14.tree"),
-                    bytes,
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.APPEND);
-        } catch (final Exception e) {
-            Out.print("@R%s@@\n", e.getMessage());
-        }
+    static boolean robotsAligned(final byte[] bytes) {
+        int run = 0;
+        for (int i = 0; i < bytes.length; i++)
+            if (bytes[i] == Space.Robot) {
+                if (++run >= Space.Line) return true;
+            } else run = 0;
+        return false;
     }
 }

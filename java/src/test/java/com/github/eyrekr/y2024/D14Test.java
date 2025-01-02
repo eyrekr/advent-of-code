@@ -21,6 +21,6 @@ class D14Test extends AocTest {
                         p=9,5 v=-3,-3
                         """,
                 21L, 231782040L);
-        star2(null, 0L, 0L);
+        star2(null, 0L, 6475L);
     }
 }
