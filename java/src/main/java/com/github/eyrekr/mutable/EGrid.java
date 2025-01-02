@@ -27,6 +27,14 @@ public class EGrid<E> {
         this.d = new long[m][n];
         this.state = new State[m][n];
         this.e = new Object[m][n];
+
+        for (int y = 0; y < n; y++)
+            for (int x = 0; x < m; x++) {
+                a[x][y] = Void;
+                d[x][y] = 0L;
+                state[x][y] = State.Unseen;
+                e[x][y] = null;
+            }
     }
 
     private EGrid(final EGrid<? extends E> grid) {
