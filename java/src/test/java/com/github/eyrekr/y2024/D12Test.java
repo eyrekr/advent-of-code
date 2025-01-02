@@ -19,5 +19,6 @@ class D12Test extends AocTest {
                 MMMISSJEEE
                 """);
         star1(1930L, 1465112L);
+        star2(1206L, 893790L);
     }
 }
