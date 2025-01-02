@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 class D13 extends Aoc {
 
     final Int domain = new Int(0, 100);
-    final long shift = 10_000_000_000_000L;
+    final long offset = 10_000_000_000_000L;
     final Arr<ClawMachine> clawMachines;
 
     D13(final String input) {
@@ -29,7 +29,7 @@ class D13 extends Aoc {
     @Override
     public long star2() {
         return clawMachines
-                .map(machine -> machine.shifted(shift))
+                .map(machine -> machine.prizeShiftedBy(offset))
                 .map(ClawMachine::countPresses)
                 .mapToLongs(Press::price)
                 .sum();
@@ -50,7 +50,7 @@ class D13 extends Aoc {
             return new Press(a, b, 3 * a + b);
         }
 
-        ClawMachine shifted(final long offset) {
+        ClawMachine prizeShiftedBy(final long offset) {
             return new ClawMachine(ax, ay, bx, by, x + offset, y + offset);
         }
     }
