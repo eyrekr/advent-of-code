@@ -51,7 +51,7 @@ class D14 extends Aoc {
         long Height = 103L;
         byte Empty = 0;
         byte Robot = '*';
-        int Line = "*******************************".length();
+        int AlignedRobots = "*******************************".length();
     }
 
     final Arr<Robot> robots;
@@ -124,7 +124,7 @@ class D14 extends Aoc {
         int run = 0;
         for (int i = 0; i < bytes.length; i++)
             if (bytes[i] == Space.Robot) {
-                if (++run >= Space.Line) return true;
+                if (++run >= Space.AlignedRobots) return true;
             } else run = 0;
         return false;
     }
