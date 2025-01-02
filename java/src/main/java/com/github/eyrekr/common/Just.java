@@ -12,4 +12,8 @@ public final class Just {
         }
     }
 
+    public static void repeat(final long times, final Runnable runnable) {
+        for (int i = 0; i < times; i++) runnable.run();
+    }
+
 }

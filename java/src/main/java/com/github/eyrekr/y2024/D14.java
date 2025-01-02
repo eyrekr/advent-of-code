@@ -3,14 +3,57 @@ package com.github.eyrekr.y2024;
 import com.github.eyrekr.Aoc;
 import com.github.eyrekr.immutable.Arr;
 import com.github.eyrekr.immutable.Longs;
+import com.github.eyrekr.output.Out;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
+
+/*
+  The tree looks like this:
+
+  *******************************
+  *                             *
+  *                             *
+  *                             *
+  *                             *
+  *              *              *
+  *             ***             *
+  *            *****            *
+  *           *******           *
+  *          *********          *
+  *            *****            *
+  *           *******           *
+  *          *********          *
+  *         ***********         *
+  *        *************        *
+  *          *********          *
+  *         ***********         *
+  *        *************        *
+  *       ***************       *
+  *      *****************      *
+  *        *************        *
+  *       ***************       *
+  *      *****************      *
+  *     *******************     *
+  *    *********************    *
+  *             ***             *
+  *             ***             *
+  *             ***             *
+  *                             *
+  *                             *
+  *                             *
+  *                             *
+  *******************************
+
+ */
 class D14 extends Aoc {
 
     interface Space {
         long Width = 101L;
         long Height = 103L;
-        //long Width = 11L;
-        //long Height = 7L;
     }
 
     final Arr<Robot> robots;
@@ -29,6 +72,27 @@ class D14 extends Aoc {
                     return count;
                 });
         return f[1] * f[2] * f[3] * f[4];
+    }
+
+    @Override
+    public long star2() {
+        final int n = (int) (Space.Width * Space.Height);
+        final byte[] buffer = new byte[n];
+        for (int step = 1; step < 10_000; step++) {
+            final long seconds = step;
+            Arrays.fill(buffer, (byte) ' ');
+
+            robots.map(robot -> robot.move(seconds)).each(robot -> {
+                final int x = (int) (robot.y * Space.Width + robot.x);
+                buffer[x] = '*';
+            });
+
+            flush(("\n\n" + seconds + "\n").getBytes(StandardCharsets.UTF_8));
+            for (long k = Space.Width - 1; k < Space.Height * Space.Width; k += Space.Width)
+                buffer[(int) k] = (byte) '\n';
+            flush(buffer);
+        }
+        return -1L;
     }
 
     record Robot(long x, long y, long dx, long dy) {
@@ -57,5 +121,17 @@ class D14 extends Aoc {
     static long mod(final long a, final long k) {
         final long mod = a % k;
         return mod < 0 ? mod + k : mod;
+    }
+
+    static void flush(final byte[] bytes) {
+        try {
+            Files.write(
+                    Paths.get("D14.tree"),
+                    bytes,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND);
+        } catch (final Exception e) {
+            Out.print("@R%s@@\n", e.getMessage());
+        }
     }
 }
