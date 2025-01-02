@@ -30,6 +30,11 @@ class D12 extends Aoc {
                 .reduce(0L, (sum, sc) -> sum + flood(sc, Fence.DiscountedPrice));
     }
 
+    /*
+      abc
+      d e
+      fgh
+     */
     long flood(final EGrid.Sc start, final Fence fence) {
         final char plant = start.symbol();
         long area = 0, perimeter = 0;
@@ -50,7 +55,7 @@ class D12 extends Aoc {
                     it.la(Direction.DownRight) == plant);
             directions.where(direction -> it.la(direction) == plant)
                     .map(direction -> it.duplicate().set(direction).go())
-                    .where(n -> n.is(State.Unseen))
+                    .where(neighbour -> neighbour.is(State.Unseen))
                     .each(queue::addLast);
         }
         start.set(area * perimeter);
