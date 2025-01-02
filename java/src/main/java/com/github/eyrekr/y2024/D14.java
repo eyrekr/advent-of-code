@@ -47,8 +47,8 @@ import java.util.Arrays;
 class D14 extends Aoc {
 
     interface Space {
-        long Width = 101L;
-        long Height = 103L;
+        int Width = 101;
+        int Height = 103;
         byte Empty = 0;
         byte Robot = '*';
         int AlignedRobots = "*******************************".length();
@@ -62,48 +62,54 @@ class D14 extends Aoc {
 
     @Override
     public long star1() {
-        final var f = robots
-                .map(robot -> robot.move(100L))
+        final var quadrants = robots
+                .each(robot -> robot.move(100))
                 .map(Robot::quadrant)
-                .reduce(new int[5], (count, quadrant) -> {
+                .reduce(new long[5], (count, quadrant) -> {
                     count[quadrant] = count[quadrant] + 1;
                     return count;
                 });
-        return f[1] * f[2] * f[3] * f[4];
+        return quadrants[1] * quadrants[2] * quadrants[3] * quadrants[4];
     }
 
     @Override
     public long star2() {
-        final int n = (int) (Space.Width * Space.Height);
-        final byte[] buffer = new byte[n];
+        final byte[] space = new byte[Space.Width * Space.Height];
 
-        long step = 0;
+        int seconds = 0;
         while (true) {
-            Arrays.fill(buffer, Space.Empty);
+            Arrays.fill(space, Space.Empty);
 
-            final long seconds = step;
-            robots.map(robot -> robot.move(seconds)).each(robot -> {
-                final int x = (int) (robot.y * Space.Width + robot.x);
-                buffer[x] = Space.Robot;
+            robots.each(robot -> {
+                robot.move(1);
+                space[robot.y * Space.Width + robot.x] = Space.Robot;
             });
 
-            if (robotsAligned(buffer)) return step;
-            step++;
+            seconds++;
+            if (robotsAligned(space)) return seconds;
         }
     }
 
-    record Robot(long x, long y, long dx, long dy) {
+    static class Robot {
+        int x, y, dx, dy;
+
         static Robot fromString(final String input) {
             final var l = Longs.fromString(input);
-            return new Robot(l.at(0), l.at(1), l.at(2), l.at(3));
+            final var robot = new Robot();
+            robot.x = (int) l.at(0);
+            robot.y = (int) l.at(1);
+            robot.dx = (int) l.at(2);
+            robot.dy = (int) l.at(3);
+            return robot;
         }
 
-        Robot move(final long seconds) {
-            return new Robot(mod(x + seconds * dx, Space.Width), mod(y + seconds * dy, Space.Height), dx, dy);
+        void move(final int seconds) {
+            x = mod(x + seconds * dx, Space.Width);
+            y = mod(y + seconds * dy, Space.Height);
         }
 
-        int quadrant() {
-            final long qx = x - Space.Width / 2, qy = y - Space.Height / 2;
+        int quadrant() { // quadrant numbers don't really matter
+            final int qx = x - Space.Width / 2, qy = y - Space.Height / 2;
             if (qx > 0 && qy < 0) return 1;
             if (qx < 0 && qy < 0) return 2;
             if (qx < 0 && qy > 0) return 3;
@@ -115,8 +121,8 @@ class D14 extends Aoc {
     /**
      * @return a % k in the range (0, k - 1)
      */
-    static long mod(final long a, final long k) {
-        final long mod = a % k;
+    static int mod(final int a, final int k) {
+        final int mod = a % k;
         return mod < 0 ? mod + k : mod;
     }
 
