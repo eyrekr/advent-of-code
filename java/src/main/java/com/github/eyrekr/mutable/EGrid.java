@@ -356,13 +356,26 @@ public class EGrid<E> {
             return this;
         }
 
+        public It go(final Direction direction) {
+            if (direction == Direction.None) throw new IllegalStateException("no direction");
+            this.x += direction.dx;
+            this.y += direction.dy;
+            return this;
+        }
+
+        public It go(final int dx, final int dy) {
+            if (dx == 0 && dy == 0) throw new IllegalStateException("no direction");
+            this.x += dx;
+            this.y += dy;
+            return this;
+        }
+
         public It goBack() {
             if (dx == 0 && dy == 0) throw new IllegalStateException("no direction");
             this.x -= dx;
             this.y -= dy;
             return this;
         }
-
 
         public It goWhile(final Predicate<It> condition) {
             while (condition.test(this)) go();

@@ -4,7 +4,9 @@ import com.github.eyrekr.Aoc;
 import com.github.eyrekr.mutable.EGrid;
 import com.github.eyrekr.raster.Direction;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
@@ -13,6 +15,7 @@ class D10 extends Aoc {
     interface Symbol {
         char Peak = '9';
         char TrailHead = '0';
+        char[] SubPeakHeights = "876543210".toCharArray();
     }
 
     final Direction[] directions = new Direction[]{Direction.Up, Direction.Down, Direction.Left, Direction.Right};
@@ -26,12 +29,11 @@ class D10 extends Aoc {
     public long star1() {
         grid.all().each(it -> it.setContext(it.is(Symbol.Peak) ? Set.of(it.id()) : new HashSet<>()));
 
-        for (final char height : "876543210".toCharArray()) {
+        for (final char height : Symbol.SubPeakHeights) {
             grid.where(it -> it.is(height)).each(it -> {
                 for (final Direction direction : directions) {
-                    it.setDirection(direction);
-                    if (it.la() == height + 1) {
-                        final var reachablePeaks = it.duplicate().go().context();
+                    if (it.la(direction) == height + 1) {
+                        final var reachablePeaks = it.duplicate().go(direction).context();
                         if (isNotEmpty(reachablePeaks))
                             it.visitContext(peaks -> peaks.addAll(reachablePeaks));
                     }
@@ -45,20 +47,19 @@ class D10 extends Aoc {
     }
 
     @Override
-    public long star2() { // not the best approach, but it still runs in 2ms // FIXME Should be enough only to remember the length, no need to keep the whole list!
-        grid.all().each(sc -> sc.setContext(sc.is(Symbol.Peak) ? List.of(sc.id()) : new ArrayList<>()));
+    public long star2() {
+        grid.where(it -> it.is(Symbol.Peak)).each(it -> it.setValue(1));
 
-        for (final char ch : "876543210".toCharArray()) {
-            grid.where(it -> it.is(ch)).each(it -> {
-                for (final Direction direction : directions) {
-                    final var neighbour = it.duplicate().setDirection(direction).go();
-                    if (neighbour.is((char) (ch + 1))) it.context().addAll(neighbour.context());
-                }
+        for (final char height : Symbol.SubPeakHeights) {
+            grid.where(it -> it.is(height)).each(it -> {
+                for (final Direction direction : directions)
+                    if (it.la(direction) == height + 1)
+                        it.incValue(it.duplicate().go(direction).value());
             });
         }
 
         return grid
-                .where(sc -> sc.is(Symbol.TrailHead))
-                .reduce(0L, (sum, trailhead) -> sum + trailhead.context().size());
+                .where(it -> it.is(Symbol.TrailHead))
+                .reduce(0L, (sum, trailhead) -> sum + trailhead.value());
     }
 }
