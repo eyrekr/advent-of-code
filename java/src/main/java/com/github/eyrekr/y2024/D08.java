@@ -36,7 +36,7 @@ class D08 extends Aoc {
                         it.setSymbol(Symbol.Antinode);
                     }
         });
-        return grid.where(it -> it.is(Symbol.Antinode)).count();
+        return grid.where(Symbol.Antinode).count();
     }
 
     @Override
@@ -50,7 +50,7 @@ class D08 extends Aoc {
                             it.setSymbol(Symbol.Antinode);
                     }
         });
-        return grid.where(it -> it.is(Symbol.Antinode)).count();
+        return grid.where(Symbol.Antinode).count();
     }
 
     record Antenna(int x, int y) {

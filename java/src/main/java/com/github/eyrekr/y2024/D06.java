@@ -21,7 +21,7 @@ class D06 extends Aoc {
 
     D06(final String input) {
         this.grid = EGrid.fromString(input);
-        guard = grid.where(it -> it.is(Symbol.Guard)).it.setDirection(Direction.Up);
+        guard = grid.where(Symbol.Guard).it.setDirection(Direction.Up);
     }
 
     @Override
@@ -32,7 +32,7 @@ class D06 extends Aoc {
             it.setSymbol(Symbol.Mark);
             return true;
         });
-        return grid.where(it -> it.is(Symbol.Mark)).count();
+        return grid.where(Symbol.Mark).count();
     }
 
     @Override
@@ -44,7 +44,7 @@ class D06 extends Aoc {
             return true;
         });
 
-        final var guardPath = grid.where(it -> it.is(Symbol.Mark)).collect();
+        final var guardPath = grid.where(Symbol.Mark).collect();
 
         for (final var obstacle : guardPath) {
             obstacle.setSymbol(Symbol.Wall);
@@ -65,7 +65,7 @@ class D06 extends Aoc {
             else obstacle.setSymbol(Symbol.Empty);
         }
 
-        return grid.where(it -> it.is(Symbol.Obstacle)).count();
+        return grid.where(Symbol.Obstacle).count();
     }
 
     record Location(int x, int y, int dx, int dy) {

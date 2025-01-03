@@ -27,7 +27,7 @@ class D12 extends Aoc {
     @Override
     public long star2() {
         return grid
-                .where(filter -> filter.is(State.Unseen))
+                .where(it -> it.is(State.Unseen))
                 .reduce(0L, (sum, it) -> sum + flood(it, Fence.DiscountedPrice));
     }
 
