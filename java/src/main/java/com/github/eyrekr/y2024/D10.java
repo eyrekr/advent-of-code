@@ -30,7 +30,7 @@ class D10 extends Aoc {
             grid.where(it -> it.is(height)).each(it -> {
                 for (final Direction direction : directions) {
                     it.setDirection(direction);
-                    if (it.la((char) (height + 1))) {
+                    if (it.la() == height + 1) {
                         final var reachablePeaks = it.duplicate().go().context();
                         if (isNotEmpty(reachablePeaks))
                             it.visitContext(peaks -> peaks.addAll(reachablePeaks));
@@ -39,7 +39,9 @@ class D10 extends Aoc {
             });
         }
 
-        return grid.where(it -> it.is(Symbol.TrailHead)).reduce(0L, (sum, trailhead) -> sum + trailhead.context().size());
+        return grid
+                .where(it -> it.is(Symbol.TrailHead))
+                .reduce(0L, (sum, trailhead) -> sum + trailhead.context().size());
     }
 
     @Override
@@ -55,6 +57,8 @@ class D10 extends Aoc {
             });
         }
 
-        return grid.where(sc -> sc.is(Symbol.TrailHead)).reduce(0L, (sum, trailhead) -> sum + trailhead.context().size());
+        return grid
+                .where(sc -> sc.is(Symbol.TrailHead))
+                .reduce(0L, (sum, trailhead) -> sum + trailhead.context().size());
     }
 }

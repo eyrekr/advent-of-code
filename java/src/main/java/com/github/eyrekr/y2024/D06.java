@@ -28,7 +28,7 @@ class D06 extends Aoc {
     public long star1() {
         guard.duplicate().goWhile(it -> {
             if (it.outside()) return false;
-            while (it.la(Symbol.Wall)) it.turnRight();
+            while (it.isAhead(Symbol.Wall)) it.turnRight();
             it.setSymbol(Symbol.Mark);
             return true;
         });
@@ -39,7 +39,7 @@ class D06 extends Aoc {
     public long star2() {
         guard.duplicate().goWhile(it -> {
             if (it.outside()) return false;
-            while (it.la(Symbol.Wall)) it.turnRight();
+            while (it.isAhead(Symbol.Wall)) it.turnRight();
             if (it.x != guard.x || it.y != guard.y) it.setSymbol(Symbol.Mark);
             return true;
         });
@@ -52,7 +52,7 @@ class D06 extends Aoc {
             final var visited = new HashSet<Location>();
             final var pathEnded = guard.duplicate().goWhile(it -> {
                 if (it.outside()) return false;
-                while (it.la(Symbol.Wall)) it.turnRight();
+                while (it.isAhead(Symbol.Wall)) it.turnRight();
 
                 final var location = new Location(it);
                 if (visited.contains(location)) return false;

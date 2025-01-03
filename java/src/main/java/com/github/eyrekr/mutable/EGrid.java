@@ -259,6 +259,10 @@ public class EGrid<E> {
             return inside() && symbol[x][y] == ch;
         }
 
+        public boolean isAhead(final char ch) {
+            return at(x + dx, y + dy) == ch;
+        }
+
         public boolean is(final long d) {
             return inside() && value[x][y] == d;
         }
@@ -269,10 +273,6 @@ public class EGrid<E> {
 
         public char la() {
             return at(x + dx, y + dy);
-        }
-
-        public boolean la(final char ch) {
-            return at(x + dx, y + dy) == ch;
         }
 
         public char la(final Direction direction) {
