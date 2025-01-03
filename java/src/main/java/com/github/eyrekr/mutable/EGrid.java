@@ -275,8 +275,16 @@ public class EGrid<E> {
             return at(x + dx, y + dy);
         }
 
+        public char la(final int k) {
+            return at(x + k * dx, y + k * dy);
+        }
+
         public char la(final Direction direction) {
             return at(x + direction.dx, y + direction.dy);
+        }
+
+        public char la(final Direction direction, final int k) {
+            return at(x + k * direction.dx, y + k * direction.dy);
         }
 
         public char la(final int dx, final int dy) {
