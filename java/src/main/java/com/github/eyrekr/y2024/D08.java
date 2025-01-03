@@ -3,6 +3,7 @@ package com.github.eyrekr.y2024;
 import com.github.eyrekr.Aoc;
 import com.github.eyrekr.mutable.Arr;
 import com.github.eyrekr.mutable.EGrid;
+import com.github.eyrekr.mutable.EGrid.It;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,8 +20,8 @@ class D08 extends Aoc {
 
     D08(final String input) {
         grid = EGrid.fromString(input);
-        grid.scan(it -> !it.is(Symbol.Empty))
-                .each(it -> antennasByFrequency.computeIfAbsent(it.symbol(), unused -> Arr.empty())
+        grid.where(it -> !it.is(Symbol.Empty))
+                .each(it -> antennasByFrequency.computeIfAbsent(it.ch(), unused -> Arr.empty())
                         .addLast(new Antenna(it)));
     }
 
@@ -35,7 +36,7 @@ class D08 extends Aoc {
                         it.set(Symbol.Antinode);
                     }
         });
-        return grid.scan(it -> it.is(Symbol.Antinode)).count();
+        return grid.where(it -> it.is(Symbol.Antinode)).count();
     }
 
     @Override
@@ -49,11 +50,11 @@ class D08 extends Aoc {
                             it.set(Symbol.Antinode);
                     }
         });
-        return grid.scan(it -> it.is(Symbol.Antinode)).count();
+        return grid.where(it -> it.is(Symbol.Antinode)).count();
     }
 
     record Antenna(int x, int y) {
-        Antenna(EGrid.Sc it) {
+        Antenna(It it) {
             this(it.x, it.y);
         }
     }

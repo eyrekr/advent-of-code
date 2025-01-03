@@ -4,6 +4,7 @@ import com.github.eyrekr.Aoc;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.mutable.Arr;
 import com.github.eyrekr.mutable.EGrid;
+import com.github.eyrekr.mutable.EGrid.It;
 import com.github.eyrekr.mutable.State;
 import com.github.eyrekr.raster.Direction;
 
@@ -19,15 +20,15 @@ class D12 extends Aoc {
     @Override
     public long star1() {
         return grid
-                .scan(sc -> sc.is(State.Unseen))
-                .reduce(0L, (sum, sc) -> sum + flood(sc, Fence.StandardPrice));
+                .where(it -> it.is(State.Unseen))
+                .reduce(0L, (sum, it) -> sum + flood(it, Fence.StandardPrice));
     }
 
     @Override
     public long star2() {
         return grid
-                .scan(sc -> sc.is(State.Unseen))
-                .reduce(0L, (sum, sc) -> sum + flood(sc, Fence.DiscountedPrice));
+                .where(filter -> filter.is(State.Unseen))
+                .reduce(0L, (sum, it) -> sum + flood(it, Fence.DiscountedPrice));
     }
 
     /*
@@ -35,10 +36,10 @@ class D12 extends Aoc {
       d e
       fgh
      */
-    long flood(final EGrid.Sc start, final Fence fence) {
+    long flood(final It start, final Fence fence) {
         final char plant = start.symbol();
         long area = 0, perimeter = 0;
-        final Arr<EGrid.It> queue = Arr.of(start.it());
+        final Arr<It> queue = Arr.of(start);
         while (queue.isNotEmpty()) {
             final var it = queue.removeFirst();
             if (!it.is(State.Unseen)) continue;

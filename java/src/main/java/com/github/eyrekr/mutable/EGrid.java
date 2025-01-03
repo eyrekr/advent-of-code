@@ -2,7 +2,6 @@ package com.github.eyrekr.mutable;
 
 import com.github.eyrekr.output.Out;
 import com.github.eyrekr.raster.Direction;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.BiFunction;
@@ -16,42 +15,42 @@ public class EGrid<E> {
 
     public final int m;
     public final int n;
-    public final char[][] a;
-    public final long[][] d;
+    public final char[][] symbol;
+    public final long[][] value;
     public final State[][] state;
-    public final Object[][] e;
+    public final Object[][] context;
 
     private EGrid(final int m, final int n) {
         this.m = m;
         this.n = n;
-        this.a = new char[m][n];
-        this.d = new long[m][n];
+        this.symbol = new char[m][n];
+        this.value = new long[m][n];
         this.state = new State[m][n];
-        this.e = new Object[m][n];
+        this.context = new Object[m][n];
 
         for (int y = 0; y < n; y++)
             for (int x = 0; x < m; x++) {
-                a[x][y] = Void;
-                d[x][y] = 0L;
+                symbol[x][y] = Void;
+                value[x][y] = 0L;
                 state[x][y] = State.Unseen;
-                e[x][y] = null;
+                context[x][y] = null;
             }
     }
 
     private EGrid(final EGrid<? extends E> grid) {
         this.m = grid.m;
         this.n = grid.n;
-        this.a = new char[m][n];
-        this.d = new long[m][n];
+        this.symbol = new char[m][n];
+        this.value = new long[m][n];
         this.state = new State[m][n];
-        this.e = new Object[m][n];
+        this.context = new Object[m][n];
 
         for (int y = 0; y < n; y++)
             for (int x = 0; x < m; x++) {
-                a[x][y] = grid.a[x][y];
-                d[x][y] = grid.d[x][y];
+                symbol[x][y] = grid.symbol[x][y];
+                value[x][y] = grid.value[x][y];
                 state[x][y] = grid.state[x][y];
-                e[x][y] = grid.e[x][y];
+                context[x][y] = grid.context[x][y];
             }
     }
 
@@ -65,7 +64,7 @@ public class EGrid<E> {
         final EGrid<T> grid = new EGrid<>(m, n);
         for (int y = 0; y < n; y++)
             for (int x = 0; x < m; x++)
-                grid.a[x][y] = lines[y].charAt(x);
+                grid.symbol[x][y] = lines[y].charAt(x);
         return grid;
     }
 
@@ -74,7 +73,7 @@ public class EGrid<E> {
     }
 
     public char at(final int x, final int y) {
-        return x >= 0 && x < m && y >= 0 && y < n ? a[x][y] : Void;
+        return x >= 0 && x < m && y >= 0 && y < n ? symbol[x][y] : Void;
     }
 
     public It it() {
@@ -93,21 +92,21 @@ public class EGrid<E> {
         return new It(x, y, dx, dy);
     }
 
-    public Sc scan() {
-        return new Sc(0, 0, Direction.RightDown, unused -> true);
+    public Filter all() {
+        return new Filter(0, 0, Direction.RightDown, unused -> true);
     }
 
-    public Sc scan(final Predicate<Sc> predicate) {
-        return new Sc(0, 0, Direction.RightDown, predicate);
+    public Filter where(final Predicate<It> predicate) {
+        return new Filter(0, 0, Direction.RightDown, predicate);
     }
 
-    public Sc scan(final int x, final int y, final Direction direction, final Predicate<Sc> predicate) {
-        return new Sc(x, y, direction, predicate);
+    public Filter where(final int x, final int y, final Direction direction, final Predicate<It> predicate) {
+        return new Filter(x, y, direction, predicate);
     }
 
     public EGrid<E> print() {
         for (int y = 0; y < n; y++) {
-            for (int x = 0; x < m; x++) Out.print("" + a[x][y]);
+            for (int x = 0; x < m; x++) Out.print("" + symbol[x][y]);
             Out.print("\n");
         }
         return this;
@@ -122,136 +121,65 @@ public class EGrid<E> {
         return this;
     }
 
-    public final class Sc {
+    public final class Filter {
 
-        public int x;
-        public int y;
-        public Direction direction;
-        public Predicate<Sc> predicate;
+        private final Direction direction;
+        private final Predicate<It> predicate;
 
-        private Sc(final int x, final int y, final Direction direction, final Predicate<Sc> predicate) {
-            this.x = x;
-            this.y = y;
+        private int x;
+        private int y;
+        public It it;
+
+        private Filter(final int x, final int y, final Direction direction, final Predicate<It> predicate) {
             this.direction = direction;
             this.predicate = predicate;
-            first();
+            to(x, y).first();
         }
 
-        private Sc(final Sc other) {
-            this.x = other.x;
-            this.y = other.y;
-            this.direction = other.direction;
-            this.predicate = other.predicate;
-            first();
-        }
-
-        public Sc first() {
-            if (!predicate.test(this)) next();
+        private Filter to(final int x, final int y) {
+            this.x = x;
+            this.y = y;
+            it.x = x;
+            it.y = y;
             return this;
         }
 
-        public It it() {
-            return new It(x, y, direction);
-        }
-
-        public Sc duplicate() {
-            return new Sc(this);
-        }
-
-        public boolean inside() {
+        private boolean inside() {
             return x >= 0 && x < m && y >= 0 && y < n;
         }
 
-        public boolean outside() {
-            return !inside();
-        }
-
-        public int id() {
-            return y * m + x;
-        }
-
-        public char symbol() {
-            return inside() ? a[x][y] : Void;
-        }
-
-        public boolean is(final char ch) {
-            return inside() && a[x][y] == ch;
-        }
-
-        public boolean isOneOf(final char... chars) {
-            return inside() && ArrayUtils.contains(chars, a[x][y]);
-        }
-
-        public boolean is(final long d) {
-            return inside() && EGrid.this.d[x][y] == d;
-        }
-
-        public boolean is(final State state) {
-            return inside() && EGrid.this.state[x][y] == state;
-        }
-
-        public Sc set(final char ch) {
-            if (inside()) EGrid.this.a[x][y] = ch;
+        private Filter first() {
+            if (!predicate.test(it)) next();
             return this;
         }
 
-        public Sc set(final long d) {
-            if (inside()) EGrid.this.d[x][y] = d;
-            return this;
-        }
-
-        public Sc set(final State state) {
-            if (inside()) EGrid.this.state[x][y] = state;
-            return this;
-        }
-
-        public Sc set(final Direction direction) {
-            this.direction = direction;
-            return this;
-        }
-
-        public E load() {
-            return inside() ? (E) EGrid.this.e[x][y] : null;
-        }
-
-        public Sc store(final E e) {
-            if (inside()) EGrid.this.e[x][y] = e;
-            return this;
-        }
-
-        public Sc to(final int x, final int y) {
-            this.x = x;
-            this.y = y;
-            return this;
-        }
-
-        public Sc next() {
+        private Filter next() {
             do {
-                final Sc next = switch (direction) {
+                final Filter next = switch (direction) {
                     case Right, RightDown, RightUp -> x < m - 1 ? to(x + direction.dx, y) : to(0, y + direction.dy);
                     case Left, LeftDown, LeftUp -> x > 0 ? to(x + direction.dx, y) : to(m - 1, y + direction.dy);
                     case Up, UpLeft, UpRight -> y > 0 ? to(x, y + direction.dy) : to(x + direction.dx, n - 1);
                     case Down, DownLeft, DownRight -> y < n - 1 ? to(x, y + direction.dy) : to(x + direction.dx, 0);
                     case None -> throw new IllegalStateException("no direction");
                 };
-            } while (inside() && !predicate.test(this));
+            } while (inside() && !predicate.test(it));
             return this;
         }
 
-        public Sc each(final Consumer<Sc> consumer) {
-            for (first(); inside(); next()) consumer.accept(this);
+        public Filter each(final Consumer<It> consumer) {
+            for (first(); inside(); next()) consumer.accept(it);
             return this;
         }
 
-        public <R> R reduce(final R initialValue, final BiFunction<R, Sc, R> reducer) {
+        public <R> R reduce(final R initialValue, final BiFunction<R, It, R> reducer) {
             R value = initialValue;
-            for (first(); inside(); next()) value = reducer.apply(value, this);
+            for (first(); inside(); next()) value = reducer.apply(value, it);
             return value;
         }
 
-        public Arr<Sc> collect() {
-            final Arr<Sc> array = Arr.empty();
-            for (first(); inside(); next()) array.addLast(duplicate());
+        public Arr<It> collect() {
+            final Arr<It> array = Arr.empty();
+            for (first(); inside(); next()) array.addLast(it.duplicate());
             return array;
         }
 
@@ -307,11 +235,15 @@ public class EGrid<E> {
         }
 
         public char ch() {
-            return inside() ? EGrid.this.a[x][y] : Void;
+            return inside() ? EGrid.this.symbol[x][y] : Void;
+        }
+
+        public char symbol() {
+            return ch();
         }
 
         public long d() {
-            return inside() ? EGrid.this.d[x][y] : 0L;
+            return inside() ? EGrid.this.value[x][y] : 0L;
         }
 
         public State state() {
@@ -319,11 +251,11 @@ public class EGrid<E> {
         }
 
         public boolean is(final char ch) {
-            return inside() && EGrid.this.a[x][y] == ch;
+            return inside() && EGrid.this.symbol[x][y] == ch;
         }
 
         public boolean is(final long d) {
-            return inside() && EGrid.this.d[x][y] == d;
+            return inside() && EGrid.this.value[x][y] == d;
         }
 
         public boolean is(final State state) {
@@ -347,22 +279,22 @@ public class EGrid<E> {
         }
 
         public It set(final char ch) {
-            if (inside()) EGrid.this.a[x][y] = ch;
+            if (inside()) EGrid.this.symbol[x][y] = ch;
             return this;
         }
 
         public It set(final long d) {
-            if (inside()) EGrid.this.d[x][y] = d;
+            if (inside()) EGrid.this.value[x][y] = d;
             return this;
         }
 
         public It inc() {
-            if (inside()) EGrid.this.d[x][y] = EGrid.this.d[x][y] + 1;
+            if (inside()) EGrid.this.value[x][y] = EGrid.this.value[x][y] + 1;
             return this;
         }
 
         public It inc(final long d) {
-            if (inside()) EGrid.this.d[x][y] = EGrid.this.d[x][y] + d;
+            if (inside()) EGrid.this.value[x][y] = EGrid.this.value[x][y] + d;
             return this;
         }
 
@@ -378,11 +310,11 @@ public class EGrid<E> {
         }
 
         public E load() {
-            return inside() ? (E) EGrid.this.e[x][y] : null;
+            return inside() ? (E) EGrid.this.context[x][y] : null;
         }
 
-        public It store(final E e) {
-            if (inside()) EGrid.this.e[x][y] = e;
+        public It let(final E e) {
+            if (inside()) EGrid.this.context[x][y] = e;
             return this;
         }
 

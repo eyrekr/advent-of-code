@@ -22,33 +22,33 @@ class D10 extends Aoc {
 
     @Override
     public long star1() {
-        grid.scan().each(sc -> sc.store(sc.is(Symbol.Peak) ? Set.of(sc.id()) : new HashSet<>()));
+        grid.all().each(it -> it.let(it.is(Symbol.Peak) ? Set.of(it.id()) : new HashSet<>()));
 
         for (final char ch : "876543210".toCharArray()) {
-            grid.scan(sc -> sc.is(ch)).each(level -> {
+            grid.where(it -> it.is(ch)).each(it -> {
                 for (final Direction direction : directions) {
-                    final var it = level.it().set(direction).go();
-                    if (it.is((char)(ch + 1))) level.load().addAll(it.load());
+                    final var neighbour = it.duplicate().set(direction).go();
+                    if (neighbour.is((char) (ch + 1))) neighbour.load().addAll(it.load());
                 }
             });
         }
 
-        return grid.scan(sc -> sc.is(Symbol.TrailHead)).reduce(0L, (sum, trailhead) -> sum + trailhead.load().size());
+        return grid.where(sc -> sc.is(Symbol.TrailHead)).reduce(0L, (sum, trailhead) -> sum + trailhead.load().size());
     }
 
     @Override
     public long star2() { // not the best approach, but it still runs in 2ms // FIXME Should be enough only to remember the length, no need to keep the whole list!
-        grid.scan().each(sc -> sc.store(sc.is(Symbol.Peak) ? List.of(sc.id()) : new ArrayList<>()));
+        grid.all().each(sc -> sc.let(sc.is(Symbol.Peak) ? List.of(sc.id()) : new ArrayList<>()));
 
         for (final char ch : "876543210".toCharArray()) {
-            grid.scan(sc -> sc.is(ch)).each(level -> {
+            grid.where(it -> it.is(ch)).each(it -> {
                 for (final Direction direction : directions) {
-                    final var it = level.it().set(direction).go();
-                    if (it.is((char)(ch + 1))) level.load().addAll(it.load());
+                    final var next = it.duplicate().set(direction).go();
+                    if (next.is((char) (ch + 1))) next.load().addAll(it.load());
                 }
             });
         }
 
-        return grid.scan(sc -> sc.is(Symbol.TrailHead)).reduce(0L, (sum, trailhead) -> sum + trailhead.load().size());
+        return grid.where(sc -> sc.is(Symbol.TrailHead)).reduce(0L, (sum, trailhead) -> sum + trailhead.load().size());
     }
 }

@@ -9,7 +9,7 @@ import java.util.HashSet;
 class D06 extends Aoc {
 
     interface Symbol {
-        char Up = '^';
+        char Guard = '^';
         char Mark = 'X';
         char Wall = '#';
         char Empty = '.';
@@ -21,7 +21,7 @@ class D06 extends Aoc {
 
     D06(final String input) {
         this.grid = EGrid.fromString(input);
-        guard = grid.scan(it -> it.is(Symbol.Up)).it().set(Direction.Up);
+        guard = grid.where(it -> it.is(Symbol.Guard)).it.set(Direction.Up);
     }
 
     @Override
@@ -32,7 +32,7 @@ class D06 extends Aoc {
             it.set(Symbol.Mark);
             return true;
         });
-        return grid.scan(it -> it.is(Symbol.Mark)).count();
+        return grid.where(it -> it.is(Symbol.Mark)).count();
     }
 
     @Override
@@ -44,7 +44,7 @@ class D06 extends Aoc {
             return true;
         });
 
-        final var guardPath = grid.scan(it -> it.is(Symbol.Mark)).collect();
+        final var guardPath = grid.where(it -> it.is(Symbol.Mark)).collect();
 
         for (final var obstacle : guardPath) {
             obstacle.set(Symbol.Wall);
@@ -65,7 +65,7 @@ class D06 extends Aoc {
             else obstacle.set(Symbol.Empty);
         }
 
-        return grid.scan(it -> it.is(Symbol.Obstacle)).count();
+        return grid.where(it -> it.is(Symbol.Obstacle)).count();
     }
 
     record Location(int x, int y, int dx, int dy) {
