@@ -259,16 +259,26 @@ public class EGrid<E> {
             return inside() && symbol[x][y] == ch;
         }
 
-        public boolean isAhead(final char ch) {
-            return at(x + dx, y + dy) == ch;
-        }
-
         public boolean is(final long d) {
             return inside() && value[x][y] == d;
         }
 
         public boolean is(final State s) {
             return inside() && state[x][y] == s;
+        }
+
+        public boolean isAhead(final char ch) {
+            return at(x + dx, y + dy) == ch;
+        }
+
+        public int findAhead(final char ch) {
+            int k = 0;
+            while (true) {
+                k++;
+                final char la = la(k);
+                if (la == ch) return k;
+                if (la == Void) return -1;
+            }
         }
 
         public char la() {
