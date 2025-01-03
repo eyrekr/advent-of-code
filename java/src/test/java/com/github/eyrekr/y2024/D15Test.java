@@ -30,6 +30,6 @@ class D15Test extends AocTest {
                 v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
                 """);
 
-        star1(10092L, 0L);
+        star1(10092L, 1476771L);
     }
 }

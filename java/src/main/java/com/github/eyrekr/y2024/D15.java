@@ -1,6 +1,7 @@
 package com.github.eyrekr.y2024;
 
 import com.github.eyrekr.Aoc;
+import com.github.eyrekr.mutable.Arr;
 import com.github.eyrekr.mutable.EGrid;
 import com.github.eyrekr.mutable.EGrid.It;
 import com.github.eyrekr.raster.Direction;
@@ -16,29 +17,32 @@ class D15 extends Aoc {
     }
 
     final EGrid grid;
-    final char[] instructions;
+    final Arr<Direction> instructions;
 
     D15(final String input) {
         final var blocks = StringUtils.splitByWholeSeparator(input, "\n\n");
         grid = EGrid.fromString(blocks[0]);
-        instructions = blocks[1].toCharArray();
+        instructions = Arr.empty();
+        for (final char instruction : blocks[1].toCharArray()) {
+            final Direction direction = Direction.fromChar(instruction);
+            if (direction != Direction.None) instructions.addLast(direction);
+        }
     }
 
     @Override
     public long star1() {
-        final var robot = grid.where(it -> it.is(Symbol.Robot)).it;
-        for (final char instruction : instructions) {
-            final Direction direction = Direction.fromChar(instruction);
-            if (direction == Direction.None) continue; // newlines
-            robot.setDirection(direction);
-            final boolean robotCanMove = robot.findFirstAhead(Symbol.Empty, Symbol.Wall) == Symbol.Empty;
+        final var robot = grid.where(Symbol.Robot).it;
+        instructions.each(direction -> {
+            final boolean robotCanMove = robot
+                    .setDirection(direction)
+                    .findFirstAhead(Symbol.Empty, Symbol.Wall) == Symbol.Empty;
             if (robotCanMove) moveAndPushBoxes(robot);
-        }
-        return 0L;
+        });
+        return grid.where(Symbol.Box).sum(it -> 100L * it.y + it.x);
     }
 
     void moveAndPushBoxes(final It robot) {
-        robot.duplicate().goUntil(it->it.is(Symbol.Empty));
+        robot.duplicate().goUntil(it -> it.is(Symbol.Empty)).setSymbol(Symbol.Box);
         robot.setSymbol(Symbol.Empty);
         robot.go().setSymbol(Symbol.Robot);
     }

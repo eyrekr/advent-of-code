@@ -177,6 +177,12 @@ public class EGrid {
             return value;
         }
 
+        public long sum(final Function<It, Long> function) {
+            long value = 0L;
+            for (first(); inside(); next()) value += function.apply(it);
+            return value;
+        }
+
         public Arr<It> collect() {
             final Arr<It> array = Arr.empty();
             for (first(); inside(); next()) array.addLast(it.duplicate());
