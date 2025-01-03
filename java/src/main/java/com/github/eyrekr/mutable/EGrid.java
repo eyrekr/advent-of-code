@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class EGrid<E> {
+public class EGrid {
 
     public static final char Void = '\0';
 
@@ -18,7 +18,6 @@ public class EGrid<E> {
     public final char[][] symbol;
     public final long[][] value;
     public final State[][] state;
-    public final Object[][] context;
 
     private EGrid(final int m, final int n) {
         this.m = m;
@@ -26,50 +25,46 @@ public class EGrid<E> {
         this.symbol = new char[m][n];
         this.value = new long[m][n];
         this.state = new State[m][n];
-        this.context = new Object[m][n];
 
         for (int y = 0; y < n; y++)
             for (int x = 0; x < m; x++) {
                 symbol[x][y] = Void;
                 value[x][y] = 0L;
                 state[x][y] = State.Unseen;
-                context[x][y] = null;
             }
     }
 
-    private EGrid(final EGrid<? extends E> grid) {
+    private EGrid(final EGrid grid) {
         this.m = grid.m;
         this.n = grid.n;
         this.symbol = new char[m][n];
         this.value = new long[m][n];
         this.state = new State[m][n];
-        this.context = new Object[m][n];
 
         for (int y = 0; y < n; y++)
             for (int x = 0; x < m; x++) {
                 symbol[x][y] = grid.symbol[x][y];
                 value[x][y] = grid.value[x][y];
                 state[x][y] = grid.state[x][y];
-                context[x][y] = grid.context[x][y];
             }
     }
 
-    public static <T> EGrid<T> empty(final int m, final int n) {
-        return new EGrid<>(m, n);
+    public static EGrid empty(final int m, final int n) {
+        return new EGrid(m, n);
     }
 
-    public static <T> EGrid<T> fromString(final String input) {
+    public static EGrid fromString(final String input) {
         final String[] lines = StringUtils.split(input, "\n");
         final int n = lines.length, m = lines[0].length();
-        final EGrid<T> grid = new EGrid<>(m, n);
+        final EGrid grid = new EGrid(m, n);
         for (int y = 0; y < n; y++)
             for (int x = 0; x < m; x++)
                 grid.symbol[x][y] = lines[y].charAt(x);
         return grid;
     }
 
-    public EGrid<E> duplicate() {
-        return new EGrid<>(this);
+    public EGrid duplicate() {
+        return new EGrid(this);
     }
 
     public char at(final int x, final int y) {
@@ -96,6 +91,10 @@ public class EGrid<E> {
         return new Filter(0, 0, Direction.RightDown, unused -> true);
     }
 
+    public Filter where(final char ch) {
+        return new Filter(0, 0, Direction.RightDown, it -> it.is(ch));
+    }
+
     public Filter where(final Predicate<It> predicate) {
         return new Filter(0, 0, Direction.RightDown, predicate);
     }
@@ -104,7 +103,7 @@ public class EGrid<E> {
         return new Filter(x, y, direction, predicate);
     }
 
-    public EGrid<E> print() {
+    public EGrid print() {
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < m; x++) Out.print("" + symbol[x][y]);
             Out.print("\n");
@@ -112,7 +111,7 @@ public class EGrid<E> {
         return this;
     }
 
-    public EGrid<E> print(final Function<It, String> formatter) {
+    public EGrid print(final Function<It, String> formatter) {
         final It it = new It(0, 0, Direction.None);
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < m; x++) Out.print(formatter.apply(it.to(x, y)));
@@ -149,12 +148,12 @@ public class EGrid<E> {
             return x >= 0 && x < m && y >= 0 && y < n;
         }
 
-        private It first() {
+        public It first() {
             if (!predicate.test(it)) next();
             return it;
         }
 
-        private It next() {
+        public It next() {
             do {
                 final Filter next = switch (direction) {
                     case Right, RightDown, RightUp -> x < m - 1 ? to(x + direction.dx, y) : to(0, y + direction.dy);
@@ -251,10 +250,6 @@ public class EGrid<E> {
             return inside() ? state[x][y] : null;
         }
 
-        public E context() {
-            return inside() ? (E) context[x][y] : null;
-        }
-
         public boolean is(final char ch) {
             return inside() && symbol[x][y] == ch;
         }
@@ -281,20 +276,31 @@ public class EGrid<E> {
             }
         }
 
+        public char findFirstAhead(final char a, final char b) {
+            int k = 0;
+            while (true) {
+                k++;
+                final char la = la(k);
+                if (la == a) return a;
+                if (la == b) return b;
+                if (la == Void) return Void;
+            }
+        }
+
         public char la() {
             return at(x + dx, y + dy);
         }
 
-        public char la(final int k) {
-            return at(x + k * dx, y + k * dy);
+        public char la(final int steps) {
+            return at(x + steps * dx, y + steps * dy);
         }
 
         public char la(final Direction direction) {
             return at(x + direction.dx, y + direction.dy);
         }
 
-        public char la(final Direction direction, final int k) {
-            return at(x + k * direction.dx, y + k * direction.dy);
+        public char la(final Direction direction, final int steps) {
+            return at(x + steps * direction.dx, y + steps * direction.dy);
         }
 
         public char la(final int dx, final int dy) {
@@ -338,21 +344,6 @@ public class EGrid<E> {
             return this;
         }
 
-        public It setContext(final E e) {
-            if (inside()) context[x][y] = e;
-            return this;
-        }
-
-        public It updateContext(final Function<? super E, ? extends E> function) {
-            if (inside()) context[x][y] = function.apply((E) context[x][y]);
-            return this;
-        }
-
-        public It visitContext(final Consumer<? super E> consumer) {
-            if (inside()) consumer.accept((E) context[x][y]);
-            return this;
-        }
-
         public It to(final int x, final int y) {
             this.x = x;
             this.y = y;
@@ -370,6 +361,13 @@ public class EGrid<E> {
             if (direction == Direction.None) throw new IllegalStateException("no direction");
             this.x += direction.dx;
             this.y += direction.dy;
+            return this;
+        }
+
+        public It go(final int steps) {
+            if (dx == 0 && dy == 0) throw new IllegalStateException("no direction");
+            this.x += steps * dx;
+            this.y += steps * dy;
             return this;
         }
 

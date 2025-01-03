@@ -11,7 +11,7 @@ import com.github.eyrekr.raster.Direction;
 class D12 extends Aoc {
 
     final Seq<Direction> directions = Seq.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right);
-    final EGrid<?> grid;
+    final EGrid grid;
 
     D12(final String input) {
         grid = EGrid.fromString(input);

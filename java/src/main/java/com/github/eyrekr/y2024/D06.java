@@ -16,8 +16,8 @@ class D06 extends Aoc {
         char Obstacle = 'O';
     }
 
-    final EGrid<?> grid;
-    final EGrid<?>.It guard;
+    final EGrid grid;
+    final EGrid.It guard;
 
     D06(final String input) {
         this.grid = EGrid.fromString(input);

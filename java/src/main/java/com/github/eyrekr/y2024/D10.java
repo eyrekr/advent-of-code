@@ -4,11 +4,8 @@ import com.github.eyrekr.Aoc;
 import com.github.eyrekr.mutable.EGrid;
 import com.github.eyrekr.raster.Direction;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 class D10 extends Aoc {
 
@@ -19,7 +16,7 @@ class D10 extends Aoc {
     }
 
     final Direction[] directions = new Direction[]{Direction.Up, Direction.Down, Direction.Left, Direction.Right};
-    final EGrid<Collection<Integer>> grid;
+    final EGrid grid;
 
     D10(final String input) {
         grid = EGrid.fromString(input);
@@ -27,23 +24,20 @@ class D10 extends Aoc {
 
     @Override
     public long star1() {
-        grid.all().each(it -> it.setContext(it.is(Symbol.Peak) ? Set.of(it.id()) : new HashSet<>()));
+        final Set<Integer>[][] reachablePeaks = new Set[grid.m][grid.n];
+        grid.where(Symbol.Peak).each(it -> reachablePeaks[it.x][it.y] = Set.of(it.id()));
 
         for (final char height : Symbol.SubPeakHeights) {
-            grid.where(it -> it.is(height)).each(it -> {
-                for (final Direction direction : directions) {
-                    if (it.la(direction) == height + 1) {
-                        final var reachablePeaks = it.duplicate().go(direction).context();
-                        if (isNotEmpty(reachablePeaks))
-                            it.visitContext(peaks -> peaks.addAll(reachablePeaks));
-                    }
-                }
+            grid.where(height).each(it -> {
+                final Set<Integer> peaks = new HashSet<>();
+                reachablePeaks[it.x][it.y] = peaks;
+                for (final Direction direction : directions)
+                    if (it.la(direction) == height + 1)
+                        peaks.addAll(reachablePeaks[it.x + direction.dx][it.y + direction.dy]);
             });
         }
 
-        return grid
-                .where(it -> it.is(Symbol.TrailHead))
-                .reduce(0L, (sum, trailhead) -> sum + trailhead.context().size());
+        return grid.where(Symbol.TrailHead).reduce(0L, (sum, it) -> sum + reachablePeaks[it.x][it.y].size());
     }
 
     @Override
@@ -58,8 +52,6 @@ class D10 extends Aoc {
             });
         }
 
-        return grid
-                .where(it -> it.is(Symbol.TrailHead))
-                .reduce(0L, (sum, trailhead) -> sum + trailhead.value());
+        return grid.where(Symbol.TrailHead).reduce(0L, (sum, it) -> sum + it.value());
     }
 }
