@@ -21,7 +21,7 @@ class D06 extends Aoc {
 
     D06(final String input) {
         this.grid = EGrid.fromString(input);
-        guard = grid.where(it -> it.is(Symbol.Guard)).it.set(Direction.Up);
+        guard = grid.where(it -> it.is(Symbol.Guard)).it.setDirection(Direction.Up);
     }
 
     @Override
@@ -29,7 +29,7 @@ class D06 extends Aoc {
         guard.duplicate().goWhile(it -> {
             if (it.outside()) return false;
             while (it.la(Symbol.Wall)) it.turnRight();
-            it.set(Symbol.Mark);
+            it.setSymbol(Symbol.Mark);
             return true;
         });
         return grid.where(it -> it.is(Symbol.Mark)).count();
@@ -40,14 +40,14 @@ class D06 extends Aoc {
         guard.duplicate().goWhile(it -> {
             if (it.outside()) return false;
             while (it.la(Symbol.Wall)) it.turnRight();
-            if (it.x != guard.x || it.y != guard.y) it.set(Symbol.Mark);
+            if (it.x != guard.x || it.y != guard.y) it.setSymbol(Symbol.Mark);
             return true;
         });
 
         final var guardPath = grid.where(it -> it.is(Symbol.Mark)).collect();
 
         for (final var obstacle : guardPath) {
-            obstacle.set(Symbol.Wall);
+            obstacle.setSymbol(Symbol.Wall);
 
             final var visited = new HashSet<Location>();
             final var pathEnded = guard.duplicate().goWhile(it -> {
@@ -61,8 +61,8 @@ class D06 extends Aoc {
                 return true;
             });
 
-            if (pathEnded.inside()) obstacle.set(Symbol.Obstacle);
-            else obstacle.set(Symbol.Empty);
+            if (pathEnded.inside()) obstacle.setSymbol(Symbol.Obstacle);
+            else obstacle.setSymbol(Symbol.Empty);
         }
 
         return grid.where(it -> it.is(Symbol.Obstacle)).count();

@@ -33,7 +33,7 @@ class D08 extends Aoc {
                     if (a != b) {
                         final int dx = a.x - b.x, dy = a.y - b.y, x = a.x + dx, y = a.y + dy;
                         final var it = grid.it(x, y);
-                        it.set(Symbol.Antinode);
+                        it.setSymbol(Symbol.Antinode);
                     }
         });
         return grid.where(it -> it.is(Symbol.Antinode)).count();
@@ -47,7 +47,7 @@ class D08 extends Aoc {
                     if (a != b) {
                         final int dx = a.x - b.x, dy = a.y - b.y;
                         for (final var it = grid.it(a.x, a.y, dx, dy); it.inside(); it.go())
-                            it.set(Symbol.Antinode);
+                            it.setSymbol(Symbol.Antinode);
                     }
         });
         return grid.where(it -> it.is(Symbol.Antinode)).count();

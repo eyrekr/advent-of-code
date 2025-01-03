@@ -43,7 +43,7 @@ class D12 extends Aoc {
         while (queue.isNotEmpty()) {
             final var it = queue.removeFirst();
             if (!it.is(State.Unseen)) continue;
-            it.set(State.Closed);
+            it.setState(State.Closed);
             area++;
             perimeter += fence.price(
                     it.la(Direction.UpLeft) == plant,
@@ -55,11 +55,11 @@ class D12 extends Aoc {
                     it.la(Direction.Down) == plant,
                     it.la(Direction.DownRight) == plant);
             directions.where(direction -> it.la(direction) == plant)
-                    .map(direction -> it.duplicate().set(direction).go())
+                    .map(direction -> it.duplicate().setDirection(direction).go())
                     .where(neighbour -> neighbour.is(State.Unseen))
                     .each(queue::addLast);
         }
-        start.set(area * perimeter);
+        start.setValue(area * perimeter);
         return area * perimeter;
     }
 

@@ -29,7 +29,7 @@ class D15 extends Aoc {
         for (final char instruction : instructions) {
             final Direction direction = Direction.fromChar(instruction);
             if (direction == Direction.None) continue; // newlines
-            robot.set(direction);
+            robot.setDirection(direction);
         }
         return 0L;
     }

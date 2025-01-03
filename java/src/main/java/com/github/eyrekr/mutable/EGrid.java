@@ -125,14 +125,15 @@ public class EGrid<E> {
 
         private final Direction direction;
         private final Predicate<It> predicate;
+        public final It it;
 
         private int x;
         private int y;
-        public It it;
 
         private Filter(final int x, final int y, final Direction direction, final Predicate<It> predicate) {
             this.direction = direction;
             this.predicate = predicate;
+            this.it = new It(x, y, direction);
             to(x, y).first();
         }
 
@@ -148,12 +149,12 @@ public class EGrid<E> {
             return x >= 0 && x < m && y >= 0 && y < n;
         }
 
-        private Filter first() {
+        private It first() {
             if (!predicate.test(it)) next();
-            return this;
+            return it;
         }
 
-        private Filter next() {
+        private It next() {
             do {
                 final Filter next = switch (direction) {
                     case Right, RightDown, RightUp -> x < m - 1 ? to(x + direction.dx, y) : to(0, y + direction.dy);
@@ -163,7 +164,7 @@ public class EGrid<E> {
                     case None -> throw new IllegalStateException("no direction");
                 };
             } while (inside() && !predicate.test(it));
-            return this;
+            return it;
         }
 
         public Filter each(final Consumer<It> consumer) {
@@ -235,31 +236,35 @@ public class EGrid<E> {
         }
 
         public char ch() {
-            return inside() ? EGrid.this.symbol[x][y] : Void;
+            return inside() ? symbol[x][y] : Void;
         }
 
         public char symbol() {
             return ch();
         }
 
-        public long d() {
-            return inside() ? EGrid.this.value[x][y] : 0L;
+        public long value() {
+            return inside() ? value[x][y] : 0L;
         }
 
         public State state() {
-            return inside() ? EGrid.this.state[x][y] : null;
+            return inside() ? state[x][y] : null;
+        }
+
+        public E context() {
+            return inside() ? (E) context[x][y] : null;
         }
 
         public boolean is(final char ch) {
-            return inside() && EGrid.this.symbol[x][y] == ch;
+            return inside() && symbol[x][y] == ch;
         }
 
         public boolean is(final long d) {
-            return inside() && EGrid.this.value[x][y] == d;
+            return inside() && value[x][y] == d;
         }
 
-        public boolean is(final State state) {
-            return inside() && EGrid.this.state[x][y] == state;
+        public boolean is(final State s) {
+            return inside() && state[x][y] == s;
         }
 
         public char la() {
@@ -278,43 +283,55 @@ public class EGrid<E> {
             return at(x + dx, y + dy);
         }
 
-        public It set(final char ch) {
-            if (inside()) EGrid.this.symbol[x][y] = ch;
+        public It setSymbol(final char ch) {
+            if (inside()) symbol[x][y] = ch;
             return this;
         }
 
-        public It set(final long d) {
-            if (inside()) EGrid.this.value[x][y] = d;
+        public It setValue(final long d) {
+            if (inside()) value[x][y] = d;
             return this;
         }
 
-        public It inc() {
-            if (inside()) EGrid.this.value[x][y] = EGrid.this.value[x][y] + 1;
+        public It incValue() {
+            if (inside()) value[x][y] = value[x][y] + 1;
             return this;
         }
 
-        public It inc(final long d) {
-            if (inside()) EGrid.this.value[x][y] = EGrid.this.value[x][y] + d;
+        public It incValue(final long d) {
+            if (inside()) value[x][y] = value[x][y] + d;
             return this;
         }
 
-        public It set(final State state) {
-            if (inside()) EGrid.this.state[x][y] = state;
+        public It setState(final State s) {
+            if (inside()) state[x][y] = s;
             return this;
         }
 
-        public It set(final Direction direction) {
+        public It setDirection(final Direction direction) {
             this.dx = direction.dx;
             this.dy = direction.dy;
             return this;
         }
 
-        public E load() {
-            return inside() ? (E) EGrid.this.context[x][y] : null;
+        public It setDirection(final int dx, final int dy) {
+            this.dx = dx;
+            this.dy = dy;
+            return this;
         }
 
-        public It let(final E e) {
-            if (inside()) EGrid.this.context[x][y] = e;
+        public It setContext(final E e) {
+            if (inside()) context[x][y] = e;
+            return this;
+        }
+
+        public It updateContext(final Function<? super E, ? extends E> function) {
+            if (inside()) context[x][y] = function.apply((E) context[x][y]);
+            return this;
+        }
+
+        public It visitContext(final Consumer<? super E> consumer) {
+            if (inside()) consumer.accept((E) context[x][y]);
             return this;
         }
 
@@ -324,18 +341,20 @@ public class EGrid<E> {
             return this;
         }
 
-        public It by(final int dx, final int dy) {
-            this.dx = dx;
-            this.dy = dy;
-            return this;
-        }
-
         public It go() {
             if (dx == 0 && dy == 0) throw new IllegalStateException("no direction");
             this.x += dx;
             this.y += dy;
             return this;
         }
+
+        public It goBack() {
+            if (dx == 0 && dy == 0) throw new IllegalStateException("no direction");
+            this.x -= dx;
+            this.y -= dy;
+            return this;
+        }
+
 
         public It goWhile(final Predicate<It> condition) {
             while (condition.test(this)) go();
