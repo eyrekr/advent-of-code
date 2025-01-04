@@ -56,7 +56,7 @@ class D15 extends Aoc {
         if (la == Symbol.Wall) return robot;
         if (la == Symbol.Empty) return moveRobotForward(robot);
 
-        final var end = robot.duplicate().go().goWhile(Symbol.Box);
+        final var end = robot.duplicate().goUntil(Symbol.Empty, Symbol.Wall);
         if (end.is(Symbol.Empty)) {
             end.setSymbol(Symbol.Box);
             moveRobotForward(robot);
@@ -70,17 +70,18 @@ class D15 extends Aoc {
         if (la == Symbol.Empty) return moveRobotForward(robot);
 
         if (robot.dy == 0) { // ← and → is similar to moveAndPushBoxes()
-            final var end = robot.duplicate().goWhile(Symbol.Box);
+            final var end = robot.duplicate().goUntil(Symbol.Empty, Symbol.Wall);
             if (end.is(Symbol.Empty)) {
-                end.turnAround().doUntil(it -> it.setSymbol(it.la()), Symbol.Robot); // ugly
+                moveBoxes(end.turnAround(), Symbol.BoxLeftEdge, Symbol.BoxRightEdge);
                 moveRobotForward(robot);
             }
         } else { // ↑ and ↓ is more complicated
-            final EGrid.It leftEnd = robot.duplicate().go(), rightEnd = robot.duplicate().go();
-            if (la == Symbol.BoxLeftEdge) rightEnd.go(Direction.Right);
-            if (la == Symbol.BoxRightEdge) leftEnd.go(Direction.Left);
-            if (leftEnd.goWhile(Symbol.BoxLeftEdge).is(Symbol.Empty) && rightEnd.goWhile(Symbol.BoxRightEdge).is(Symbol.Empty)) {
-
+            final var other = la == Symbol.BoxLeftEdge ? Direction.Right : Direction.Left;
+            final EGrid.It end = robot.duplicate().go().goWhile(la);
+            if (end.is(Symbol.Empty) && end.isAhead(other, Symbol.Empty)) {
+                final var otherEnd = end.turnAround().duplicate().go(other);
+                moveBoxes(end, la);
+                moveBoxes(otherEnd, la == Symbol.BoxLeftEdge ? Symbol.BoxRightEdge : Symbol.BoxLeftEdge);
                 moveRobotForward(robot);
             }
         }
@@ -91,8 +92,9 @@ class D15 extends Aoc {
         return robot.setSymbol(Symbol.Empty).go().setSymbol(Symbol.Robot);
     }
 
-    EGrid.It moveBoxes(final EGrid.It start, final EGrid.It end) {
-return start;
+    EGrid.It moveBoxes(final EGrid.It end, final char... chars) {
+        end.doWhile(it -> it.setSymbol(it.la()), it -> it.isAheadOneOf(chars));
+        return end.setSymbol(Symbol.Empty);
     }
 
     static String twiceAsWide(final String input) {

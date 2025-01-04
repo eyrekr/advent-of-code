@@ -297,6 +297,16 @@ public class EGrid {
             return at(x + dx, y + dy) == ch;
         }
 
+        public boolean isAhead(final Direction direction, final char ch) {
+            return at(x + direction.dx, y + direction.dy) == ch;
+        }
+
+        public boolean isAheadOneOf(final char... chars) {
+            final char symbol = at(x + dx, y + dy);
+            for (final char ch : chars) if (symbol == ch) return true;
+            return false;
+        }
+
         public int findDistanceToFirstAhead(final char... chars) {
             int k = 0;
             while (true) {
@@ -315,6 +325,14 @@ public class EGrid {
                 if (la == Void) return Void;
                 for (final char ch : chars) if (ch == la) return ch;
             }
+        }
+
+        public int manhattanDistanceTo(final It it) {
+            return Math.abs(x - it.x) + Math.abs(y - it.y);
+        }
+
+        public int chebyshevDistanceTo(final It it) {
+            return Math.max(Math.abs(x - it.x), Math.abs(y - it.y));
         }
 
         public char la() {
@@ -459,17 +477,17 @@ public class EGrid {
 
         public It turnRight() {
             guard();
-            final int rdx = -dy, rdy = dx;
-            this.dx = rdx;
-            this.dy = rdy;
+            final int t = dx;
+            this.dx = -dy;
+            this.dy = t;
             return this;
         }
 
         public It turnLeft() {
             guard();
-            final int ldx = dy, ldy = -dx;
-            this.dx = ldx;
-            this.dy = ldy;
+            final int t = -dx;
+            this.dx = dy;
+            this.dy = t;
             return this;
         }
 
