@@ -4,6 +4,7 @@ import com.github.eyrekr.output.Out;
 import com.github.eyrekr.raster.Direction;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -259,11 +260,11 @@ public class EGrid {
         }
 
         public char ch() {
-            return inside() ? symbol[x][y] : Void;
+            return at(x, y);
         }
 
         public char symbol() {
-            return ch();
+            return at(x, y);
         }
 
         public long value() {
@@ -275,15 +276,21 @@ public class EGrid {
         }
 
         public boolean is(final char ch) {
-            return inside() && symbol[x][y] == ch;
+            return at(x, y) == ch;
+        }
+
+        public boolean isOneOf(final char... chars) {
+            final char symbol = at(x, y);
+            for (final char ch : chars) if (symbol == ch) return true;
+            return false;
         }
 
         public boolean is(final long d) {
-            return inside() && value[x][y] == d;
+            return value() == d;
         }
 
         public boolean is(final State s) {
-            return inside() && state[x][y] == s;
+            return state() == s;
         }
 
         public boolean isAhead(final char ch) {
@@ -437,6 +444,16 @@ public class EGrid {
         public It guard() {
             if (debug && dx == 0 && dy == 0) throw new DirectionNotSpecifiedException();
             return this;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            return this == obj || (obj instanceof final EGrid.It that) && x == that.x && y == that.y && dx == that.dx && dy == that.dy;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, y, dx, dy);
         }
     }
 
