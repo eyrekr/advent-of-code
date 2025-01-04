@@ -184,8 +184,8 @@ public class EGrid {
             return it;
         }
 
-        public Filter each(final Consumer<It> consumer) {
-            for (first(); inside(); next()) consumer.accept(it);
+        public Filter each(final Consumer<It> action) {
+            for (first(); inside(); next()) action.accept(it);
             return this;
         }
 
@@ -433,6 +433,30 @@ public class EGrid {
             return goUntil(it -> it.isOneOf(chars));
         }
 
+        public It doWhile(final Consumer<It> action, final Predicate<It> condition) {
+            while (condition.test(this)) {
+                action.accept(this);
+                go();
+            }
+            return this;
+        }
+
+        public It doWhile(final Consumer<It> action, final char... chars) {
+            return doWhile(action, it -> it.isOneOf(chars));
+        }
+
+        public It doUntil(final Consumer<It> action, final Predicate<It> condition) {
+            while (!condition.test(this)) {
+                action.accept(this);
+                go();
+            }
+            return this;
+        }
+
+        public It doUntil(final Consumer<It> action, final char... chars) {
+            return doUntil(action, it -> it.isOneOf(chars));
+        }
+
         public It turnRight() {
             guard();
             final int rdx = -dy, rdy = dx;
@@ -446,6 +470,13 @@ public class EGrid {
             final int ldx = dy, ldy = -dx;
             this.dx = ldx;
             this.dy = ldy;
+            return this;
+        }
+
+        public It turnAround() {
+            guard();
+            this.dx = -dx;
+            this.dy = -dy;
             return this;
         }
 
