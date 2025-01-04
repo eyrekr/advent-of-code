@@ -48,7 +48,9 @@ class D15 extends Aoc {
 
     void run(final EGrid grid, final Consumer<EGrid.It> move) {
         final var robot = grid.where(Symbol.Robot).it;
-        instructions.each(direction -> move.accept(robot.setDirection(direction)));
+        instructions.each(direction -> {
+            move.accept(robot.setDirection(direction));
+        });
     }
 
     EGrid.It moveAndPushBoxes(final EGrid.It robot) {

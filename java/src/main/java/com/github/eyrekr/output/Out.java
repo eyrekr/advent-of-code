@@ -29,17 +29,21 @@ public final class Out {
         String LIGHT_MAGENTA = "\033[95m";
         String LIGHT_CYAN = "\033[96m";
         String LIGHT_WHITE = "\033[97m";
+        String TOP_LEFT = "\033[H";
+        String ERASE_SCREEN = "\033[2J";
     }
 
     private static final String[] FORMAT_CONTROL = new String[]{
             "@@",
             "@k", "@r", "@g", "@y", "@b", "@m", "@c", "@w",
             "@K", "@R", "@G", "@Y", "@B", "@M", "@C", "@W",
+            "@~", "@/"
     };
     private static final String[] FORMAT_ASCII = new String[]{
             Ascii.RESET,
             Ascii.BLACK, Ascii.RED, Ascii.GREEN, Ascii.YELLOW, Ascii.BLUE, Ascii.MAGENTA, Ascii.CYAN, Ascii.WHITE,
             Ascii.LIGHT_BLACK, Ascii.LIGHT_RED, Ascii.LIGHT_GREEN, Ascii.LIGHT_YELLOW, Ascii.LIGHT_BLUE, Ascii.LIGHT_MAGENTA, Ascii.LIGHT_CYAN, Ascii.LIGHT_WHITE,
+            Ascii.TOP_LEFT, Ascii.ERASE_SCREEN
     };
 
     public static String mainResource(final String name) {

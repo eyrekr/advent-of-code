@@ -1,6 +1,9 @@
 package com.github.eyrekr.common;
 
+import com.google.common.util.concurrent.Uninterruptibles;
+
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 public final class Just {
 
@@ -16,4 +19,7 @@ public final class Just {
         for (int i = 0; i < times; i++) runnable.run();
     }
 
+    public static void sleep(final long millis) {
+        Uninterruptibles.sleepUninterruptibly(millis, TimeUnit.MILLISECONDS);
+    }
 }
