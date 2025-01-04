@@ -420,9 +420,17 @@ public class EGrid {
             return this;
         }
 
+        public It goWhile(final char... chars) {
+            return goWhile(it -> it.isOneOf(chars));
+        }
+
         public It goUntil(final Predicate<It> condition) {
             while (!condition.test(this)) go();
             return this;
+        }
+
+        public It goUntil(final char... chars) {
+            return goUntil(it -> it.isOneOf(chars));
         }
 
         public It turnRight() {

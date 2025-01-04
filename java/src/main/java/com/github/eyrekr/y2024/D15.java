@@ -49,10 +49,12 @@ class D15 extends Aoc {
     }
 
     void moveAndPushBoxes(final EGrid.It robot) {
-        if (robot.findFirstAhead(Symbol.Empty, Symbol.Wall) != Symbol.Empty) return;
-        robot.duplicate().goUntil(it -> it.is(Symbol.Empty)).setSymbol(Symbol.Box);
-        robot.setSymbol(Symbol.Empty);
-        robot.go().setSymbol(Symbol.Robot);
+        final var end = robot.duplicate().goUntil(Symbol.Empty, Symbol.Wall);
+        if (end.is(Symbol.Empty)) {
+            end.setSymbol(Symbol.Box);
+            robot.setSymbol(Symbol.Empty);
+            robot.go().setSymbol(Symbol.Robot);
+        }
     }
 
     static String twiceAsWide(final String input) {
