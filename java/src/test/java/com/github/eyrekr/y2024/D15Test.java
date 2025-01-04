@@ -1,6 +1,9 @@
 package com.github.eyrekr.y2024;
 
 import com.github.eyrekr.AocTest;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class D15Test extends AocTest {
 
@@ -31,5 +34,36 @@ class D15Test extends AocTest {
                 """);
 
         star1(10092L, 1476771L);
+        star2(9021L, 0L);
+    }
+
+    @Test
+    void twiceAsWide() {
+        assertThat(
+                D15.twiceAsWide("""
+                        ##########
+                        #..O..O.O#
+                        #......O.#
+                        #.OO..O.O#
+                        #..O@..O.#
+                        #O#..O...#
+                        #O..O..O.#
+                        #.OO.O.OO#
+                        #....O...#
+                        ##########
+                        """))
+                .as("grid twice as wide")
+                .isEqualTo("""
+                        ####################
+                        ##....[]....[]..[]##
+                        ##............[]..##
+                        ##..[][]....[]..[]##
+                        ##....[]@.....[]..##
+                        ##[]##....[]......##
+                        ##[]....[]....[]..##
+                        ##..[][]..[]..[][]##
+                        ##........[]......##
+                        ####################
+                        """);
     }
 }

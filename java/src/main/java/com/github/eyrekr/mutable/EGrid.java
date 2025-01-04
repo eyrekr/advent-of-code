@@ -95,6 +95,10 @@ public class EGrid {
         return new Filter(0, 0, Direction.RightDown, it -> it.is(ch));
     }
 
+    public Filter where(final State state) {
+        return new Filter(0, 0, Direction.RightDown, it -> it.is(state));
+    }
+
     public Filter where(final Predicate<It> predicate) {
         return new Filter(0, 0, Direction.RightDown, predicate);
     }
@@ -104,20 +108,33 @@ public class EGrid {
     }
 
     public EGrid print() {
-        for (int y = 0; y < n; y++) {
-            for (int x = 0; x < m; x++) Out.print("" + symbol[x][y]);
-            Out.print("\n");
-        }
+        Out.print(toString());
         return this;
     }
 
     public EGrid print(final Function<It, String> formatter) {
-        final It it = new It(0, 0, Direction.None);
-        for (int y = 0; y < n; y++) {
-            for (int x = 0; x < m; x++) Out.print(formatter.apply(it.to(x, y)));
-            Out.print("\n");
-        }
+        Out.print(toString(formatter));
         return this;
+    }
+
+    @Override
+    public String toString() {
+        final var sb = new StringBuilder();
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < m; x++) sb.append(symbol[x][y]);
+            sb.append('\n');
+        }
+        return sb.toString();
+    }
+
+    public String toString(final Function<It, String> formatter) {
+        final var sb = new StringBuilder();
+        final var it = new It(0, 0, Direction.None);
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < m; x++) sb.append(formatter.apply(it.to(x, y)));
+            sb.append('\n');
+        }
+        return sb.toString();
     }
 
     public final class Filter {
@@ -198,6 +215,7 @@ public class EGrid {
 
     public final class It {
 
+        public boolean debug = false;
         public int x;
         public int y;
         public int dx;
@@ -272,24 +290,23 @@ public class EGrid {
             return at(x + dx, y + dy) == ch;
         }
 
-        public int findAhead(final char ch) {
+        public int findDistanceToFirstAhead(final char... chars) {
             int k = 0;
             while (true) {
                 k++;
                 final char la = la(k);
-                if (la == ch) return k;
                 if (la == Void) return -1;
+                for (final char ch : chars) if (ch == la) return k;
             }
         }
 
-        public char findFirstAhead(final char a, final char b) {
+        public char findFirstAhead(final char... chars) {
             int k = 0;
             while (true) {
                 k++;
                 final char la = la(k);
-                if (la == a) return a;
-                if (la == b) return b;
                 if (la == Void) return Void;
+                for (final char ch : chars) if (ch == la) return ch;
             }
         }
 
@@ -357,35 +374,35 @@ public class EGrid {
         }
 
         public It go() {
-            if (dx == 0 && dy == 0) throw new IllegalStateException("no direction");
+            guard();
             this.x += dx;
             this.y += dy;
             return this;
         }
 
         public It go(final Direction direction) {
-            if (direction == Direction.None) throw new IllegalStateException("no direction");
+            guard();
             this.x += direction.dx;
             this.y += direction.dy;
             return this;
         }
 
         public It go(final int steps) {
-            if (dx == 0 && dy == 0) throw new IllegalStateException("no direction");
+            guard();
             this.x += steps * dx;
             this.y += steps * dy;
             return this;
         }
 
         public It go(final int dx, final int dy) {
-            if (dx == 0 && dy == 0) throw new IllegalStateException("no direction");
+            guard();
             this.x += dx;
             this.y += dy;
             return this;
         }
 
         public It goBack() {
-            if (dx == 0 && dy == 0) throw new IllegalStateException("no direction");
+            guard();
             this.x -= dx;
             this.y -= dy;
             return this;
@@ -402,6 +419,7 @@ public class EGrid {
         }
 
         public It turnRight() {
+            guard();
             final int rdx = -dy, rdy = dx;
             this.dx = rdx;
             this.dy = rdy;
@@ -409,10 +427,19 @@ public class EGrid {
         }
 
         public It turnLeft() {
+            guard();
             final int ldx = dy, ldy = -dx;
             this.dx = ldx;
             this.dy = ldy;
             return this;
         }
+
+        public It guard() {
+            if (debug && dx == 0 && dy == 0) throw new DirectionNotSpecifiedException();
+            return this;
+        }
+    }
+
+    public class DirectionNotSpecifiedException extends IllegalStateException {
     }
 }
