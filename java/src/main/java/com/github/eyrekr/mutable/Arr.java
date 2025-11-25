@@ -10,6 +10,8 @@ import com.github.eyrekr.output.Out;
 
 import java.util.*;
 import java.util.function.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Auto-expandable mutable array of elements.
@@ -17,6 +19,8 @@ import java.util.function.*;
  */
 public final class Arr<E> implements Iterable<E> {
 
+    private static final Pattern NUMBERS = Pattern.compile("(-?\\d+)", Pattern.MULTILINE | Pattern.DOTALL);
+    private static final Pattern WORDS = Pattern.compile("(\\w+)", Pattern.MULTILINE | Pattern.DOTALL);
     private static final int MIN_CAPACITY = 16;
 
     private int length;
@@ -48,6 +52,46 @@ public final class Arr<E> implements Iterable<E> {
         arr.addLast(value);
         if (values != null) for (final T t : values) arr.addLast(t);
         return arr;
+    }
+
+    public static <T> Arr<T> fromArray(final T[] array) {
+        if (array == null || array.length == 0) return empty();
+        final Arr<T> arr = new Arr<>(array.length);
+        for (final T t : array) arr.addLast(t);
+        return arr;
+    }
+
+    public static <T> Arr<T> fromIterator(final Iterator<T> iterator) {
+        final Arr<T> array = empty();
+        while (iterator.hasNext()) array.addLast(iterator.next());
+        return array;
+    }
+
+    public static <T> Arr<T> fromIterable(final Iterable<T> iterable) {
+        return iterable != null ? fromIterator(iterable.iterator()) : empty();
+    }
+
+    public static Arr<String> fromMatcher(final Matcher matcher) {
+        final Arr<String> array = empty();
+        while (matcher.find()) array.addLast(matcher.group(0));
+        return array;
+    }
+
+    public static Arr<String> ofLinesFromString(final String string) {
+        return fromArray(string.split("\n"));
+    }
+
+    public static Arr<Long> ofNumbersFromString(final String string) {
+        final var matcher = NUMBERS.matcher(string);
+        final Arr<Long> arr = empty();
+        while (matcher.find()) {
+            arr.addLast(Long.parseLong(matcher.group()));
+        }
+        return arr;
+    }
+
+    public static Arr<String> ofWordsFromString(final String string) {
+        return fromMatcher(WORDS.matcher(string));
     }
 
     public static <T> Arr<T> repeat(final T value, final int n) {
@@ -309,6 +353,13 @@ public final class Arr<E> implements Iterable<E> {
             if (predicate.test(at(i))) swap(i, n++);
         length = n;
         return this;
+    }
+
+    public int countWhere(final Predicate<? super E> predicate) {
+        int n = 0;
+        for (int i = 0; i < length; i++)
+            if (predicate.test(at(i))) n++;
+        return n;
     }
 
     public Arr<E> reversed() {
