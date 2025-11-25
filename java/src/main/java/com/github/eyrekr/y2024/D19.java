@@ -2,7 +2,6 @@ package com.github.eyrekr.y2024;
 
 import com.github.eyrekr.Aoc;
 import com.github.eyrekr.mutable.Arr;
-import com.github.eyrekr.output.Out;
 import org.apache.commons.lang3.StringUtils;
 
 class D19 extends Aoc {
@@ -12,7 +11,7 @@ class D19 extends Aoc {
 
     D19(final String input) {
         final var blocks = StringUtils.splitByWholeSeparator(input, "\n\n");
-        patterns = Arr.ofWordsFromString(blocks[0]).sortedBy(String::length);
+        patterns = Arr.ofWordsFromString(blocks[0]).sortedBy(String::length).reversed();
         words = Arr.ofLinesFromString(blocks[1]);
     }
 
@@ -24,13 +23,8 @@ class D19 extends Aoc {
     private boolean isDesignPossible(final String word) {
         if (StringUtils.isBlank(word)) return true;
         for (final String pattern : patterns)
-            if (word.startsWith(pattern)) {
-                final boolean solved = isDesignPossible(word.substring(pattern.length()));
-                if (solved) {
-                    Out.print("-", pattern);
-                    return true;
-                }
-            }
+            if (word.startsWith(pattern) && isDesignPossible(word.substring(pattern.length()))) return true;
+
         return false;
     }
 
