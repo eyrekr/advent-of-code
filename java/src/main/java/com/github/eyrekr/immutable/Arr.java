@@ -457,7 +457,7 @@ public final class Arr<E> implements Iterable<E> {
     }
 
     public static <T> void quicksort(final T[] a, final int begin, final int end, final Comparator<? super T> comparator) {
-        final T pivot = a[begin + end / 2];
+        final T pivot = a[(begin + end) / 2];
         int l = begin, r = end;
         do {
             while (comparator.compare(a[l], pivot) < 0 && l < end) l++;

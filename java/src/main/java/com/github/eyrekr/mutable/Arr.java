@@ -377,7 +377,7 @@ public final class Arr<E> implements Iterable<E> {
     }
 
     private void quicksort(final int begin, final int end, final Comparator<? super E> comparator) {
-        final E pivot = at(begin + end / 2);
+        final E pivot = at((begin + end) / 2);
         int l = begin, r = end;
         do {
             while (comparator.compare(at(l), pivot) < 0 && l < end) l++;
