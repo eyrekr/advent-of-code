@@ -1,0 +1,8 @@
+<aspectj>
+    <aspects>
+        <aspect name="com.github.eyrekr.aop.MemoizeAspect"/>
+    </aspects>
+    <weaver options="-verbose -showWeaveInfo">
+        <include within="com.github.eyrekr..*"/>
+    </weaver>
+</aspectj>
