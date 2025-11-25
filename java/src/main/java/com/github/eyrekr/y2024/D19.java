@@ -4,33 +4,48 @@ import com.github.eyrekr.Aoc;
 import com.github.eyrekr.mutable.Arr;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 class D19 extends Aoc {
 
-    final Arr<String> patterns;
-    final Arr<String> words;
+    final Arr<String> towels;
+    final Arr<String> designs;
+    final Map<String, Long> waysToComposeDesign;
 
     D19(final String input) {
         final var blocks = StringUtils.splitByWholeSeparator(input, "\n\n");
-        patterns = Arr.ofWordsFromString(blocks[0]).sortedBy(String::length).reversed();
-        words = Arr.ofLinesFromString(blocks[1]);
+        towels = Arr.ofWordsFromString(blocks[0]);
+        designs = Arr.ofLinesFromString(blocks[1]);
+
+        waysToComposeDesign = new HashMap<>();
     }
 
     @Override
     public long star1() {
-        return words.countWhere(this::isDesignPossible);
+        return designs.map(this::countWaysToComposeDesign).countWhere(value -> value > 0);
     }
 
-    private boolean isDesignPossible(final String word) {
-        if (StringUtils.isBlank(word)) return true;
-        for (final String pattern : patterns)
-            if (word.startsWith(pattern) && isDesignPossible(word.substring(pattern.length()))) return true;
-
-        return false;
-    }
 
     @Override
     public long star2() {
-        return -1;
+        return designs.map(this::countWaysToComposeDesign).reduce(Long::sum).getOrElse(-1L);
     }
 
+    long countWaysToComposeDesign(final String design) {
+        final Long n = waysToComposeDesign.getOrDefault(design, -1L);
+        if (n >= 0) return n;
+
+        long k = towels
+                .map(towel -> {
+                    if (Objects.equals(design, towel)) return 1L;
+                    if (design.startsWith(towel)) return countWaysToComposeDesign(design.substring(towel.length()));
+                    return 0L;
+                })
+                .reduce(Long::sum)
+                .getOrElse(0L);
+        waysToComposeDesign.put(design, k);
+        return k;
+    }
 }

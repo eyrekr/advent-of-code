@@ -19,8 +19,8 @@ class D19Test extends AocTest {
                 bbrgwb
                 """);
 
-        star1(6L, -1L);
-        star2(-1L, -1L);
+        star1(6L, 300L);
+        star2(16L, 624802218898092L);
     }
 
 }
