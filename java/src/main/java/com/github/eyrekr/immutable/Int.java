@@ -4,7 +4,7 @@ package com.github.eyrekr.immutable;
  * Interval.
  */
 public final class Int {
-    public long a, b;
+    public final long a, b;
 
     public Int(long a, long b) {
         this.a = a;
