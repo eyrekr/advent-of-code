@@ -597,7 +597,9 @@ public final class Arr<E> implements Iterable<E> {
 
         @Override
         public E next() {
-            return at(i++);
+            final E e = at(i);
+            i++;
+            return e;
         }
     }
 
