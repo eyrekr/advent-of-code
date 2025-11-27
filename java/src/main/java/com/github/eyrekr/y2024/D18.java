@@ -26,16 +26,15 @@ class D18 extends Aoc {
 
     @Override
     public long star2() {
-        //6,1
         int l = 0, r = positionsOfCorruptedBytes.length() - 1;
-        while (r - l > 1) {
+        while (r - l > 1) { // bisection
             final int k = (l + r) / 2;
             final boolean isExitStillReachable = solve(k) > 0;
             if (isExitStillReachable) l = k;
             else r = k;
         }
         final P p = positionsOfCorruptedBytes.at(r - 1);
-        Out.print("Path is closed with byte @b#%d@@ at (@b%d@@,@b%d@@)\n", r, p.x, p.y);
+        Out.print("Path is closed with byte @b#%d@@ at (@b%d@@,@b%d@@)\n", r, p.x, p.y); // AoC requires the coordinates this time
         return r;
     }
 
