@@ -12,7 +12,7 @@ class D19 extends Aoc {
 
     final Arr<String> towels;
     final Arr<String> designs;
-    private final Map<String, Long> memory = new HashMap<>();
+    final Map<String, Long> memory = new HashMap<>();
 
     D19(final String input) {
         final var blocks = StringUtils.splitByWholeSeparator(input, "\n\n");

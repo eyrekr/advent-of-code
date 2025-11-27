@@ -27,12 +27,7 @@ public class EGrid {
         this.value = new long[m][n];
         this.state = new State[m][n];
 
-        for (int y = 0; y < n; y++)
-            for (int x = 0; x < m; x++) {
-                symbol[x][y] = Void;
-                value[x][y] = 0L;
-                state[x][y] = State.Unseen;
-            }
+        reset();
     }
 
     private EGrid(final EGrid grid) {
@@ -66,6 +61,16 @@ public class EGrid {
 
     public EGrid duplicate() {
         return new EGrid(this);
+    }
+
+    public EGrid reset() {
+        for (int y = 0; y < n; y++)
+            for (int x = 0; x < m; x++) {
+                symbol[x][y] = Void;
+                value[x][y] = 0L;
+                state[x][y] = State.Unseen;
+            }
+        return this;
     }
 
     public char at(final int x, final int y) {
@@ -279,18 +284,31 @@ public class EGrid {
             return at(x, y) == ch;
         }
 
-        public boolean isOneOf(final char... chars) {
+        public boolean isOneOf(final char ch, final char... chars) {
             final char symbol = at(x, y);
-            for (final char ch : chars) if (symbol == ch) return true;
+            if (symbol == ch) return true;
+            for (final char c : chars) if (symbol == c) return true;
             return false;
+        }
+
+        public boolean isNot(final char ch) {
+            return at(x, y) != ch;
         }
 
         public boolean is(final long d) {
             return value() == d;
         }
 
+        public boolean isNot(final long d) {
+            return value() != d;
+        }
+
         public boolean is(final State s) {
             return state() == s;
+        }
+
+        public boolean isNot(final State s) {
+            return state() != s;
         }
 
         public boolean isAhead(final char ch) {
@@ -438,8 +456,8 @@ public class EGrid {
             return this;
         }
 
-        public It goWhile(final char... chars) {
-            return goWhile(it -> it.isOneOf(chars));
+        public It goWhile(final char ch, final char... chars) {
+            return goWhile(it -> it.isOneOf(ch, chars));
         }
 
         public It goUntil(final Predicate<It> condition) {
@@ -447,8 +465,8 @@ public class EGrid {
             return this;
         }
 
-        public It goUntil(final char... chars) {
-            return goUntil(it -> it.isOneOf(chars));
+        public It goUntil(final char ch, final char... chars) {
+            return goUntil(it -> it.isOneOf(ch, chars));
         }
 
         public It doWhile(final Consumer<It> action, final Predicate<It> condition) {
@@ -459,8 +477,8 @@ public class EGrid {
             return this;
         }
 
-        public It doWhile(final Consumer<It> action, final char... chars) {
-            return doWhile(action, it -> it.isOneOf(chars));
+        public It doWhile(final Consumer<It> action, final char ch, final char... chars) {
+            return doWhile(action, it -> it.isOneOf(ch, chars));
         }
 
         public It doUntil(final Consumer<It> action, final Predicate<It> condition) {
@@ -471,8 +489,8 @@ public class EGrid {
             return this;
         }
 
-        public It doUntil(final Consumer<It> action, final char... chars) {
-            return doUntil(action, it -> it.isOneOf(chars));
+        public It doUntil(final Consumer<It> action, final char ch, final char... chars) {
+            return doUntil(action, it -> it.isOneOf(ch, chars));
         }
 
         public It turnRight() {
@@ -500,6 +518,26 @@ public class EGrid {
 
         public It guard() {
             if (debug && dx == 0 && dy == 0) throw new DirectionNotSpecifiedException();
+            return this;
+        }
+
+        public It bfs() {
+            return bfs(Arr.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right));
+        }
+
+        public It bfs(final Arr<Direction> directions) {
+            final Arr<It> queue = Arr.of(this);
+            while (queue.isNotEmpty()) {
+                final It it = queue.removeFirst();
+                if (it.is(State.Closed)) continue; // closed in the meantime, there might be more paths to one spot
+                it.setState(State.Closed);
+                directions
+                        .map(direction -> it.duplicate().go(direction))
+                        .where(It::inside)
+                        .where(neighbour -> neighbour.isNot(State.Closed))
+                        .each(neighbour -> neighbour.setValue(it.value() + 1))
+                        .each(queue::addLast);
+            }
             return this;
         }
 

@@ -118,6 +118,13 @@ public final class Arr<E> implements Iterable<E> {
         return arr;
     }
 
+    public Arr<E> copyFirst(final int n) {
+        final int l = Math.min(n, length);
+        final Arr<E> arr = new Arr<>(l);
+        for (int i = 0; i < l; i++) arr.addLast(at(i));
+        return arr;
+    }
+
     public E getFirst() {
         return at(0);
     }
