@@ -76,6 +76,12 @@ public final class Opt<E> {
         return value;
     }
 
+    public Opt<E> ifPresentOrElse(final Consumer<? super E> consumeIfPresent, final Runnable runIfMissing) {
+        if (present) consumeIfPresent.accept(value);
+        else runIfMissing.run();
+        return this;
+    }
+
     @Override
     public boolean equals(final Object obj) {
         return obj instanceof final Opt that && this.present == that.present && Objects.equals(this.value, that.value);
