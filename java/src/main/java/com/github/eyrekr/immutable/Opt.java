@@ -82,6 +82,18 @@ public final class Opt<E> {
         return this;
     }
 
+    public Arr<E> toArr() {
+        return present ? Arr.of(value) : Arr.empty();
+    }
+
+    public Seq<E> toSeq() {
+        return present ? Seq.of(value) : Seq.empty();
+    }
+
+    public com.github.eyrekr.mutable.Arr<E> toMutableArr() {
+        return present ? com.github.eyrekr.mutable.Arr.of(value) : com.github.eyrekr.mutable.Arr.empty();
+    }
+
     @Override
     public boolean equals(final Object obj) {
         return obj instanceof final Opt that && this.present == that.present && Objects.equals(this.value, that.value);

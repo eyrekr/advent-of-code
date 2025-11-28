@@ -252,6 +252,10 @@ public class EGrid {
             return new It(this);
         }
 
+        public It clone() {
+            return new It(this);
+        }
+
         public boolean inside() {
             return x >= 0 && x < m && y >= 0 && y < n;
         }
@@ -323,6 +327,14 @@ public class EGrid {
             final char symbol = at(x + dx, y + dy);
             for (final char ch : chars) if (symbol == ch) return true;
             return false;
+        }
+
+        public boolean hasSamePositionAs(final It other) {
+            return x == other.x && y == other.y;
+        }
+
+        public boolean hasSameDirectionAs(final It other) {
+            return dx == other.dx && y == other.dy;
         }
 
         public int findDistanceToFirstAhead(final char... chars) {

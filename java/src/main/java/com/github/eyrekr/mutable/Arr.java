@@ -47,6 +47,7 @@ public final class Arr<E> implements Iterable<E> {
         return new Arr<>(MIN_CAPACITY);
     }
 
+    @SafeVarargs
     public static <T> Arr<T> of(final T value, final T... values) {
         final Arr<T> arr = new Arr<>(values != null ? values.length + 1 : 1);
         arr.addLast(value);

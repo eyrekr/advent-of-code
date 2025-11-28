@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 
 /**
- * Heap.
+ * Min-Heap
  */
 public final class Hp<E> implements Iterable<E> {
     private static final int MIN_CAPACITY = 16;
