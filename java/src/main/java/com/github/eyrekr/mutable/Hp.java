@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * Min-Heap
@@ -117,6 +118,11 @@ public final class Hp<E> implements Iterable<E> {
 
     public Hp<E> each(final BiConsumer<? super Long, ? super E> consumer) {
         for (int i = 0; i < length; i++) consumer.accept(keys[i], (E) values[i]);
+        return this;
+    }
+
+    public Hp<E> whileNotEmpty(final Consumer<? super E> consumer) {
+        while (isNotEmpty()) removeFirst().ifPresent(consumer);
         return this;
     }
 

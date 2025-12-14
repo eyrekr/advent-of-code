@@ -487,6 +487,11 @@ public final class Arr<E> implements Iterable<E> {
         return this;
     }
 
+    public Arr<E> whileNotEmpty(final Consumer<? super E> consumer) {
+        while (isNotEmpty()) consumer.accept(removeFirst());
+        return this;
+    }
+
     public Arr<E> transform(final Function<? super E, ? extends E> transform) {
         for (int i = 0; i < length; i++) set(i, transform.apply(at(i)));
         return this;
