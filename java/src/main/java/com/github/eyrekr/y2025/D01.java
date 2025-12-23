@@ -8,7 +8,7 @@ import com.github.eyrekr.immutable.Seq;
 class D01 extends Aoc {
 
     static final long N = 100L;
-    static final Int RANGE = new Int(0, N);
+    static final Int RANGE = Int.closed(0, N);
     final Longs rotations;
 
     D01(final String input) {

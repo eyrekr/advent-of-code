@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 class D13 extends Aoc {
 
-    final Int domain = new Int(0, 100);
+    final Int domain = Int.closed(0, 100);
     final long offset = 10_000_000_000_000L;
     final Arr<ClawMachine> clawMachines;
 

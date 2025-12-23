@@ -7,8 +7,8 @@ import com.github.eyrekr.immutable.Longs;
 
 class D02 extends Aoc {
 
-    static final Int AscendingDeltas = new Int(1, 3);
-    static final Int DescendingDeltas = new Int(-3, -1);
+    static final Int AscendingDeltas = Int.closed(1, 3);
+    static final Int DescendingDeltas = Int.closed(-3, -1);
 
     final Arr<Longs> reports;
 

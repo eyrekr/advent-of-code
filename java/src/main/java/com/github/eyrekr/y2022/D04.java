@@ -24,7 +24,7 @@ public class D04 {
     record AssignmentPair(Int i1, Int i2) {
         static AssignmentPair from(final String input) {
             final var l = Longs.fromStringArray(StringUtils.split(input, "-,"));
-            return new AssignmentPair(new Int(l.at(0), l.at(1)), new Int(l.at(2), l.at(3)));
+            return new AssignmentPair(Int.closed(l.at(0), l.at(1)), Int.closed(l.at(2), l.at(3)));
         }
 
         boolean contained() {

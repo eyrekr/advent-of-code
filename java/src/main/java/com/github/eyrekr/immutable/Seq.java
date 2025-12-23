@@ -3,6 +3,7 @@ package com.github.eyrekr.immutable;
 import com.github.eyrekr.common.Just;
 import com.github.eyrekr.common.Numbered;
 import com.github.eyrekr.output.Out;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.TriFunction;
 
 import java.security.SecureRandom;
@@ -62,6 +63,10 @@ public final class Seq<E> implements Iterable<E> {
 
     public static Seq<String> ofLinesFromString(final String string) {
         return fromArray(string.split("\n"));
+    }
+
+    public static Seq<String> ofLinesFromString(final String string, final String delimiter) {
+        return fromArray(StringUtils.split(string, delimiter));
     }
 
     public static Seq<Long> ofNumbersFromString(final String string) {
