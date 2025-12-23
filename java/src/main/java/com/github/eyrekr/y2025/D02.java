@@ -2,7 +2,6 @@ package com.github.eyrekr.y2025;
 
 import com.github.eyrekr.Aoc;
 import com.github.eyrekr.immutable.Int;
-import com.github.eyrekr.immutable.Longs;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.math.Algebra;
 
@@ -17,7 +16,7 @@ class D02 extends Aoc {
 
     @Override
     public long star1() {
-        return ranges.map(D02::enumerateInvalidIds).toLongs(Longs::sum).sum();
+        return ranges.toLongs(D02::sumInvalidIdsInRange).sum();
     }
 
     @Override
@@ -25,8 +24,8 @@ class D02 extends Aoc {
         return -1L;
     }
 
-    static Longs enumerateInvalidIds(final Int interval) {
-        return interval.where(D02::isIdInvalid);
+    static long sumInvalidIdsInRange(final Int range) {
+        return range.where(D02::isIdInvalid).sum();
     }
 
     static boolean isIdInvalid(final long id) {

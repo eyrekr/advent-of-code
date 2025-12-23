@@ -70,9 +70,20 @@ public final class Int {
         return longs;
     }
 
+    public <R> R reduce(final R init, final AccumulatorLongToR<R> reducer) {
+        R acc = init;
+        for (long value = a; value <= b; value++) acc = reducer.reduce(acc, value);
+        return acc;
+    }
+
     @Override
     public String toString() {
         return String.format("[%d,%d]", a, b);
+    }
+
+    @FunctionalInterface
+    public interface AccumulatorLongToR<R> {
+        R reduce(R accumulator, long value);
     }
 
     private static class Parser {
