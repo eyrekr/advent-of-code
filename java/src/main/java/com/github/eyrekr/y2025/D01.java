@@ -2,6 +2,7 @@ package com.github.eyrekr.y2025;
 
 import com.github.eyrekr.Aoc;
 import com.github.eyrekr.immutable.Seq;
+import com.github.eyrekr.output.Out;
 
 class D01 extends Aoc {
 
@@ -26,10 +27,10 @@ class D01 extends Aoc {
     enum Direction {
         Left(-1), Right(+1);
 
-        final long δ;
+        final long delta;
 
-        Direction(long δ) {
-            this.δ = δ;
+        Direction(final long delta) {
+            this.delta = delta;
         }
 
         static Direction from(final char ch) {
@@ -49,25 +50,25 @@ class D01 extends Aoc {
                 if (Character.isDigit(ch)) value = 10 * value + Character.digit(ch, 10);
             return new Rotation(Direction.from(characters[0]), value);
         }
+
+        long apply(final long state) { // output guaranteed to be 0..99
+            return (state + (value % N) * direction.delta + N) % N;
+        }
     }
 
     record Dial(long value, long count) {
         static Dial INITIAL = new Dial(50L, 0L);
 
         Dial turnAndCountWhereDialEndsAtZero(final Rotation rotation) {
-            final long result = (value + rotation.value * rotation.direction.δ) % N;
-            return new Dial(result, result == 0 ? this.count + 1 : this.count);
+            final long result = rotation.apply(value);
+            return new Dial(result, count + (result == 0 ? 1 : 0));
         }
 
         Dial turnAndCountWhereDialCrossesZero(final Rotation rotation) {
-            long state = value, crossings = 0;
-            for (int i = 0; i < rotation.value; i++) {
-                state = (state + rotation.direction.δ);
-                if (state >= N) state = state - N;
-                if (state < 0) state = N + state;
-                if (state == 0) crossings++;
-            }
-            return new Dial(state, count + crossings);
+            final long t = value + (rotation.value % N) * rotation.direction.delta;
+            final long fullCycles = rotation.value / N;
+            final long extraCycles = (value != 0 && (t <= 0 || t >= N) ? 1 : 0); // is the remainder out of bounds?
+            return new Dial(rotation.apply(value), count + fullCycles + extraCycles);
         }
     }
 }
