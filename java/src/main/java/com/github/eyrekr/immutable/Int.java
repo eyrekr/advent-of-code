@@ -1,6 +1,7 @@
 package com.github.eyrekr.immutable;
 
-import java.util.Arrays;
+import java.util.function.LongConsumer;
+import java.util.function.LongPredicate;
 
 /**
  * Interval.
@@ -56,6 +57,17 @@ public final class Int {
 
     public boolean notContains(final long x) {
         return x < a || b < x;
+    }
+
+    public Int each(final LongConsumer consumer) {
+        for (long value = a; value <= b; value++) consumer.accept(value);
+        return this;
+    }
+
+    public Longs where(final LongPredicate predicate) {
+        Longs longs = Longs.empty();
+        for (long value = a; value <= b; value++) if (predicate.test(value)) longs = longs.addLast(value);
+        return longs;
     }
 
     @Override
