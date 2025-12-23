@@ -19,6 +19,6 @@ class D01Test extends AocTest {
                 L82
                 """);
         star1(3L, 1011L);
-        star2(-1L, -1L);
+        star2(6L, 5937L);
     }
 }
