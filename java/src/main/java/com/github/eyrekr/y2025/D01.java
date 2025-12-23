@@ -51,7 +51,7 @@ class D01 extends Aoc {
         }
 
         Dial turn(final long rotation, final long extra) {
-            final long result = (state + rotation % N + N) % N; // output guaranteed to be 0..99
+            final long result = (state + rotation % N + N) % N; // result is guaranteed to be always 0..99
             return new Dial(result, count + (result == 0 ? 1 : 0) + extra);
         }
     }
