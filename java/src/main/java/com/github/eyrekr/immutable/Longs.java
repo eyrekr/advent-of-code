@@ -183,6 +183,20 @@ public final class Longs implements Iterable<Long> {
     }
 
     /**
+     * @return The first element in the array. If the array is empty, 0 is returned.
+     */
+    public long getFirst() {
+        return at(0);
+    }
+
+    /**
+     * @return The last element in the array. If the array is empty, 0 is returned.
+     */
+    public long getLast() {
+        return isEmpty ? 0L : at(length - 1);
+    }
+
+    /**
      * @return New array without the last value. If the array is empty, the operation does not do anything.
      * @complexity O(1)
      */
@@ -408,6 +422,16 @@ public final class Longs implements Iterable<Long> {
     public long countWhere(final LongToBool predicate) {
         long count = 0L;
         for (int i = 0; i < length; i++) if (predicate.test(at(i))) count++;
+        return count;
+    }
+
+    /**
+     * @return Number of occurrences of the value.
+     * @complexity O(n)
+     */
+    public long count(final long value) {
+        long count = 0L;
+        for (int i = 0; i < length; i++) if (at(i) == value) count++;
         return count;
     }
 
