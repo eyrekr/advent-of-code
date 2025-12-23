@@ -1,15 +1,18 @@
 package com.github.eyrekr.y2025;
 
 import com.github.eyrekr.Aoc;
+import com.github.eyrekr.immutable.Int;
+import com.github.eyrekr.immutable.Longs;
 import com.github.eyrekr.immutable.Seq;
 
 class D01 extends Aoc {
 
     static final long N = 100L;
-    final Seq<Rotation> rotations;
+    static final Int RANGE = new Int(0, N);
+    final Longs rotations;
 
     D01(final String input) {
-        rotations = Seq.ofLinesFromString(input).map(Rotation::from);
+        rotations = Seq.ofLinesFromString(input).toLongs(D01::rotations);
     }
 
     @Override
@@ -23,55 +26,34 @@ class D01 extends Aoc {
     }
 
 
-    enum Direction {
-        Left(-1), Right(+1);
-
-        final long delta;
-
-        Direction(final long delta) {
-            this.delta = delta;
-        }
-
-        static Direction from(final char ch) {
-            return switch (ch) {
-                case 'R', 'r' -> Right;
-                case 'L', 'l' -> Left;
-                default -> throw new IllegalStateException();
-            };
-        }
-    }
-
-    record Rotation(Direction direction, long value, long fullCycles) {
-        static Rotation from(final String line) {
-            long value = 0;
-            final char[] characters = line.toCharArray();
-            for (final char ch : characters)
-                if (Character.isDigit(ch)) value = 10 * value + Character.digit(ch, 10);
-            return new Rotation(Direction.from(characters[0]), value % N, value / N);
-        }
-
-        long apply(final long state) { // output guaranteed to be 0..99
-            return (state + value * direction.delta + N) % N;
-        }
+    static long rotations(final String line) {
+        long value = 0;
+        final char[] characters = line.toCharArray();
+        for (final char ch : characters)
+            if (Character.isDigit(ch)) value = 10 * value + Character.digit(ch, 10);
+        return switch (characters[0]) {
+            case 'R', 'r' -> value;
+            case 'L', 'l' -> -value;
+            default -> throw new IllegalStateException();
+        };
     }
 
     record Dial(long state, long count) {
         static Dial INITIAL = new Dial(50L, 0L);
 
-        Dial turnAndCountWhereDialEndsAtZero(final Rotation rotation) {
-            return to(rotation.apply(state), 0);
+        Dial turnAndCountWhereDialEndsAtZero(final long rotation) {
+            return turn(rotation, 0);
         }
 
-        Dial turnAndCountWhereDialCrossesZero(final Rotation rotation) {
-            final long extraCycles = switch (rotation.direction) {
-                case Left -> state - rotation.value < 0 && state != 0 ? 1 : 0;
-                case Right -> state + rotation.value > N && state != 0 ? 1 : 0;
-            };
-            return to(rotation.apply(state), rotation.fullCycles + extraCycles);
+        Dial turnAndCountWhereDialCrossesZero(final long rotation) {
+            final long fullCycles = Math.abs(rotation) / N;
+            final long extraCycles = state != 0 && RANGE.notContains(state + rotation % N) ? 1 : 0;
+            return turn(rotation, fullCycles + extraCycles);
         }
 
-        Dial to(final long result, final long extra) {
-            return new Dial(result, count + extra + (result == 0 ? 1 : 0));
+        Dial turn(final long rotation, final long extra) {
+            final long result = (state + rotation % N + N) % N; // output guaranteed to be 0..99
+            return new Dial(result, count + (result == 0 ? 1 : 0) + extra);
         }
     }
 }
