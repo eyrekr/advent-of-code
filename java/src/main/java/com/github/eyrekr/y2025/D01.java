@@ -25,7 +25,6 @@ class D01 extends Aoc {
         return rotations.reduce(Dial.INITIAL, Dial::turnAndCountWhereDialCrossesZero).count;
     }
 
-
     static long rotations(final String line) {
         long value = 0;
         final char[] characters = line.toCharArray();
@@ -47,8 +46,8 @@ class D01 extends Aoc {
 
         Dial turnAndCountWhereDialCrossesZero(final long rotation) {
             final long fullCycles = Math.abs(rotation) / N;
-            final long extraCycles = state != 0 && RANGE.notContains(state + rotation % N) ? 1 : 0;
-            return turn(rotation, fullCycles + extraCycles);
+            final long extraCrossingNotEndingAtZero = state != 0 && RANGE.notContains(state + rotation % N) ? 1 : 0;
+            return turn(rotation, fullCycles + extraCrossingNotEndingAtZero);
         }
 
         Dial turn(final long rotation, final long extra) {
