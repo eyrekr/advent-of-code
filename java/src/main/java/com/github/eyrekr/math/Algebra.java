@@ -1,5 +1,7 @@
 package com.github.eyrekr.math;
 
+import com.github.eyrekr.immutable.Longs;
+
 public final class Algebra {
 
     public static final long[] E10 = {
@@ -70,6 +72,12 @@ public final class Algebra {
         if (n < 100) return 2;
         if (n < 1000) return 3;
         return decimalDigits(n / 1000) + 3;
+    }
+
+    public static Longs allDivisors(final long n) {
+        Longs divisors = Longs.of(1);
+        for (int i = 2; i < n / 2; i++) if (n % i == 0) divisors = divisors.addLast(i);
+        return divisors.addLast(n);
     }
     //endregion
 }

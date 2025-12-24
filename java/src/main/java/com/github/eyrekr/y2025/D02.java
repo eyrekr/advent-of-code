@@ -2,11 +2,11 @@ package com.github.eyrekr.y2025;
 
 import com.github.eyrekr.Aoc;
 import com.github.eyrekr.immutable.Int;
+import com.github.eyrekr.immutable.Longs;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.math.Algebra;
 
 class D02 extends Aoc {
-
 
     final Seq<Int> ranges;
 
@@ -16,16 +16,12 @@ class D02 extends Aoc {
 
     @Override
     public long star1() {
-        return ranges.toLongs(D02::sumInvalidIdsInRange).sum();
+        return ranges.toLongs(range -> range.where(D02::isIdInvalid).sum()).sum();
     }
 
     @Override
     public long star2() {
-        return -1L;
-    }
-
-    static long sumInvalidIdsInRange(final Int range) {
-        return range.where(D02::isIdInvalid).sum();
+        return ranges.toLongs(D02::invalidIds).sum();
     }
 
     static boolean isIdInvalid(final long id) {
@@ -34,5 +30,15 @@ class D02 extends Aoc {
         if (digits % 2 == 1 || digits == 0) return false;
         final long exp = Algebra.E10[digits / 2];
         return (id / exp) == (id % exp);
+    }
+
+    static long invalidIds(final Int range) {
+        final int digits = Algebra.decimalDigits(range.a);
+        final Longs divisors = Algebra.allDivisors(digits).removeLast();
+        return range.where(id -> divisors.atLeastOneIs()).sum();
+    }
+
+    static boolean isIdInvalid(final long id, final int segment) {
+        final long t = id % Algebra.E10[segment];
     }
 }
