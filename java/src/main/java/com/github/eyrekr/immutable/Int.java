@@ -35,6 +35,10 @@ public final class Int {
         return new Int(leftOpen ? left + 1 : left, rightOpen ? right - 1 : right);
     }
 
+    public long length() {
+        return b - a + 1;
+    }
+
     public boolean overlaps(final Int that) {
         return that.a <= this.b && this.a <= that.b;
     }
@@ -57,6 +61,12 @@ public final class Int {
 
     public boolean notContains(final long x) {
         return x < a || b < x;
+    }
+
+    public Int merge(final Int that) {
+        if (this.notOverlaps(that))
+            throw new IllegalStateException(String.format("Intervals %s and %s do not overlap", this, that));
+        return new Int(Math.min(this.a, that.a), Math.max(this.b, that.b));
     }
 
     public Int each(final LongConsumer consumer) {

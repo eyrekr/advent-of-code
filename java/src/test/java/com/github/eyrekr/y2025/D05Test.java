@@ -11,7 +11,7 @@ class D05Test extends AocTest {
                 10-14
                 16-20
                 12-18
-                
+                                
                 1
                 5
                 8
@@ -20,6 +20,6 @@ class D05Test extends AocTest {
                 32
                 """);
         star1(3L, 868L);
-        star2(-1L, -1L);
+        star2(14L, 354143734113772L);
     }
 }
