@@ -253,6 +253,10 @@ public final class Seq<E> implements Iterable<E> {
         return max(Comparator.comparing((Object a) -> ((Comparable) a)));
     }
 
+    public long sum(final Function<? super E, Long> translate) {
+        return isEmpty ? 0L : translate.apply(value) + tail.sum(translate);
+    }
+
     public Seq<Seq<E>> split(final Predicate<? super E> predicate) {
         return reduceR(
                 Seq.of(empty(), empty()),

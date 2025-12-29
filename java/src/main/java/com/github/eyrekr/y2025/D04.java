@@ -18,7 +18,7 @@ class D04 extends Aoc {
 
     @Override
     public long star1() {
-        return grid.where(D04::fewerThanFourRollsOfPaper).collect().length();
+        return grid.where(D04::fewerThanFourRollsOfPaper).count();
     }
 
     @Override
@@ -34,7 +34,7 @@ class D04 extends Aoc {
 
     static boolean fewerThanFourRollsOfPaper(final EGrid.It it) {
         if (it.isNot(Symbol.RollOfPaper)) return false;
-        final long rollsOfPaperAround = D8.reduce(0L, (acc, direction) -> it.isAhead(direction, Symbol.RollOfPaper) ? acc + 1 : acc);
+        final long rollsOfPaperAround = D8.sum(direction -> it.isAhead(direction, Symbol.RollOfPaper) ? 1L : 0L);
         return rollsOfPaperAround < 4;
     }
 
