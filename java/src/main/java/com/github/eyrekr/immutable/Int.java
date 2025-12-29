@@ -1,5 +1,6 @@
 package com.github.eyrekr.immutable;
 
+import java.util.Iterator;
 import java.util.function.LongConsumer;
 import java.util.function.LongPredicate;
 
@@ -33,6 +34,26 @@ public final class Int {
         final long right = parser.eatNumber();
         final boolean rightOpen = parser.eatOneOf(')', ']') == ')';
         return new Int(leftOpen ? left + 1 : left, rightOpen ? right - 1 : right);
+    }
+
+    public static Arr<Int> mergeAll(final Arr<Int> intervals) {
+        final Arr<Int> sortedIntervals = intervals.sortedBy(range -> range.a);
+        Arr<Int> mergedIntervals = Arr.empty();
+
+        final Iterator<Int> queue = sortedIntervals.iterator();
+        Int previousInterval = null;
+        while (queue.hasNext()) {
+            final Int interval = queue.next();
+            if (previousInterval == null) previousInterval = interval;
+            else if (previousInterval.overlaps(interval)) previousInterval = previousInterval.merge(interval);
+            else {
+                mergedIntervals = mergedIntervals.addLast(previousInterval);
+                previousInterval = interval;
+            }
+            if (!queue.hasNext()) mergedIntervals = mergedIntervals.addLast(previousInterval);
+        }
+
+        return mergedIntervals;
     }
 
     public long length() {
