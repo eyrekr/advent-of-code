@@ -34,7 +34,7 @@ class D04 extends Aoc {
 
     static boolean fewerThanFourRollsOfPaper(final EGrid.It it) {
         if (it.isNot(Symbol.RollOfPaper)) return false;
-        final long rollsOfPaperAround = D8.sum(direction -> it.isAhead(direction, Symbol.RollOfPaper) ? 1L : 0L);
+        final long rollsOfPaperAround = D8.countWhere(direction -> it.isAhead(direction, Symbol.RollOfPaper));
         return rollsOfPaperAround < 4;
     }
 
