@@ -2,43 +2,37 @@ package com.github.eyrekr.y2025;
 
 import com.github.eyrekr.Aoc;
 import com.github.eyrekr.immutable.Seq;
+import com.github.eyrekr.math.Algebra;
 
 class D03 extends Aoc {
 
-    final Seq<String> banks;
+    final Seq<int[]> banks;
 
     D03(final String input) {
-        banks = Seq.ofLinesFromString(input);
+        banks = Seq.ofLinesFromString(input).map(D03::bank);
     }
 
     @Override
     public long star1() {
-        return banks.toLongs(D03::joltage).sum();
+        return banks.toLongs(bank -> joltage(bank, 0, 2)).sum();
     }
 
     @Override
     public long star2() {
-        return -1L;
+        return banks.toLongs(bank -> joltage(bank, 0, 12)).sum();
     }
 
-    static long joltage(final String bank) {
-        // find biggest number
-        int max1 = -1, index = -1;
-        for (int i = 0; i < bank.length() - 1; i++) {
-            final int value = Character.digit(bank.charAt(i), 10);
-            if (value > max1) {
-                max1 = value;
-                index = i;
-            }
-        }
+    static int[] bank(final String line) {
+        final int[] bank = new int[line.length()];
+        for (int i = 0; i < bank.length; i++) bank[i] = Character.digit(line.charAt(i), 10);
+        return bank;
+    }
 
-        int max2 = -1;
-        for (int i = index + 1; i < bank.length(); i++) {
-            final int value = Character.digit(bank.charAt(i), 10);
-            if (value > max2) max2 = value;
-        }
-
-        return max1 * 10 + max2;
+    static long joltage(final int[] bank, int i0, int l) {
+        if (l <= 0) return 0L;
+        int argmax = i0;
+        for (int i = i0; i < bank.length - l + 1; i++) if (bank[i] > bank[argmax]) argmax = i;
+        return bank[argmax] * Algebra.E10[l - 1] + joltage(bank, argmax + 1, l - 1);
     }
 
 }
