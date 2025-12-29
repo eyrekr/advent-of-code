@@ -114,6 +114,16 @@ public final class Arr<E> implements Iterable<E> {
     }
 
     /**
+     * @return Array of characters from the supplied string.
+     * @complexity O(n)
+     */
+    public static Arr<Character> ofCharactersFromString(final String string) {
+        Arr<Character> array = new Arr<>();
+        for (char ch : string.toCharArray()) array = array.addLast(ch);
+        return array;
+    }
+
+    /**
      * @return Array from the supplied iterable collection.
      * @complexity O(n)
      */
