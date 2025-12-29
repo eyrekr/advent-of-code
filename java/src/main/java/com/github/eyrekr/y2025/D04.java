@@ -18,17 +18,28 @@ class D04 extends Aoc {
 
     @Override
     public long star1() {
-        return grid.where(D04::fewerThanFourRollsOfPaper).count();
+        return grid.where(D04::fewerThanFourRollsOfPaper).collect().length();
     }
 
     @Override
     public long star2() {
-        return -1L;
+        long sum = 0L;
+        while (true) {
+            final var toBeRemoved = grid.where(D04::fewerThanFourRollsOfPaper).collect();
+            if (toBeRemoved.isEmpty()) return sum;
+            sum += toBeRemoved.length();
+            toBeRemoved.each(it -> it.setSymbol(Symbol.Empty));
+        }
     }
 
     static boolean fewerThanFourRollsOfPaper(final EGrid.It it) {
-        if(it.isNot('@')) return false;
-        final long rollsOfPaperAround = D8.reduce(0L, (acc, direction) -> it.isAhead(direction, '@') ? acc + 1 : acc);
+        if (it.isNot(Symbol.RollOfPaper)) return false;
+        final long rollsOfPaperAround = D8.reduce(0L, (acc, direction) -> it.isAhead(direction, Symbol.RollOfPaper) ? acc + 1 : acc);
         return rollsOfPaperAround < 4;
+    }
+
+    interface Symbol {
+        char RollOfPaper = '@';
+        char Empty = '.';
     }
 }

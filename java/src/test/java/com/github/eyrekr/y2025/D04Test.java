@@ -19,6 +19,6 @@ class D04Test extends AocTest {
                 @.@.@@@.@.
                 """);
         star1(13L, 1367L);
-        star2(43L, -1L);
+        star2(43L, 9144L);
     }
 }
