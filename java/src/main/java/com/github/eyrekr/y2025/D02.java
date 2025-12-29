@@ -2,7 +2,6 @@ package com.github.eyrekr.y2025;
 
 import com.github.eyrekr.Aoc;
 import com.github.eyrekr.immutable.Int;
-import com.github.eyrekr.immutable.Longs;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.math.Algebra;
 
@@ -16,15 +15,15 @@ class D02 extends Aoc {
 
     @Override
     public long star1() {
-        return ranges.toLongs(range -> range.where(D02::isIdInvalid).sum()).sum();
+        return ranges.toLongs(range -> range.where(D02::madeOfSomeSequenceOfDigitsRepeatedTwice).sum()).sum();
     }
 
     @Override
     public long star2() {
-        return ranges.toLongs(D02::invalidIds).sum();
+        return ranges.toLongs(range -> range.where(D02::madeOfSomeSequenceOfDigitsRepeatedAtLeastTwice).sum()).sum();
     }
 
-    static boolean isIdInvalid(final long id) {
+    static boolean madeOfSomeSequenceOfDigitsRepeatedTwice(final long id) {
         if (id == 0) return false;
         final int digits = Algebra.decimalDigits(id);
         if (digits % 2 == 1 || digits == 0) return false;
@@ -32,13 +31,17 @@ class D02 extends Aoc {
         return (id / exp) == (id % exp);
     }
 
-    static long invalidIds(final Int range) {
-        final int digits = Algebra.decimalDigits(range.a);
-        final Longs divisors = Algebra.allDivisors(digits).removeLast();
-        return range.where(id -> divisors.atLeastOneIs()).sum();
-    }
+    static boolean madeOfSomeSequenceOfDigitsRepeatedAtLeastTwice(final long id) {
+        final int digits = Algebra.decimalDigits(id);
+        if (digits == 1) return false;
+        return Algebra.allDivisors(digits).removeLast().atLeastOneIs(segmentLength -> {
+            final int l = (int) segmentLength;
+            final long exp = Algebra.E10[l];
+            final long segment = id % exp;
+            for (int i = l; i < digits; i += l)
+                if ((id / Algebra.E10[i]) % exp != segment) return false;
 
-    static boolean isIdInvalid(final long id, final int segment) {
-        final long t = id % Algebra.E10[segment];
+            return true;
+        });
     }
 }

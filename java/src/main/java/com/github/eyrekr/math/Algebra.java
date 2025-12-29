@@ -76,7 +76,7 @@ public final class Algebra {
 
     public static Longs allDivisors(final long n) {
         Longs divisors = Longs.of(1);
-        for (int i = 2; i < n / 2; i++) if (n % i == 0) divisors = divisors.addLast(i);
+        for (int i = 2; i <= n / 2; i++) if (n % i == 0) divisors = divisors.addLast(i);
         return divisors.addLast(n);
     }
     //endregion
