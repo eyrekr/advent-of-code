@@ -12,7 +12,7 @@ class D03Test extends AocTest {
                 234234234234278
                 818181911112111
                 """);
-        star1(357L, -1L);
+        star1(357L, 17430L);
         star2(-1L, -1L);
     }
 }
