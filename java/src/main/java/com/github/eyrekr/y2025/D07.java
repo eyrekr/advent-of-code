@@ -24,16 +24,15 @@ class D07 extends Aoc {
     }
 
     void emitTachyonBeams() {
+        grid.where(Symbol.Start).first().setValue(1);
         grid.all().each(it -> {
-            switch (it.symbol()) {
-                case Symbol.Start -> it.clone().go(Direction.Down).setSymbol(Symbol.Beam);
-                case Symbol.Empty -> {
-                    if (it.isAhead(Direction.Up, Symbol.Beam)) it.setSymbol(Symbol.Beam);
-                }
-                case Symbol.Splitter -> {
-                    if (it.isAhead(Direction.Up, Symbol.Beam)) {
-                        it.clone().go(Direction.Left).setSymbol(Symbol.Beam);
-                        it.clone().go(Direction.Right).setSymbol(Symbol.Beam);
+            final var above = it.clone().go(Direction.Up);
+            if (above.isOneOf(Symbol.Beam, Symbol.Start)) {
+                switch (it.symbol()) {
+                    case Symbol.Empty -> it.setSymbol(Symbol.Beam).setValue(above.value());
+                    case Symbol.Splitter -> {
+                        it.clone().go(Direction.Left).setSymbol(Symbol.Beam).incValue(above.value());
+                        it.clone().go(Direction.Right).setSymbol(Symbol.Beam).incValue(above.value());
                     }
                 }
             }
