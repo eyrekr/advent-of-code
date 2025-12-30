@@ -232,6 +232,16 @@ public final class Arr<E> implements Iterable<E> {
     }
 
     /**
+     * @return Value at the given index. The index neither overflows nor underflows; it goes around.
+     * Negative indexes work too: -1 is the last element, -2 is the second last, and so on.
+     * If the array is empty, 0 is returned.
+     * @complexity O(1)
+     */
+    public E at(final long i) {
+        return at((int) i);
+    }
+
+    /**
      * @return Random value from the array.
      * @complexity O(1)
      */
@@ -410,6 +420,12 @@ public final class Arr<E> implements Iterable<E> {
             final E value = at(i);
             if (predicate.test(value)) array = array.addLast(value);
         }
+        return array;
+    }
+
+    public Arr<Integer> argsWhere(final Predicate<? super E> predicate) {
+        Arr<Integer> array = new Arr<>();
+        for (int i = 0; i < length; i++) if (predicate.test(at(i))) array = array.addLast(i);
         return array;
     }
 
@@ -623,7 +639,8 @@ public final class Arr<E> implements Iterable<E> {
         Arr<R> arr = new Arr<>();
         for (int i = 0; i < length; i++) {
             final Arr<? extends R> sub = transform.apply(at(i));
-            for (int j = 0; j < sub.length; j++) arr = arr.addLast(sub.at(j));
+            arr = arr.addLast(sub);
+            //for (int j = 0; j < sub.length; j++) arr = arr.addLast(sub.at(j));
         }
         return arr;
     }

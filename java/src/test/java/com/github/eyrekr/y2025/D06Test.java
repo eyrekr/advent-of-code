@@ -13,6 +13,6 @@ class D06Test extends AocTest {
                 *   +   *   +
                 """);
         star1(4277556L, 4449991244405L);
-        star2(-1L, -1L);
+        star2(3263827L, -1L);
     }
 }

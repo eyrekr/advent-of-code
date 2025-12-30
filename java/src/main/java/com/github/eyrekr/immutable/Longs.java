@@ -249,6 +249,16 @@ public final class Longs implements Iterable<Long> {
     }
 
     /**
+     * @return Value at the given index. The index neither overflows nor underflows; it goes around.
+     * Negative indexes work too: -1 is the last element, -2 is the second last, and so on.
+     * If the array is empty, 0 is returned.
+     * @complexity O(1)
+     */
+    public long at(final long i) {
+        return at((int) i);
+    }
+
+    /**
      * @return True, if the value is in the array at least once.
      * @complexity O(n)
      */
@@ -308,6 +318,16 @@ public final class Longs implements Iterable<Long> {
     public boolean noneIs(final LongToBool predicate) {
         for (int i = 0; i < length; i++) if (predicate.test(at(i))) return false;
         return true;
+    }
+
+    /**
+     * @param reducer Function combining the values of the array.
+     * @return Accumulated values.
+     */
+    public long reduce(final LongLongToLong reducer) {
+        long acc = at(0);
+        for (int i = 1; i < length; i++) acc = reducer.apply(acc, at(i));
+        return acc;
     }
 
     /**
@@ -561,6 +581,16 @@ public final class Longs implements Iterable<Long> {
     public Longs last(final int n) {
         Longs arr = new Longs();
         for (int i = Math.max(0, length - n); i < length; i++) arr = arr.addLast(at(i));
+        return arr;
+    }
+
+    /**
+     * @return New array with the values between the two positions.
+     * @complexity O(n)
+     */
+    public Longs between(final int left, final int right) {
+        Longs arr = new Longs();
+        for (int i = left; i <= right; i++) arr = arr.addLast(at(i));
         return arr;
     }
 
