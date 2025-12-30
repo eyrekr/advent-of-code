@@ -33,11 +33,13 @@ class D09 extends Aoc {
         }
     }
 
-    record Rectangle(P p1, P p2) {
+    record Rectangle(long x1, long y1, long x2, long y2) {
+        Rectangle(final P p1, final P p2) {
+            this(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), Math.max(p1.x, p2.x), Math.max(p1.y, p2.y));
+        }
+
         long area() {
-            final long width = Math.abs(p1.x - p2.x) + 1;
-            final long height = Math.abs(p1.y - p2.y) + 1;
-            return width * height;
+            return (x2 - x1 + 1) * (y2 - y1 + 1);
         }
 
         boolean inside(final Arr<P> polygon) {
