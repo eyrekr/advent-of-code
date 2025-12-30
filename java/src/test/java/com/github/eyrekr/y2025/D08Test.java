@@ -41,4 +41,14 @@ class D08Test {
         Assertions.assertThat(new D08(input).star1(1000)).isEqualTo(46398L);
     }
 
+    @Test
+    void sampleStar2() {
+        Assertions.assertThat(new D08(sample1).star2()).isEqualTo(25272L);
+    }
+
+    @Test
+    void star2() {
+        Assertions.assertThat(new D08(input).star2()).isEqualTo(8141888143L);
+    }
+
 }

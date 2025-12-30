@@ -284,6 +284,11 @@ public final class Arr<E> implements Iterable<E> {
         return true;
     }
 
+    public boolean allValuesAreTheSame() {
+        if (isEmpty()) return true;
+        return allMatch(at(0));
+    }
+
     public boolean allAre(final Predicate<? super E> predicate) {
         for (int i = 0; i < length; i++)
             if (!predicate.test(at(i))) return false;
