@@ -3,7 +3,6 @@ package com.github.eyrekr.y2025;
 import com.github.eyrekr.Aoc;
 import com.github.eyrekr.immutable.Longs;
 import com.github.eyrekr.mutable.Arr;
-import com.github.eyrekr.output.Out;
 
 class D08 extends Aoc {
 
@@ -18,31 +17,15 @@ class D08 extends Aoc {
         final Arr<Long> circuits = Arr.range(0, points.length());
         final Arr<Pair> pairsSortedByDistance = points
                 .prodUpperTriangleWith(points, (p1, p2) -> new Pair(p1.i, p2.i, p1.d(p2)))
-                .sortedBy(Pair::d);
+                .sortedBy(Pair::d)
+                .first(10)
+                .each(pair -> {
+                    final long c1 = circuits.at(pair.i);
+                    final long c2 = circuits.at(pair.j);
+                    if (c1 != c2) circuits.replaceAll(c2, c1); // merge circuits
 
-        int matchedPairs = 0;
-        for (final Pair pair : pairsSortedByDistance) {
-            final long c1 = circuits.at(pair.i);
-            final long c2 = circuits.at(pair.j);
-
-//            Out.print("""
-//                    %s - %s : %f  (c1=%d c2=%d)
-//                    """,
-//                    points.at(pair.i),
-//                    points.at(pair.j),
-//                    pair.d,
-//                    c1,
-//                    c2);
-
-            if (c1 == c2) continue; // i-j already form a circuit
-
-            circuits.replaceAll(c2, c1);
-
-            System.out.println(circuits.frequencies().values().stream().sorted().toList());
-
-            matchedPairs++;
-            if (matchedPairs == 9) break;
-        }
+                    System.out.println(circuits.frequencies().values().stream().sorted().toList());
+                });
 
         return Longs.fromIterable(circuits.frequencies().values()).sorted().last(3).prod();
     }

@@ -14,8 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AocTest {
 
-    private final Pattern pattern = Pattern.compile("y(\\d{4})\\.D(\\d{2})");
-
     final String year;
     final String day;
     final String input;
@@ -25,6 +23,7 @@ public class AocTest {
     private final Star star2 = new Star();
 
     protected AocTest() {
+        final var pattern = Pattern.compile("y(\\d{4})\\.D(\\d{2})");
         final var matcher = pattern.matcher(getClass().getName());
         if (matcher.find()) {
             year = matcher.group(1);
