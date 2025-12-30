@@ -3,8 +3,6 @@ package com.github.eyrekr.y2025;
 import com.github.eyrekr.immutable.Longs;
 import com.github.eyrekr.mutable.Arr;
 
-import java.util.Iterator;
-
 class D08 {
 
     final Arr<Point> points;
@@ -30,18 +28,16 @@ class D08 {
 
     public long star2() {
         final Arr<Long> circuits = Arr.range(0, points.length());
-        final Iterator<Pair> distinctPairsSortedByDistance = points.prodUpperTriangleWith(points, Pair::of).sortedBy(Pair::d).iterator();
+        final Arr<Pair> distinctPairsSortedByDistance = points.prodUpperTriangleWith(points, Pair::of).sortedBy(Pair::d);
 
-        boolean allJunctionBoxesFormSingleCircuit = false;
         Pair lastTwoJunctionBoxes = null;
-        while (!allJunctionBoxesFormSingleCircuit && distinctPairsSortedByDistance.hasNext()) {
-            final Pair pair = distinctPairsSortedByDistance.next();
+        for (final Pair pair : distinctPairsSortedByDistance) {
             final long c1 = circuits.at(pair.i);
             final long c2 = circuits.at(pair.j);
             if (c1 != c2) {
                 circuits.replaceAll(c2, c1);
-                allJunctionBoxesFormSingleCircuit = circuits.allValuesAreTheSame();
                 lastTwoJunctionBoxes = pair;
+                if (circuits.allValuesAreTheSame()) break;
             }
         }
 
