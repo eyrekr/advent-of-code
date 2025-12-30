@@ -17,6 +17,6 @@ class D09Test extends AocTest {
                 7,3
                 """);
         star1(50L, 4776487744L);
-        star2(-1L, -1L);
+        star2(24L, -1L);
     }
 }
