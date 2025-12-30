@@ -11,7 +11,7 @@ class D08 {
         points = Arr.ofLinesFromString(input).contextMap(Point::new);
     }
 
-    public long star1(final int n) {
+    long star1(final int n) {
         points
                 .prodUpperTriangleWith(points, Pair::new)
                 .sortedBy(Pair::d)
@@ -21,26 +21,24 @@ class D08 {
         return points.toLongs(p -> p.circuit).frequencies().sorted().last(3).prod();
     }
 
-    public long star2() {
+    long star2() {
         final Arr<Pair> distinctPairsSortedByDistance = points.prodUpperTriangleWith(points, Pair::new).sortedBy(Pair::d);
 
-        for (final Pair pair : distinctPairsSortedByDistance) {
-            if (mergeCircuitsIfPossible(pair)) {
-                return pair.p1.x * pair.p2.x;
-            }
-        }
+        for (final Pair pair : distinctPairsSortedByDistance)
+            if (mergeCircuitsIfPossible(pair)) return pair.p1.x * pair.p2.x;
+
 
         throw new IllegalStateException("unable to close the circuit");
     }
 
     boolean mergeCircuitsIfPossible(final Pair pair) {
         final int c1 = pair.p1.circuit, c2 = pair.p2.circuit;
-        if (c1 == c2) return false;
+        if (c1 == c2) return false; // already part of the same circuit
 
         boolean singleCircuit = true;
         for (final Point p : points) {
-            if (p.circuit == c2) p.circuit = c1;
-            if (p.circuit != c1) singleCircuit = false;
+            if (p.circuit == c2) p.circuit = c1; // merge circuits
+            if (p.circuit != c1) singleCircuit = false; // check if we only have one circuit
         }
 
         return singleCircuit;
