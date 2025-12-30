@@ -3,14 +3,17 @@ package com.github.eyrekr.y2025;
 import com.github.eyrekr.Aoc;
 import com.github.eyrekr.immutable.Arr;
 import com.github.eyrekr.immutable.Longs;
+import com.github.eyrekr.output.Out;
 import org.apache.commons.lang3.StringUtils;
 
 class D06 extends Aoc {
 
     final Arr<String> lines;
+    final int n;
 
     D06(final String input) {
         lines = Arr.ofLinesFromString(input);
+        n = lines.map(String::length).max(Integer::compare).get();
     }
 
     @Override
@@ -30,14 +33,21 @@ class D06 extends Aoc {
         final Arr<Integer> positions = Arr.ofCharactersFromString(lastLine).argsWhere(ch -> ch == '+' || ch == '*');
         final Longs numbersInColumns = numbersInColumns(lines.removeLast());
         return positions.mapWith(
-                        positions.removeFirst().addLast(lastLine.length()),
-                        (i, j) -> numbersInColumns.between(i, j - 2).reduce(Operation.fromSymbol(lastLine.charAt(i))))
+                        positions.removeFirst().addLast(n+1),
+                        (i, j) -> {
+                            Out.print("""
+                                    %3d - %3d %s
+                                    """,
+                                    i,
+                                    j-2,
+                                    lastLine.charAt(i));
+                            return numbersInColumns.between(i, j - 2).reduce(Operation.fromSymbol(lastLine.charAt(i)));
+                        })
                 .reduce(Long::sum)
                 .get();
     }
 
     Longs numbersInColumns(final Arr<String> lines) {
-        final int n = lines.map(String::length).max(Integer::compare).get();
         return Longs.range(0, n)
                 .map(column -> lines.reduce(
                         0L,
