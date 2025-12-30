@@ -19,15 +19,15 @@ class D10 extends Aoc {
 
     @Override
     public long star1() {
-        return machines.toLongs(D10::minPressesRequiredToConfigure).sum();
+        return machines.toLongs(D10::minPressesToLights).sum();
     }
 
     @Override
     public long star2() {
-        return -2L;
+        return machines.toLongs(D10::minPressesToJoltage).sum();
     }
 
-    static long minPressesRequiredToConfigure(final Machine machine) {
+    static long minPressesToLights(final Machine machine) {
         final Set<String> processedStates = new HashSet<>();
         final Arr<State> queue = Arr.of(State.initialState(machine));
 
@@ -43,6 +43,10 @@ class D10 extends Aoc {
         }
 
         throw new IllegalStateException("sequence not found");
+    }
+
+    static long minPressesToJoltage(final Machine machine) {
+        return -1L;
     }
 
     record Machine(char[] lights, Arr<Longs> buttons, Longs joltage) {
