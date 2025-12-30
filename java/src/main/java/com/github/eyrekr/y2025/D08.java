@@ -1,10 +1,9 @@
 package com.github.eyrekr.y2025;
 
-import com.github.eyrekr.Aoc;
 import com.github.eyrekr.immutable.Longs;
 import com.github.eyrekr.mutable.Arr;
 
-class D08 extends Aoc {
+class D08 {
 
     final Arr<Point> points;
 
@@ -12,25 +11,21 @@ class D08 extends Aoc {
         points = Arr.ofLinesFromString(input).contextMap(Point::deserialize);
     }
 
-    @Override
-    public long star1() {
+    public long star1(final int n) {
         final Arr<Long> circuits = Arr.range(0, points.length());
-        final Arr<Pair> pairsSortedByDistance = points
-                .prodUpperTriangleWith(points, (p1, p2) -> new Pair(p1.i, p2.i, p1.d(p2)))
+        points
+                .prodUpperTriangleWith(points, Pair::of)
                 .sortedBy(Pair::d)
-                .first(10)
+                .first(n)
                 .each(pair -> {
                     final long c1 = circuits.at(pair.i);
                     final long c2 = circuits.at(pair.j);
                     if (c1 != c2) circuits.replaceAll(c2, c1); // merge circuits
-
-                    System.out.println(circuits.frequencies().values().stream().sorted().toList());
                 });
 
         return Longs.fromIterable(circuits.frequencies().values()).sorted().last(3).prod();
     }
 
-    @Override
     public long star2() {
         return -1L;
     }
@@ -47,5 +42,8 @@ class D08 extends Aoc {
     }
 
     record Pair(int i, int j, double d) {
+        static Pair of(final Point p1, final Point p2) {
+            return new Pair(p1.i, p2.i, p1.d(p2));
+        }
     }
 }
