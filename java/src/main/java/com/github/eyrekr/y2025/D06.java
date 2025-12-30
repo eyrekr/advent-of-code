@@ -28,15 +28,15 @@ class D06 extends Aoc {
     public long star2() {
         final String lastLine = lines.at(-1);
         final Arr<Integer> positions = Arr.ofCharactersFromString(lastLine).argsWhere(ch -> ch == '+' || ch == '*');
-        final Longs numbers = numbersByColumns(lines.removeLast());
+        final Longs numbersInColumns = numbersInColumns(lines.removeLast());
         return positions.mapWith(
                         positions.removeFirst().addLast(lastLine.length()),
-                        (i, j) -> numbers.between(i, j - 2).reduce(Operation.fromSymbol(lastLine.charAt(i))))
+                        (i, j) -> numbersInColumns.between(i, j - 2).reduce(Operation.fromSymbol(lastLine.charAt(i))))
                 .reduce(Long::sum)
                 .get();
     }
 
-    Longs numbersByColumns(final Arr<String> lines) {
+    Longs numbersInColumns(final Arr<String> lines) {
         final int n = lines.map(String::length).max(Integer::compare).get();
         return Longs.range(0, n)
                 .map(column -> lines.reduce(
