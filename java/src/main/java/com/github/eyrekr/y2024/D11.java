@@ -13,7 +13,7 @@ class D11 extends Aoc {
 
     D11(final String input) {
         final var stones = Longs.fromString(input);
-        line = new Line(stones.frequency());
+        line = new Line(stones.histogram());
     }
 
     @Override

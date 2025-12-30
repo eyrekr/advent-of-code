@@ -779,7 +779,7 @@ public final class Longs implements Iterable<Long> {
         return arr;
     }
 
-    public Map<Long, Long> frequency() {
+    public Map<Long, Long> histogram() {
         final Map<Long, Long> frequencies = new HashMap<>();
         for (int i = 0; i < length; i++) {
             final long value = at(i);
@@ -787,6 +787,10 @@ public final class Longs implements Iterable<Long> {
             frequencies.put(value, count);
         }
         return frequencies;
+    }
+
+    public Longs frequencies() {
+        return Longs.fromIterable(histogram().values());
     }
 
     @FunctionalInterface

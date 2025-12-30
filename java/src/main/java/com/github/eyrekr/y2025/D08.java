@@ -8,56 +8,60 @@ class D08 {
     final Arr<Point> points;
 
     D08(final String input) {
-        points = Arr.ofLinesFromString(input).contextMap(Point::deserialize);
+        points = Arr.ofLinesFromString(input).contextMap(Point::new);
     }
 
     public long star1(final int n) {
-        final Arr<Long> circuits = Arr.range(0, points.length());
         points
-                .prodUpperTriangleWith(points, Pair::of)
+                .prodUpperTriangleWith(points, Pair::new)
                 .sortedBy(Pair::d)
                 .first(n)
-                .each(pair -> {
-                    final long c1 = circuits.at(pair.i);
-                    final long c2 = circuits.at(pair.j);
-                    if (c1 != c2) circuits.replaceAll(c2, c1); // merge circuits
-                });
+                .each(this::mergeCircuitsIfPossible);
 
-        return Longs.fromIterable(circuits.frequencies().values()).sorted().last(3).prod();
+        return points.toLongs(p -> p.circuit).frequencies().sorted().last(3).prod();
     }
 
     public long star2() {
-        final Arr<Long> circuits = Arr.range(0, points.length());
-        final Arr<Pair> distinctPairsSortedByDistance = points.prodUpperTriangleWith(points, Pair::of).sortedBy(Pair::d);
+        final Arr<Pair> distinctPairsSortedByDistance = points.prodUpperTriangleWith(points, Pair::new).sortedBy(Pair::d);
 
-        Pair lastTwoJunctionBoxes = null;
         for (final Pair pair : distinctPairsSortedByDistance) {
-            final long c1 = circuits.at(pair.i);
-            final long c2 = circuits.at(pair.j);
-            if (c1 != c2) {
-                circuits.replaceAll(c2, c1);
-                lastTwoJunctionBoxes = pair;
-                if (circuits.allValuesAreTheSame()) break;
+            if (mergeCircuitsIfPossible(pair)) {
+                return pair.p1.x * pair.p2.x;
             }
         }
 
-        return points.at(lastTwoJunctionBoxes.i).x * points.at(lastTwoJunctionBoxes.j).x;
+        throw new IllegalStateException("unable to close the circuit");
     }
 
-    record Point(int i, long x, long y, long z) {
-        static Point deserialize(final String line, final int i, final boolean first, final boolean last) {
+    boolean mergeCircuitsIfPossible(final Pair pair) {
+        final int c1 = pair.p1.circuit, c2 = pair.p2.circuit;
+        if (c1 == c2) return false;
+
+        boolean singleCircuit = true;
+        for (final Point p : points) {
+            if (p.circuit == c2) p.circuit = c1;
+            if (p.circuit != c1) singleCircuit = false;
+        }
+
+        return singleCircuit;
+    }
+
+    static final class Point {
+        final long x, y, z;
+        int circuit;
+
+        private Point(final String line, final int i, final boolean first, final boolean last) {
             final var c = Longs.fromString(line);
-            return new Point(i, c.at(0), c.at(1), c.at(2));
-        }
-
-        double d(final Point that) {
-            return Math.sqrt((this.x - that.x) * (this.x - that.x) + (this.y - that.y) * (this.y - that.y) + (this.z - that.z) * (this.z - that.z));
+            this.x = c.at(0);
+            this.y = c.at(1);
+            this.z = c.at(2);
+            this.circuit = i;
         }
     }
 
-    record Pair(int i, int j, double d) {
-        static Pair of(final Point p1, final Point p2) {
-            return new Pair(p1.i, p2.i, p1.d(p2));
+    record Pair(Point p1, Point p2, double d) {
+        Pair(final Point p1, final Point p2) {
+            this(p1, p2, Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y) + (p1.z - p2.z) * (p1.z - p2.z)));
         }
     }
 }
