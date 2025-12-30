@@ -329,6 +329,36 @@ public class EGrid {
             return false;
         }
 
+        public boolean isAtBorder(final Direction direction) {
+            return switch (direction) {
+                case Up -> y == 0;
+                case Down -> y == n - 1;
+                case Left -> x == 0;
+                case Right -> x == m - 1;
+                case LeftUp, UpLeft -> y == 0 && x == 0;
+                case RightUp, UpRight -> y == 0 && x == m - 1;
+                case LeftDown, DownLeft -> y == n - 1 && x == 0;
+                case RightDown, DownRight -> y == n - 1 && x == m - 1;
+                default -> false;
+            };
+        }
+
+        public boolean isBottomBorder() {
+            return isAtBorder(Direction.Down);
+        }
+
+        public boolean isTopBorder() {
+            return isAtBorder(Direction.Up);
+        }
+
+        public boolean isLeftBorder() {
+            return isAtBorder(Direction.Left);
+        }
+
+        public boolean isRightBorder() {
+            return isAtBorder(Direction.Right);
+        }
+
         public boolean hasSamePositionAs(final It other) {
             return x == other.x && y == other.y;
         }

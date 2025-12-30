@@ -25,6 +25,6 @@ class D07Test extends AocTest {
                 ...............
                 """);
         star1(21L, 1600L);
-        star2(40L, -1L);
+        star2(40L, 8632253783011L);
     }
 }

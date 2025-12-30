@@ -20,16 +20,18 @@ class D07 extends Aoc {
 
     @Override
     public long star2() {
-        return -1L;
+        emitTachyonBeams();
+        return grid.where(EGrid.It::isBottomBorder).sum(EGrid.It::value);
     }
 
     void emitTachyonBeams() {
         grid.where(Symbol.Start).first().setValue(1);
+        
         grid.all().each(it -> {
             final var above = it.clone().go(Direction.Up);
             if (above.isOneOf(Symbol.Beam, Symbol.Start)) {
                 switch (it.symbol()) {
-                    case Symbol.Empty -> it.setSymbol(Symbol.Beam).setValue(above.value());
+                    case Symbol.Empty, Symbol.Beam -> it.setSymbol(Symbol.Beam).incValue(above.value());
                     case Symbol.Splitter -> {
                         it.clone().go(Direction.Left).setSymbol(Symbol.Beam).incValue(above.value());
                         it.clone().go(Direction.Right).setSymbol(Symbol.Beam).incValue(above.value());
