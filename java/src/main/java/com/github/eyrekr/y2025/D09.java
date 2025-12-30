@@ -9,7 +9,7 @@ class D09 extends Aoc {
     final Arr<P> redTiles;
 
     D09(final String input) {
-        redTiles = Arr.ofLinesFromString(input).map(P::of);//.sortedBy(P::x);
+        redTiles = Arr.ofLinesFromString(input).map(P::of);
     }
 
     @Override
