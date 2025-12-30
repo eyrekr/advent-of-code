@@ -9,29 +9,39 @@ class D09 extends Aoc {
     final Arr<P> redTiles;
 
     D09(final String input) {
-        redTiles = Arr.ofLinesFromString(input).map(P::of);
+        redTiles = Arr.ofLinesFromString(input).map(P::fromLine);
     }
 
     @Override
     public long star1() {
-        return redTiles.prodUpperTriangleWith(redTiles, P::area).max(Long::compareTo).get();
+        return redTiles.prodUpperTriangleWith(redTiles, Rectangle::new).mapToLongs(Rectangle::area).max();
     }
 
     @Override
     public long star2() {
-        return -1L;
+        return redTiles
+                .prodUpperTriangleWith(redTiles, Rectangle::new)
+                .where(rectangle -> rectangle.inside(redTiles))
+                .mapToLongs(Rectangle::area)
+                .max();
     }
 
     record P(long x, long y) {
-        static P of(final String line) {
+        static P fromLine(final String line) {
             final String[] p = StringUtils.split(line, ',');
             return new P(Long.parseLong(p[0]), Long.parseLong(p[1]));
         }
+    }
 
-        long area(final P that) {
-            final long width = Math.abs(this.x - that.x) + 1;
-            final long height = Math.abs(this.y - that.y) + 1;
+    record Rectangle(P p1, P p2) {
+        long area() {
+            final long width = Math.abs(p1.x - p2.x) + 1;
+            final long height = Math.abs(p1.y - p2.y) + 1;
             return width * height;
+        }
+
+        boolean inside(final Arr<P> polygon) {
+            return true;
         }
     }
 }
