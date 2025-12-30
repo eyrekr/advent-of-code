@@ -3,7 +3,6 @@ package com.github.eyrekr.y2025;
 import com.github.eyrekr.Aoc;
 import com.github.eyrekr.immutable.Arr;
 import com.github.eyrekr.immutable.Longs;
-import com.github.eyrekr.output.Out;
 import org.apache.commons.lang3.StringUtils;
 
 class D06 extends Aoc {
@@ -33,16 +32,8 @@ class D06 extends Aoc {
         final Arr<Integer> positions = Arr.ofCharactersFromString(lastLine).argsWhere(ch -> ch == '+' || ch == '*');
         final Longs numbersInColumns = numbersInColumns(lines.removeLast());
         return positions.mapWith(
-                        positions.removeFirst().addLast(n+1),
-                        (i, j) -> {
-                            Out.print("""
-                                    %3d - %3d %s
-                                    """,
-                                    i,
-                                    j-2,
-                                    lastLine.charAt(i));
-                            return numbersInColumns.between(i, j - 2).reduce(Operation.fromSymbol(lastLine.charAt(i)));
-                        })
+                        positions.removeFirst().addLast(n + 1),
+                        (i, j) -> numbersInColumns.between(i, j - 2).reduce(Operation.fromSymbol(lastLine.charAt(i))))
                 .reduce(Long::sum)
                 .get();
     }
