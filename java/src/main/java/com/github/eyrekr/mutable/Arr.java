@@ -55,6 +55,12 @@ public final class Arr<E> implements Iterable<E> {
         return arr;
     }
 
+    public static Arr<Long> range(final long startInclusive, final long endExclusive) {
+        final Arr<Long> array = new Arr<>((int) (endExclusive - startInclusive));
+        for (long value = startInclusive; value < endExclusive; value++) array.addLast(value);
+        return array;
+    }
+
     public static <T> Arr<T> fromArray(final T[] array) {
         if (array == null || array.length == 0) return empty();
         final Arr<T> arr = new Arr<>(array.length);
@@ -444,6 +450,13 @@ public final class Arr<E> implements Iterable<E> {
     public <R> Arr<R> map(final Function<? super E, ? extends R> transform) {
         final Arr<R> arr = new Arr<>(length);
         for (int i = 0; i < length; i++) arr.addLast(transform.apply(at(i)));
+        return arr;
+    }
+
+    @ReturnsNewInstance
+    public <R> Arr<R> contextMap(final ContextFunction<? super E, ? extends R> transform) {
+        final Arr<R> arr = new Arr<>(length);
+        for (int i = 0; i < length; i++) arr.addLast(transform.apply(at(i), i, i == 0, i == length - 1));
         return arr;
     }
 
