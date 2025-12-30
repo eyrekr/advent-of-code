@@ -43,7 +43,20 @@ class D09 extends Aoc {
         }
 
         boolean inside(final Arr<P> polygon) {
+            final boolean atLeastOnePointOfPolygonIsInsideRectangle = polygon.atLeastOneIs(this::inside);
+            if (atLeastOnePointOfPolygonIsInsideRectangle) return false;
+
+
+
+//            for (int i = 0; i <= polygon.length; i++) {
+//                final P p1 = polygon.at(i), p2 = polygon.at(i + 1);
+//                if(x1 < p1.x && p1.x < x2 && x1 < p2.x && p2.x < x2)
+//            }
             return true;
+        }
+
+        boolean inside(final P p) {
+            return x1 < p.x && p.x < x2 && y1 < p.y && p.y < y2;
         }
     }
 }
