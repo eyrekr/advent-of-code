@@ -65,7 +65,7 @@ public final class Seq<E> implements Iterable<E> {
         return fromArray(string.split("\n"));
     }
 
-    public static Seq<String> ofLinesFromString(final String string, final String delimiter) {
+    public static Seq<String> ofWordsFromString(final String string, final String delimiter) {
         return fromArray(StringUtils.split(string, delimiter));
     }
 

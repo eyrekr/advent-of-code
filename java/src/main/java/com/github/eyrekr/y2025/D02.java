@@ -10,7 +10,7 @@ class D02 extends Aoc {
     final Seq<Int> ranges;
 
     D02(final String input) {
-        ranges = Seq.ofLinesFromString(input, ",").map(Int::fromString);
+        ranges = Seq.ofWordsFromString(input, ",").map(Int::fromString);
     }
 
     @Override

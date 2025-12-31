@@ -8,8 +8,20 @@ import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.math.Algebra;
 import com.github.eyrekr.output.Out;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -148,8 +160,8 @@ public final class Arr<E> implements Iterable<E> {
         return this;
     }
 
-    public Arr<E> addAllLast(final Arr<? extends E> values) {
-        values.each(this::addLast);
+    public Arr<E> addAllLast(final Iterable<? extends E> values) {
+        for (final E e : values) addLast(e);
         return this;
     }
 
@@ -507,6 +519,18 @@ public final class Arr<E> implements Iterable<E> {
 
     public Arr<E> whileNotEmpty(final Consumer<? super E> consumer) {
         while (isNotEmpty()) consumer.accept(removeFirst());
+        return this;
+    }
+
+    public Arr<E> doWhileNotEmptyWithoutRepeats(final Function<? super E, ? extends Iterable<? extends E>> consumerProducer) {
+        final Set<E> visited = new HashSet<>();
+        while (isNotEmpty()) {
+            final E value = removeFirst();
+            if (visited.contains(value)) continue;
+            visited.add(value);
+            final Iterable<? extends E> values = consumerProducer.apply(value);
+            addAllLast(values);
+        }
         return this;
     }
 
