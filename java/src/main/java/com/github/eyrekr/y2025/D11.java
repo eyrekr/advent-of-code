@@ -6,6 +6,7 @@ import com.github.eyrekr.mutable.Arr;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,26 +38,27 @@ class D11 extends Aoc {
     Map<String, long[]> countPaths(final String start) {
         final Map<String, long[]> paths = new HashMap<>();
         paths.put(start, new long[]{1, 0, 0, 0});
-        topologicallySortedVertices(graph).each(u -> graph.getOrDefault(u, Seq.empty())
-                .each(v -> {
-                    final long[] i = paths.get(u);
-                    if (i == null) return;
-                    final long[] o = paths.computeIfAbsent(v, key -> new long[]{0, 0, 0, 0});
-                    o[all] += i[all];
-                    if ("fft".equals(v)) {
-                        o[fft] += i[all];
-                        o[dac] += i[dac];
-                        o[both] += i[dac];
-                    } else if ("dac".equals(v)) {
-                        o[fft] += i[fft];
-                        o[dac] += i[all];
-                        o[both] += i[fft];
-                    } else {
-                        o[fft] += i[fft];
-                        o[dac] += i[dac];
-                        o[both] += i[both];
-                    }
-                }));
+        topologicallySortedVertices(graph, start, new HashSet<>(), Arr.empty())
+                .each(u -> graph.getOrDefault(u, Seq.empty())
+                        .each(v -> {
+                            final long[] i = paths.get(u);
+                            if (i == null) return;
+                            final long[] o = paths.computeIfAbsent(v, key -> new long[]{0, 0, 0, 0});
+                            o[all] += i[all];
+                            if ("fft".equals(v)) {
+                                o[fft] += i[all];
+                                o[dac] += i[dac];
+                                o[both] += i[dac];
+                            } else if ("dac".equals(v)) {
+                                o[fft] += i[fft];
+                                o[dac] += i[all];
+                                o[both] += i[fft];
+                            } else {
+                                o[fft] += i[fft];
+                                o[dac] += i[dac];
+                                o[both] += i[both];
+                            }
+                        }));
         return paths;
     }
 
