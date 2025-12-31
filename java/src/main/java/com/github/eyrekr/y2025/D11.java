@@ -3,7 +3,6 @@ package com.github.eyrekr.y2025;
 import com.github.eyrekr.Aoc;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.mutable.Arr;
-import com.github.eyrekr.output.Out;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -34,14 +33,6 @@ class D11 extends Aoc {
                 .each(output -> {
                     final long count = paths.get(input);
                     paths.compute(output, (key, value) -> count + firstNonNull(value, 0L));
-
-                    Out.print("""
-                                    %s -> %s  +%d => %d
-                                    """,
-                            input,
-                            output,
-                            count,
-                            paths.get(output));
                 }));
         return paths.getOrDefault(TerminalDevice, -1L);
     }

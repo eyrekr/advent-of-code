@@ -46,6 +46,11 @@ public final class Opt<E> {
         return this;
     }
 
+    public Opt<E> then(final Consumer<? super E> consumer) {
+        if (present) consumer.accept(value);
+        return this;
+    }
+
     public E value() {
         return value;
     }

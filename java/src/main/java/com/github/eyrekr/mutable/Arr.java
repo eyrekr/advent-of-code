@@ -25,6 +25,8 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.function.Predicate.not;
+
 /**
  * Auto-expandable mutable array of elements.
  * Not thread-safe!
@@ -524,13 +526,11 @@ public final class Arr<E> implements Iterable<E> {
 
     public Arr<E> doWhileNotEmptyWithoutRepeats(final Function<? super E, ? extends Iterable<? extends E>> consumerProducer) {
         final Set<E> visited = new HashSet<>();
-        while (isNotEmpty()) {
-            final E value = removeFirst();
-            if (visited.contains(value)) continue;
-            visited.add(value);
-            final Iterable<? extends E> values = consumerProducer.apply(value);
-            addAllLast(values);
-        }
+        while (isNotEmpty()) Opt.of(removeFirst())
+                .where(not(visited::contains))
+                .then(visited::add)
+                .map(consumerProducer)
+                .then(this::addAllLast);
         return this;
     }
 
