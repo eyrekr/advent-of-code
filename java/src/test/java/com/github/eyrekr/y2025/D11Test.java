@@ -35,7 +35,7 @@ class D11Test extends AocTest {
                         ggg: out
                         hhh: out
                         """,
-                -1L,
+                2L,
                 -1L);
     }
 }
