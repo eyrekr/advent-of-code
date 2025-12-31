@@ -12,8 +12,6 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 class D11 extends Aoc {
 
-    static final String InitialDevice = "you";
-    static final String TerminalDevice = "out";
     final Map<String, Seq<String>> graph;
 
     D11(final String input) {
@@ -26,15 +24,7 @@ class D11 extends Aoc {
 
     @Override
     public long star1() {
-        final Map<String, Long> paths = new HashMap<>();
-        paths.put(InitialDevice, 1L);
-        final Arr<String> queue = Arr.of(InitialDevice);
-        queue.doWhileNotEmptyWithoutRepeats(input -> graph.getOrDefault(input, Seq.empty())
-                .each(output -> {
-                    final long count = paths.get(input);
-                    paths.compute(output, (key, value) -> count + firstNonNull(value, 0L));
-                }));
-        return paths.getOrDefault(TerminalDevice, -1L);
+        return countPaths("you").get("out");
     }
 
     @Override
@@ -42,4 +32,16 @@ class D11 extends Aoc {
         return -1L;
     }
 
+    // works by accident; the traversal should be in topological order!
+    Map<String, Long> countPaths(final String start) {
+        final Map<String, Long> paths = new HashMap<>();
+        paths.put(start, 1L);
+        final Arr<String> queue = Arr.of(start);
+        queue.doWhileNotEmptyWithoutRepeats(input -> graph.getOrDefault(input, Seq.empty())
+                .each(output -> {
+                    final long count = paths.get(input);
+                    paths.compute(output, (key, value) -> count + firstNonNull(value, 0L));
+                }));
+        return paths;
+    }
 }
