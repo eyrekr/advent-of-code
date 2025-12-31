@@ -3,11 +3,13 @@ package com.github.eyrekr.y2025;
 import com.github.eyrekr.Aoc;
 import com.github.eyrekr.immutable.Seq;
 import com.github.eyrekr.mutable.Arr;
-import com.github.eyrekr.output.Out;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
+import static java.util.function.Predicate.not;
 
 class D11 extends Aoc {
 
@@ -32,22 +34,20 @@ class D11 extends Aoc {
         return countPaths("svr").get("out")[both];
     }
 
-    // works by accident; the traversal should be in topological order!
     Map<String, long[]> countPaths(final String start) {
         final Map<String, long[]> paths = new HashMap<>();
         paths.put(start, new long[]{1, 0, 0, 0});
-
-        final Arr<String> queue = Arr.of(start);
-        queue.doWhileNotEmptyWithoutRepeats(input -> graph.getOrDefault(input, Seq.empty())
-                .each(output -> {
-                    final long[] i = paths.get(input);
-                    final long[] o = paths.computeIfAbsent(output, key -> new long[]{0, 0, 0, 0});
+        topologicallySortedVertices(graph).each(u -> graph.getOrDefault(u, Seq.empty())
+                .each(v -> {
+                    final long[] i = paths.get(u);
+                    if (i == null) return;
+                    final long[] o = paths.computeIfAbsent(v, key -> new long[]{0, 0, 0, 0});
                     o[all] += i[all];
-                    if ("fft".equals(output)) {
+                    if ("fft".equals(v)) {
                         o[fft] += i[all];
                         o[dac] += i[dac];
                         o[both] += i[dac];
-                    } else if ("dac".equals(output)) {
+                    } else if ("dac".equals(v)) {
                         o[fft] += i[fft];
                         o[dac] += i[all];
                         o[both] += i[fft];
@@ -56,12 +56,43 @@ class D11 extends Aoc {
                         o[dac] += i[dac];
                         o[both] += i[both];
                     }
-
-                    Out.print("""
-                                    %s -> %s : %d·%d·%d·%d
-                                    """,
-                            input, output, o[0], o[1], o[2], o[3]);
                 }));
         return paths;
     }
+
+    Arr<String> topologicallySortedVertices(final Map<String, Seq<String>> graph) {
+        final Map<String, Integer> inDegree = new HashMap<>();
+        graph.forEach((u, neighbors) -> {
+            inDegree.putIfAbsent(u, 0);
+            neighbors.each(v -> inDegree.putIfAbsent(v, 0));
+            neighbors.each(v -> inDegree.compute(v, (k, degree) -> degree + 1));
+        });
+
+        final Arr<String> queue = Arr.empty();
+        inDegree.forEach((node, degree) -> {
+            if (degree == 0) queue.addLast(node);
+        });
+
+        final Arr<String> result = Arr.empty();
+        queue.whileNotEmpty(u -> {
+            result.addLast(u);
+            graph.getOrDefault(u, Seq.empty()).each(v -> {
+                final int d = inDegree.compute(v, (k, degree) -> degree - 1);
+                if (d == 0) queue.addLast(v);
+            });
+
+        });
+
+        return result;
+    }
+
+    Arr<String> topologicallySortedVertices(final Map<String, Seq<String>> graph,
+                                            final String u,
+                                            final Set<String> visited,
+                                            final Arr<String> order) {
+        visited.add(u);
+        graph.getOrDefault(u, Seq.empty()).where(not(visited::contains)).each(v -> topologicallySortedVertices(graph, v, visited, order));
+        return order.addFirst(u); // post-order traversal
+    }
+
 }
