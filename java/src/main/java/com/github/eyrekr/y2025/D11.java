@@ -11,6 +11,7 @@ import java.util.Map;
 
 class D11 extends Aoc {
 
+    final int all = 0, fft = 1, dac = 2, both = 3;
     final Map<String, Seq<String>> graph;
 
     D11(final String input) {
@@ -23,12 +24,12 @@ class D11 extends Aoc {
 
     @Override
     public long star1() {
-        return countPaths("you").get("out")[0];
+        return countPaths("you").get("out")[all];
     }
 
     @Override
     public long star2() {
-        return countPaths("svr").get("out")[3];
+        return countPaths("svr").get("out")[both];
     }
 
     // works by accident; the traversal should be in topological order!
@@ -41,18 +42,19 @@ class D11 extends Aoc {
                 .each(output -> {
                     final long[] i = paths.get(input);
                     final long[] o = paths.computeIfAbsent(output, key -> new long[]{0, 0, 0, 0});
-                    // increment counters
-                    o[0] += i[0];
-                    o[1] += i[1];
-                    o[2] += i[2];
-                    o[3] += i[3];
+                    o[all] += i[all];
                     if ("fft".equals(output)) {
-                        o[1] += i[0];
-                        o[3] += i[2];
-                    }
-                    if ("dac".equals(output)) {
-                        o[2] += i[0];
-                        o[3] += i[1];
+                        o[fft] += i[all];
+                        o[dac] += i[dac];
+                        o[both] += i[dac];
+                    } else if ("dac".equals(output)) {
+                        o[fft] += i[fft];
+                        o[dac] += i[all];
+                        o[both] += i[fft];
+                    } else {
+                        o[fft] += i[fft];
+                        o[dac] += i[dac];
+                        o[both] += i[both];
                     }
 
                     Out.print("""
