@@ -62,32 +62,6 @@ class D11 extends Aoc {
         return paths;
     }
 
-    Arr<String> topologicallySortedVertices(final Map<String, Seq<String>> graph) {
-        final Map<String, Integer> inDegree = new HashMap<>();
-        graph.forEach((u, neighbors) -> {
-            inDegree.putIfAbsent(u, 0);
-            neighbors.each(v -> inDegree.putIfAbsent(v, 0));
-            neighbors.each(v -> inDegree.compute(v, (k, degree) -> degree + 1));
-        });
-
-        final Arr<String> queue = Arr.empty();
-        inDegree.forEach((node, degree) -> {
-            if (degree == 0) queue.addLast(node);
-        });
-
-        final Arr<String> result = Arr.empty();
-        queue.whileNotEmpty(u -> {
-            result.addLast(u);
-            graph.getOrDefault(u, Seq.empty()).each(v -> {
-                final int d = inDegree.compute(v, (k, degree) -> degree - 1);
-                if (d == 0) queue.addLast(v);
-            });
-
-        });
-
-        return result;
-    }
-
     Arr<String> topologicallySortedVertices(final Map<String, Seq<String>> graph,
                                             final String u,
                                             final Set<String> visited,
