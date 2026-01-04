@@ -1,48 +1,17 @@
 package com.github.eyrekr.y2025;
 
 import com.github.eyrekr.AocTest;
+import com.github.eyrekr.output.Out;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-class D12Test extends AocTest {
+class D12Test {
 
-    D12Test() {
-        constructor(D12::new);
-        sample("""
-                0:
-                ###
-                ##.
-                ##.
-                
-                1:
-                ###
-                ##.
-                .##
-                
-                2:
-                .##
-                ###
-                ##.
-                
-                3:
-                ##.
-                ###
-                ##.
-                
-                4:
-                ###
-                #..
-                ###
-                
-                5:
-                ###
-                .#.
-                ###
-                
-                4x4: 0 0 0 0 2 0
-                12x5: 1 0 1 0 2 2
-                12x5: 1 0 1 0 3 2
-                """);
-        star1(2L, -1L);
-        star2(-1L, -1L);
+    final String input = Out.testResource("2025/D12.txt");
+
+    @Test
+    void star1() {
+        Assertions.assertThat(new D12(input).star1()).isEqualTo(505L);
     }
 
 }

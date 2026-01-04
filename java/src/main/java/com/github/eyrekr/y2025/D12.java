@@ -19,26 +19,21 @@ class D12 extends Aoc {
 
     @Override
     public long star1() {
-        if (regions.length == 3) return 2L;
         return regions.countWhere(region -> {
-            final long area = region.width * region.length;
-            final long max = region.counts.sum() * 9;
-            if (area >= max) return true;
+            // heuristic 1: the area of the region is so big that it can fit all shapes without overlapping
+            final long area = region.width >= 3 && region.length >= 3 ? region.width * region.length : -1L;
+            final long areaBigEnoughThatWillEasilyFitAllShapesWithoutAnyInterlocking = region.counts.sum() * 9;
+            if (area >= areaBigEnoughThatWillEasilyFitAllShapesWithoutAnyInterlocking) return true;
 
-            final long min = region.counts.reduce(
+            // heuristic 2: the area of the region is so small that it cannot fit all the shapes even with perfect interlocking (that leaves no space)
+            final long minimumRequiredAreaToFitAllShapesWithPerfectInterlocking = region.counts.reduce(
                     0L,
-                    (accumulator, count, nextValue, previousValue, i, first, last) -> accumulator + count * shapes.at(i - 1));
-            if (area < min) return false;
+                    (accumulator, count, nextValue, previousValue, i, first, last) -> accumulator + count * shapes.at(i));
+            if (area < minimumRequiredAreaToFitAllShapesWithPerfectInterlocking) return false;
 
             throw new IllegalStateException("lot of manual work I don't want to do");
         });
     }
-
-    @Override
-    public long star2() {
-        return -1L;
-    }
-
 
     record Region(long width, long length, Longs counts) {
         static Region fromLine(final String line) {
