@@ -60,6 +60,7 @@ class D09 extends Aoc {
             return (x2 - x1 + 1) * (y2 - y1 + 1);
         }
 
+        // This method does not work in general! But for the special shape of the input polygon it does...
         boolean isInsidePolygon(final Arr<P> polygon) {
             final P center = center();
             int edges = 0; // how many edges does a ray from center -----> cut?
