@@ -70,7 +70,7 @@ class D09 extends Aoc {
                 // if one point of the polygon is inside the rectangle -> false
                 if (a.isInsideRectangle(this) || b.isInsideRectangle(this)) return false;
 
-                // at least one edge of the polygon cuts through the rectangle -> false
+                // at least one edge of the polygon cuts directly through the whole rectangle -> false
                 if (isCrosscutByLine(a, b)) return false;
 
                 if (a.y != b.y && center.x <= a.x && Math.min(a.y, b.y) <= center.y && center.y <= Math.max(a.y, b.y))
