@@ -41,6 +41,14 @@ class D09 extends Aoc {
                     ||
                     a.y == b.y && y == a.y && Math.min(a.x, b.x) <= x && x <= Math.max(a.x, b.x);
         }
+
+        P plus(final P p) {
+            return new P(x + p.x, y + p.y);
+        }
+
+        P plus(final long dx, final long dy) {
+            return new P(x + dx, y + dy);
+        }
     }
 
     record Rectangle(long x1, long y1, long x2, long y2) {
@@ -62,7 +70,7 @@ class D09 extends Aoc {
                 if (a.isInsideRectangle(this) || b.isInsideRectangle(this)) return false;
 
                 // at least one edge of the polygon cuts through the rectangle -> false
-                if (isCutByLine(a, b)) return false;
+                if (isCrosscutByLine(a, b)) return false;
 
                 if (a.y != b.y && center.x <= a.x && Math.min(a.y, b.y) <= center.y && center.y <= Math.max(a.y, b.y))
                     edges++;
@@ -75,7 +83,7 @@ class D09 extends Aoc {
             return x1 < p.x && p.x < x2 && y1 < p.y && p.y < y2;
         }
 
-        boolean isCutByLine(final P a, final P b) {
+        boolean isCrosscutByLine(final P a, final P b) {
             return a.y == b.y && y1 < a.y && a.y < y2 && Math.min(a.x, b.x) <= x1 && x2 <= Math.max(a.x, b.x)
                     ||
                     a.x == b.x && x1 < a.x && a.x < x2 && Math.min(a.y, b.y) <= y1 && y2 <= Math.max(a.y, b.y);

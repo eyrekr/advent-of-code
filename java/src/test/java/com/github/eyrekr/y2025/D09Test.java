@@ -2,6 +2,7 @@ package com.github.eyrekr.y2025;
 
 import com.github.eyrekr.AocTest;
 import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class D09Test extends AocTest {
@@ -19,45 +20,89 @@ class D09Test extends AocTest {
                 7,3
                 """);
         star1(50L, 4776487744L);
-        star2(24L, -1L);
+        star2(24L, 1560299548L);
     }
 
     @Test
-    void isInsideRectangle() {
-        final D09.P a = new D09.P(5,5),
-                b = new D09.P(10,10),
-                o = new D09.P(0,0),
-                c1 = new D09.P((5+10)/2, 5),
-                c2 = new D09.P((5+10)/2, 10),
-                c3 = new D09.P(5, (5+10)/2),
-                c4 = new D09.P(10, (5+10)/2);
-        final D09.Rectangle r = new D09.Rectangle(a,b);
-       assertThat(r.isPointInside(a)).isFalse();
-       assertThat(r.isPointInside(b)).isFalse();
-       assertThat(r.isPointInside(r.center())).isTrue();
-       assertThat(r.isPointInside(c1)).isFalse();
-       assertThat(r.isPointInside(c2)).isFalse();
-       assertThat(r.isPointInside(c3)).isFalse();
-       assertThat(r.isPointInside(c4)).isFalse();
-       assertThat(r.isPointInside(o)).isFalse();
+    void point_isInsideRectangle() {
+        final D09.P a = new D09.P(5, 5),
+                b = new D09.P(10, 10),
+                o = new D09.P(0, 0),
+                c1 = new D09.P((5 + 10) / 2, 5),
+                c2 = new D09.P((5 + 10) / 2, 10),
+                c3 = new D09.P(5, (5 + 10) / 2),
+                c4 = new D09.P(10, (5 + 10) / 2);
+        final D09.Rectangle r = new D09.Rectangle(a, b);
+
+        assertThat(a.isInsideRectangle(r)).isFalse();
+        assertThat(b.isInsideRectangle(r)).isFalse();
+        assertThat(r.center().isInsideRectangle(r)).isTrue();
+        assertThat(c1.isInsideRectangle(r)).isFalse();
+        assertThat(c2.isInsideRectangle(r)).isFalse();
+        assertThat(c3.isInsideRectangle(r)).isFalse();
+        assertThat(c4.isInsideRectangle(r)).isFalse();
+        assertThat(o.isInsideRectangle(r)).isFalse();
     }
 
     @Test
-    void isOnLine() {
-        final D09.P a = new D09.P(5,5),
-                b = new D09.P(10,5),
-                o = new D09.P(0,0),
-                c1 = new D09.P((5+10)/2, 5),
-                c2 = new D09.P((5+10)/2, 10),
-                c3 = new D09.P(5, (5+10)/2),
-                c4 = new D09.P(10, (5+10)/2);
-        assertThat(o.isOnLine(a,b)).isFalse();
-        assertThat(o.isOnLine(b,a)).isFalse();
-        assertThat(c1.isOnLine(a,b)).isTrue();
-        assertThat(c2.isOnLine(a,b)).isFalse();
-        assertThat(c3.isOnLine(a,b)).isFalse();
-        assertThat(c4.isOnLine(a,b)).isFalse();
-        assertThat(a.isOnLine(a,b)).isTrue();
-        assertThat(b.isOnLine(a,b)).isTrue();
+    void point_isOnLine() {
+        final D09.P a = new D09.P(5, 5),
+                b = new D09.P(10, 5),
+                o = new D09.P(0, 0),
+                c1 = new D09.P((5 + 10) / 2, 5),
+                c2 = new D09.P((5 + 10) / 2, 10),
+                c3 = new D09.P(5, (5 + 10) / 2),
+                c4 = new D09.P(10, (5 + 10) / 2);
+
+        assertThat(o.isOnLine(a, b)).isFalse();
+        assertThat(o.isOnLine(b, a)).isFalse();
+        assertThat(c1.isOnLine(a, b)).isTrue();
+        assertThat(c2.isOnLine(a, b)).isFalse();
+        assertThat(c3.isOnLine(a, b)).isFalse();
+        assertThat(c4.isOnLine(a, b)).isFalse();
+        assertThat(a.isOnLine(a, b)).isTrue();
+        assertThat(b.isOnLine(a, b)).isTrue();
     }
+
+    @Test
+    void rectangle_isPointInside() {
+        final D09.P a = new D09.P(5, 5),
+                b = new D09.P(10, 10),
+                o = new D09.P(0, 0),
+                c1 = new D09.P((5 + 10) / 2, 5),
+                c2 = new D09.P((5 + 10) / 2, 10),
+                c3 = new D09.P(5, (5 + 10) / 2),
+                c4 = new D09.P(10, (5 + 10) / 2);
+        final D09.Rectangle r = new D09.Rectangle(a, b);
+
+        assertThat(r.isPointInside(a)).isFalse();
+        assertThat(r.isPointInside(b)).isFalse();
+        assertThat(r.isPointInside(r.center())).isTrue();
+        assertThat(r.isPointInside(c1)).isFalse();
+        assertThat(r.isPointInside(c2)).isFalse();
+        assertThat(r.isPointInside(c3)).isFalse();
+        assertThat(r.isPointInside(c4)).isFalse();
+        assertThat(r.isPointInside(o)).isFalse();
+    }
+
+    @Test
+    void rectangle_isCrosscutByLine() {
+        final D09.P a = new D09.P(5, 5),
+                b = new D09.P(10, 5),
+                c = new D09.P(10, 10),
+                d = new D09.P(5, 10),
+                o = new D09.P(0, 0);
+        final D09.Rectangle r = new D09.Rectangle(a, c);
+
+        assertThat(r.isCrosscutByLine(a, b)).isFalse();
+        assertThat(r.isCrosscutByLine(a, d)).isFalse();
+        assertThat(r.isCrosscutByLine(a, a)).isFalse();
+        assertThat(r.isCrosscutByLine(a.plus(2, 0), d.plus(2, 0))).isTrue();
+        assertThat(r.isCrosscutByLine(a.plus(0, 2), b.plus(0, 2))).isTrue();
+
+        // line must go through the whole rectangle, not just one bit
+        assertThat(r.isCrosscutByLine(r.center(), r.center().plus(20, 0))).isFalse();
+        assertThat(r.isCrosscutByLine(r.center(), r.center().plus(0, 20))).isFalse();
+    }
+
 }
