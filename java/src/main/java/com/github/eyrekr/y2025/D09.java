@@ -32,14 +32,14 @@ class D09 extends Aoc {
             return new P(Long.parseLong(p[0]), Long.parseLong(p[1]));
         }
 
-        boolean isInside(final Rectangle r) {
+        boolean isInsideRectangle(final Rectangle r) {
             return r.x1 < x && x < r.x2 && r.y1 < y && y < r.y2;
         }
 
         boolean isOnLine(final P a, final P b) {
-            return a.x == b.x
-                    ? Math.min(a.y, b.y) <= y && y <= Math.max(a.y, b.y)
-                    : Math.min(a.x, b.x) <= x && x <= Math.max(a.x, b.x);
+            return a.x == b.x && x == a.x && Math.min(a.y, b.y) <= y && y <= Math.max(a.y, b.y)
+                    ||
+                    a.y == b.y && y == a.y && Math.min(a.x, b.x) <= x && x <= Math.max(a.x, b.x);
         }
     }
 
@@ -59,7 +59,7 @@ class D09 extends Aoc {
                 final P a = polygon.at(i), b = polygon.at(i + 1);
 
                 // if one point of the polygon is inside the rectangle -> false
-                if (a.isInside(this) || b.isInside(this)) return false;
+                if (a.isInsideRectangle(this) || b.isInsideRectangle(this)) return false;
 
                 // at least one edge of the polygon cuts through the rectangle -> false
                 if (isCutByLine(a, b)) return false;
