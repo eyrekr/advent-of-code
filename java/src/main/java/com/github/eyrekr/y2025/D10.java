@@ -28,7 +28,8 @@ class D10 extends Aoc {
         return machines.toLongs(Machine::minPressesToLights).sum();
     }
 
-    // 16316 too low
+    // 16316 too low (with only lower bound set)
+    // 17128 too low (with equality forced via lower and upper bound)
     @Override
     public long star2() {
         return machines.toLongs(Machine::minPressesToJoltage).sum();
@@ -84,7 +85,7 @@ class D10 extends Aoc {
                         }
                         return 0;
                     });
-                    constraint.lower(joltage);
+                    constraint.lower(joltage).upper(joltage); // forced equality
                     Out.print(" = %d\n", joltage);
                     return 0;
                 });

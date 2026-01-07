@@ -56,10 +56,10 @@ class D10Test extends AocTest {
         final Variable x4 = model.newVariable("x4").integer(true).lower(0);
         final Variable x5 = model.newVariable("x5").integer(true).lower(0);
         // Constraints
-        model.newExpression("c0").set(x4, 1).set(x5, 1).lower(3);
-        model.newExpression("c1").set(x1, 1).set(x5, 1).lower(5);
-        model.newExpression("c2").set(x2, 1).set(x3, 1).set(x4, 1).lower(4);
-        model.newExpression("c3").set(x0, 1).set(x1, 1).set(x3, 1).lower(7);
+        model.newExpression("c0").set(x4, 1).set(x5, 1).lower(3).upper(3);
+        model.newExpression("c1").set(x1, 1).set(x5, 1).lower(5).upper(5);
+        model.newExpression("c2").set(x2, 1).set(x3, 1).set(x4, 1).lower(4).upper(4);
+        model.newExpression("c3").set(x0, 1).set(x1, 1).set(x3, 1).lower(7).upper(7);
         // Objective function
         model.newExpression("objective").set(x0, 1).set(x1, 1).set(x2, 1).set(x3, 1).set(x4, 1).set(x5, 1).weight(1.0);
         // Solution
