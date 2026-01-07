@@ -10,6 +10,7 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -39,9 +40,9 @@ class D10 extends Aoc {
         static Machine fromLine(final String line) { //    [.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}
             final Arr<String> blocks = Arr.fromArray(StringUtils.split(StringUtils.remove(line, ' '), "[](){}"));
             final char[] lights = blocks.removeFirst().toCharArray();
-            final Longs joltage = Longs.fromString(blocks.removeLast());
+            final Longs joltages = Longs.fromString(blocks.removeLast());
             final Arr<Longs> buttons = blocks.map(Longs::fromString);
-            return new Machine(lights, buttons, joltage);
+            return new Machine(lights, buttons, joltages);
         }
 
         long minPressesToLights() {
@@ -64,9 +65,9 @@ class D10 extends Aoc {
 
         long minPressesToJoltage() {
             Out.print("""
-            @b%s@@
-            """,
-            joltages);
+                            @b%s@@
+                            """,
+                    joltages);
             final ExpressionsBasedModel model = new ExpressionsBasedModel();
             // Variables
             final Variable[] x = buttons
@@ -78,10 +79,10 @@ class D10 extends Aoc {
             {// Constraints
                 joltages.contextMap((joltage, position, first, last) -> {
                     final Expression constraint = model.newExpression("c" + position);
-                    buttons.contextMap((longs, i, _first, _last) -> {
+                    buttons.contextMap((longs, button, _first, _last) -> {
                         if (longs.has(position)) {
-                            constraint.set(x[i], 1);
-                            Out.print(x[i].getName() + " + ");
+                            constraint.set(x[button], 1);
+                            Out.print(x[button].getName() + " + ");
                         }
                         return 0;
                     });
@@ -106,7 +107,36 @@ class D10 extends Aoc {
                     result.getState(),
                     (long) result.getValue());
             for (final Variable v : x) Out.print("  %s = %d\n", v.getName(), v.getValue().longValue());
+
+            validateJoltagesWithPresses(x);
+
             return (long) result.getValue();
+        }
+
+        void validateJoltagesWithPresses(final Variable[] x) {
+            final long[] finalJoltages = buttons.mapWith(
+                            Arr.fromArray(x)
+                                    .map(Variable::getValue)
+                                    .map(BigDecimal::longValue),
+                            (button, pressCount) -> button.reduce(
+                                    new long[joltages.length],
+                                    (joltage, i) -> {
+                                        joltage[(int) i] = pressCount;
+                                        return joltage;
+                                    }))
+                    .reduce(
+                            new long[joltages.length],
+                            (a, b) -> {
+                                for (int i = 0; i < a.length; i++) a[i] += b[i];
+                                return a;
+                            });
+
+            for (int i = 0; i < joltages.length; i++)
+                Out.print("@g%d@@ ", finalJoltages[i]);
+            Out.print("\n");
+
+            for (int i = 0; i < joltages.length; i++)
+                if (finalJoltages[i] != joltages.at(i)) throw new IllegalStateException("does not compute");
         }
     }
 
