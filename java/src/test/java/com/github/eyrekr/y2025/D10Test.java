@@ -23,6 +23,7 @@ class D10Test extends AocTest {
 
     /**
      * Input
+     * <pre>
      * x0 = (3)
      * x1 = (1,3)
      * x2 = (2)
@@ -30,16 +31,19 @@ class D10Test extends AocTest {
      * x4 = (0,2)
      * x5 = (0,1)
      * -> {3,5,4,7}
-     * <p>
-     * Contraints
+     * </pre>
+     * Constraints
+     * <pre>
      * c0:    x4 + x5 = 3
      * c1:    x1 + x5 = 5
      * c2:    x2 + x3 + x4 = 4
      * c3:    x0 + x1 + x3 = 7
      * x{i} >= 0, x{i} integer
-     * <p>
+     * </pre>
      * Objective function
+     * <pre>
      * minimize x0 + x1 + x2 + x3 + x4 + x5
+     * </pre>
      */
     @Test
     void ILP() {

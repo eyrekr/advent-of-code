@@ -62,6 +62,10 @@ class D10 extends Aoc {
         }
 
         long minPressesToJoltage() {
+            Out.print("""
+            @b%s@@
+            """,
+            joltages);
             final ExpressionsBasedModel model = new ExpressionsBasedModel();
             // Variables
             final Variable[] x = buttons
@@ -70,29 +74,38 @@ class D10 extends Aoc {
                             .integer(true)
                             .lower(0))
                     .toArray(Variable[]::new);
-            // Constraints
-            joltages.contextMap((joltage, position, first, last) -> {
-                final Expression constraint = model.newExpression("c" + position);
-                buttons.contextMap((longs, i, _first, _last) -> {
-                    if (longs.has(position)) constraint.set(x[i], 1);
+            {// Constraints
+                joltages.contextMap((joltage, position, first, last) -> {
+                    final Expression constraint = model.newExpression("c" + position);
+                    buttons.contextMap((longs, i, _first, _last) -> {
+                        if (longs.has(position)) {
+                            constraint.set(x[i], 1);
+                            Out.print(x[i].getName() + " + ");
+                        }
+                        return 0;
+                    });
+                    constraint.lower(joltage);
+                    Out.print(" = %d\n", joltage);
                     return 0;
                 });
-                constraint.lower(joltage);
-                return 0;
-            });
-            // Objective function
-            final Expression objective = model.newExpression("objective");
-            for (final Variable v : x) objective.set(v, 1);
-            objective.weight(1.0);
+            }
+            {// Objective function
+                final Expression objective = model.newExpression("objective");
+                for (final Variable v : x) {
+                    objective.set(v, 1);
+                    Out.print(v.getName() + " + ");
+                }
+                objective.weight(1.0);
+            }
             // Solution
             final Optimisation.Result result = model.minimise();
             Out.print("""
-                    %s %f (%d)
-                    """,
+                            = %s %d
+                            """,
                     result.getState(),
-                    result.getValue(),
-                    (long)result.getValue());
-            return (long)result.getValue();
+                    (long) result.getValue());
+            for (final Variable v : x) Out.print("  %s = %d\n", v.getName(), v.getValue().longValue());
+            return (long) result.getValue();
         }
     }
 
