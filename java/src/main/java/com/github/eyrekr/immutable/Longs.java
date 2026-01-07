@@ -644,6 +644,12 @@ public final class Longs implements Iterable<Long> {
         return arr;
     }
 
+    public Longs contextMap(final RichLongToLong transform) {
+        Longs arr = new Longs();
+        for (int i = 0; i < length; i++) arr = arr.addLast(transform.apply(at(i), i, i == 0, i == length - 1));
+        return arr;
+    }
+
     /**
      * @return New array with values zipped with the other array transformed using the given binary function.
      * @complexity O(n)
@@ -796,6 +802,11 @@ public final class Longs implements Iterable<Long> {
     @FunctionalInterface
     public interface RichLongToString {
         String format(long value, int i, boolean first, boolean last);
+    }
+
+    @FunctionalInterface
+    public interface RichLongToLong {
+        long apply(long value, int i, boolean first, boolean last);
     }
 
     @FunctionalInterface

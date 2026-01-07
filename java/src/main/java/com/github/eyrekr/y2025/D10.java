@@ -3,11 +3,17 @@ package com.github.eyrekr.y2025;
 import com.github.eyrekr.Aoc;
 import com.github.eyrekr.immutable.Longs;
 import com.github.eyrekr.mutable.Arr;
+import com.github.eyrekr.output.Out;
 import org.apache.commons.lang3.StringUtils;
+import org.ojalgo.optimisation.Expression;
+import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Variable;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
 class D10 extends Aoc {
 
@@ -19,37 +25,16 @@ class D10 extends Aoc {
 
     @Override
     public long star1() {
-        return machines.toLongs(D10::minPressesToLights).sum();
+        return machines.toLongs(Machine::minPressesToLights).sum();
     }
 
+    // 16316 too low
     @Override
     public long star2() {
-        return machines.toLongs(D10::minPressesToJoltage).sum();
+        return machines.toLongs(Machine::minPressesToJoltage).sum();
     }
 
-    static long minPressesToLights(final Machine machine) {
-        final Set<String> processedStates = new HashSet<>();
-        final Arr<State> queue = Arr.of(State.initialState(machine));
-
-        while (queue.isNotEmpty()) {
-            final State state = queue.removeFirst();
-            { // avoid infinite loops
-                final String serializedState = state.toString();
-                if (processedStates.contains(serializedState)) continue;
-                processedStates.add(serializedState);
-            }
-            if (state.matches(machine.lights)) return state.steps;
-            machine.buttons.map(state::apply).each(queue::addLast);
-        }
-
-        throw new IllegalStateException("sequence not found");
-    }
-
-    static long minPressesToJoltage(final Machine machine) {
-        return -1L;
-    }
-
-    record Machine(char[] lights, Arr<Longs> buttons, Longs joltage) {
+    record Machine(char[] lights, Arr<Longs> buttons, Longs joltages) {
         static Machine fromLine(final String line) { //    [.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}
             final Arr<String> blocks = Arr.fromArray(StringUtils.split(StringUtils.remove(line, ' '), "[](){}"));
             final char[] lights = blocks.removeFirst().toCharArray();
@@ -57,11 +42,63 @@ class D10 extends Aoc {
             final Arr<Longs> buttons = blocks.map(Longs::fromString);
             return new Machine(lights, buttons, joltage);
         }
+
+        long minPressesToLights() {
+            final Set<String> processedStates = new HashSet<>();
+            final Arr<State> queue = Arr.of(State.initialState(lights.length));
+
+            while (queue.isNotEmpty()) {
+                final State state = queue.removeFirst();
+                { // avoid infinite loops
+                    final String serializedState = state.toString();
+                    if (processedStates.contains(serializedState)) continue;
+                    processedStates.add(serializedState);
+                }
+                if (state.matches(lights)) return state.steps;
+                buttons.map(state).each(queue::addLast);
+            }
+
+            throw new IllegalStateException("sequence not found");
+        }
+
+        long minPressesToJoltage() {
+            final ExpressionsBasedModel model = new ExpressionsBasedModel();
+            // Variables
+            final Variable[] x = buttons
+                    .contextMap((longs, i, first, last) -> model
+                            .newVariable("x" + i)
+                            .integer(true)
+                            .lower(0))
+                    .toArray(Variable[]::new);
+            // Constraints
+            joltages.contextMap((joltage, position, first, last) -> {
+                final Expression constraint = model.newExpression("c" + position);
+                buttons.contextMap((longs, i, _first, _last) -> {
+                    if (longs.has(position)) constraint.set(x[i], 1);
+                    return 0;
+                });
+                constraint.lower(joltage);
+                return 0;
+            });
+            // Objective function
+            final Expression objective = model.newExpression("objective");
+            for (final Variable v : x) objective.set(v, 1);
+            objective.weight(1.0);
+            // Solution
+            final Optimisation.Result result = model.minimise();
+            Out.print("""
+                    %s %f (%d)
+                    """,
+                    result.getState(),
+                    result.getValue(),
+                    (long)result.getValue());
+            return (long)result.getValue();
+        }
     }
 
-    record State(char[] lights, long steps) {
-        static State initialState(final Machine machine) {
-            final char[] lights = new char[machine.lights.length];
+    record State(char[] lights, long steps) implements Function<Longs, State> {
+        static State initialState(final int n) {
+            final char[] lights = new char[n];
             Arrays.fill(lights, Symbol.Off);
             return new State(lights, 0L);
         }
@@ -70,7 +107,8 @@ class D10 extends Aoc {
             return Arrays.equals(this.lights, lights);
         }
 
-        State apply(final Longs button) {
+        @Override
+        public State apply(final Longs button) {
             final char[] lights = Arrays.copyOf(this.lights, this.lights.length);
             for (final long i : button)
                 lights[(int) i] = lights[(int) i] == Symbol.On ? Symbol.Off : Symbol.On;
