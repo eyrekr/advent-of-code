@@ -61,8 +61,8 @@ public final class Tableau {
         for (int pivotColumn = findPivotColumn(); pivotColumn >= 0; pivotColumn = findPivotColumn()) {
             final int pivotRow = findPivotRow(pivotColumn);
             Out.print("""
-                    pivoting: column %d  row %d
-                    """,
+                            pivoting: column %d  row %d
+                            """,
                     pivotColumn, pivotRow);
             divideRow(a[pivotRow], a[pivotRow][pivotColumn]);
             for (int row = 0; row < rows; row++)
@@ -76,7 +76,7 @@ public final class Tableau {
     private int findPivotColumn() {
         F min = F.Zero;
         int argmin = -1;
-        for (int column = 0; column < variables; column++)
+        for (int column = 0; column < variables + constraints; column++)
             if (a[objective][column].lowerThan(min)) {
                 argmin = column;
                 min = a[objective][column];
@@ -88,7 +88,7 @@ public final class Tableau {
         F min = F.Infinity;
         int argmin = -1;
         for (int row = 0; row < objective; row++)
-            if (!a[row][pivotColumn].zero && a[row][C].positive) {
+            if (!a[row][pivotColumn].zero) {
                 final F k = a[row][C].div(a[row][pivotColumn]);
                 if (k.lowerThan(min)) {
                     min = k;
@@ -130,9 +130,9 @@ public final class Tableau {
         Out.print("obj: ");
         for (int column = 0; column < columns; column++) {
             final F value = a[objective][column];
-            if(value.zero) {
+            if (value.zero) {
                 Out.print("@b%5s@@", value);
-            } else if(value.negative) {
+            } else if (value.negative) {
                 Out.print("@r%5s@@", value);
             } else {
                 Out.print("@c%5s@@", value);
@@ -218,8 +218,8 @@ public final class Tableau {
     }
 
     public static void main(String[] args) {
-        /*
-        final var t = new Tableau(11, 10);
+
+        final var t = new Tableau(10, 11);
         t.setConstraint(0, new long[]{1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1}, -95);
         t.setConstraint(1, new long[]{1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1}, -54);
         t.setConstraint(2, new long[]{1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0}, -85);
@@ -233,8 +233,9 @@ public final class Tableau {
         t.print();
         t.minimize();
         t.print();
-        */
 
+
+        /*
         final var t = new Tableau(2, 2);
         t.setConstraint(0, new long[]{1,2}, -40);
         t.setConstraint(1, new long[]{1,1}, -30);
@@ -243,5 +244,16 @@ public final class Tableau {
         t.print();
         final var C = t.minimize();
         Out.print("result @G%s@@\n", C);
+        */
+
+        /*
+        final var t = new Tableau(4, 6);
+        t.setConstraint(0, new long[]{0, 0, 0, 0, 1, 1}, -3);
+        t.setConstraint(1, new long[]{0, 1, 0, 0, 0, 1}, -5);
+        t.setConstraint(2, new long[]{0, 0, 1, 1, 1, 0}, -4);
+        t.setConstraint(3, new long[]{1, 1, 0, 1, 0, 0}, -7);
+        t.print();
+        t.minimize();
+         */
     }
 }
