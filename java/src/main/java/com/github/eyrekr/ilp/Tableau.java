@@ -1,11 +1,10 @@
 package com.github.eyrekr.ilp;
 
-import com.github.eyrekr.math.Algebra;
 import com.github.eyrekr.output.Out;
 
 public final class Tableau {
 
-    private final F[][] a;
+    private final Q[][] a;
     private final int rows, columns, variables, constraints, objective, Z, C;
 
     /**
@@ -37,27 +36,27 @@ public final class Tableau {
         this.constraints = constraints;
         this.rows = constraints + 1;
         this.columns = variables + constraints + 2;
-        this.a = new F[rows][columns];
-        for (int row = 0; row < rows; row++) for (int column = 0; column < columns; column++) a[row][column] = F.Zero;
+        this.a = new Q[rows][columns];
+        for (int row = 0; row < rows; row++) for (int column = 0; column < columns; column++) a[row][column] = Q.Zero;
         this.objective = this.rows - 1;
         this.C = this.columns - 1;
         this.Z = this.C - 1;
         // init slack variables
-        for (int s = 0; s < this.constraints; s++) this.a[s][this.variables + s] = F.One;
+        for (int s = 0; s < this.constraints; s++) this.a[s][this.variables + s] = Q.One;
         // init column Z
-        this.a[objective][Z] = F.One;
+        this.a[objective][Z] = Q.One;
         // init column C
-        for (int row = 0; row < objective; row++) this.a[row][C] = F.One;
+        for (int row = 0; row < objective; row++) this.a[row][C] = Q.One;
     }
 
     public Tableau setConstraint(final int c, final long[] coefs, final long value) {
         for (int row = 0; row < objective; row++)
-            a[row][c] = F.of(coefs[row]);
-        a[objective][c] = F.of(value);
+            a[row][c] = Q.of(coefs[row]);
+        a[objective][c] = Q.of(value);
         return this;
     }
 
-    public F minimize() {
+    public Q minimize() {
         for (int pivotColumn = findPivotColumn(); pivotColumn >= 0; pivotColumn = findPivotColumn()) {
             final int pivotRow = findPivotRow(pivotColumn);
             Out.print("""
@@ -74,7 +73,7 @@ public final class Tableau {
     }
 
     private int findPivotColumn() {
-        F min = F.Zero;
+        Q min = Q.Zero;
         int argmin = -1;
         for (int column = 0; column < variables + constraints; column++)
             if (a[objective][column].lowerThan(min)) {
@@ -85,11 +84,11 @@ public final class Tableau {
     }
 
     private int findPivotRow(final int pivotColumn) {
-        F min = F.Infinity;
+        Q min = Q.Infinity;
         int argmin = -1;
         for (int row = 0; row < objective; row++)
             if (a[row][pivotColumn].positive) {
-                final F k = a[row][C].div(a[row][pivotColumn]);
+                final Q k = a[row][C].div(a[row][pivotColumn]);
                 if (k.lowerThan(min)) {
                     min = k;
                     argmin = row;
@@ -98,12 +97,12 @@ public final class Tableau {
         return argmin;
     }
 
-    private static void divideRow(final F[] row, final F factor) {
+    private static void divideRow(final Q[] row, final Q factor) {
         for (int i = 0; i < row.length; i++)
             row[i] = row[i].div(factor);
     }
 
-    private static void addRowMultipleToRow(final F[] row, final F factor, final F[] target) {
+    private static void addRowMultipleToRow(final Q[] row, final Q factor, final Q[] target) {
         for (int i = 0; i < row.length; i++) target[i] = row[i].mul(factor).add(target[i]);
     }
 
@@ -115,10 +114,10 @@ public final class Tableau {
         for (int row = 0; row < objective; row++) {
             Out.print("b%02d  ", row);
             for (int column = 0; column < columns; column++) {
-                final F value = a[row][column];
+                final Q value = a[row][column];
                 if (value.zero) {
                     Out.print("@W%5s@@", value);
-                } else if (value.is(F.One)) {
+                } else if (value.is(Q.One)) {
                     Out.print("@G%5s@@", value);
                 } else {
                     Out.print("%5s", value);
@@ -129,7 +128,7 @@ public final class Tableau {
 
         Out.print("obj: ");
         for (int column = 0; column < columns; column++) {
-            final F value = a[objective][column];
+            final Q value = a[objective][column];
             if (value.zero) {
                 Out.print("@b%5s@@", value);
             } else if (value.negative) {
@@ -139,82 +138,6 @@ public final class Tableau {
             }
         }
         Out.print("\n");
-    }
-
-    record F(long a, long b, boolean zero, boolean negative, boolean positive) implements Comparable<F> {
-        static F Zero = of(0);
-        static F One = of(1);
-        static F Infinity = of(Long.MAX_VALUE);
-
-        static F of(final long a) {
-            return new F(a, 1, a == 0, a < 0, a > 0);
-        }
-
-        static F of(final long a, final long b) {
-            if (a == 0) return Zero;
-            if (b == 0) throw new ArithmeticException("division by 0 not defined");
-            if (b < 0) return of(-a, -b);
-
-            final long gcd = Algebra.gcd(Math.abs(a), Math.abs(b));
-            return new F(a / gcd, b / gcd, a == 0, a * b < 0, a * b > 0);
-        }
-
-        F abs() {
-            return negative ? neg() : this;
-        }
-
-        F neg() {
-            return of(-a, b);
-        }
-
-        F add(final F that) {
-            return this.b == that.b
-                    ? of(this.a + that.a, this.b)
-                    : of(this.a * that.b + that.a * this.b, this.b * that.b);
-        }
-
-        F mul(final F that) {
-            return of(this.a * that.a, this.b * that.b);
-        }
-
-
-        F div(final F that) {
-            return mul(that.inv());
-        }
-
-        F inv() {
-            return of(b, a);
-        }
-
-        @Override
-        public String toString() {
-            return b == 1 ? String.valueOf(a) : a + "/" + b;
-        }
-
-        @Override
-        public int compareTo(final F that) {
-            return Long.compare(this.a * that.b, that.a * this.b);
-        }
-
-        boolean is(final long a) {
-            return this.a == a && this.b == 1;
-        }
-
-        boolean is(final long a, final long b) {
-            return this.a == a && this.b == b;
-        }
-
-        boolean is(final F that) {
-            return this.equals(that);
-        }
-
-        boolean lowerThan(final F that) {
-            return compareTo(that) < 0;
-        }
-
-        boolean greaterThan(final F that) {
-            return compareTo(that) > 0;
-        }
     }
 
     public static void main(String[] args) {
