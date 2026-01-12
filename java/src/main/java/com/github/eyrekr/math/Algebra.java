@@ -1,5 +1,6 @@
 package com.github.eyrekr.math;
 
+import com.github.eyrekr.ilp.Q;
 import com.github.eyrekr.immutable.Longs;
 import com.github.eyrekr.output.Out;
 
@@ -108,7 +109,7 @@ public final class Algebra {
     public static long[][] gaussJordanEliminationMethod(final long[][] a, final long[] b) {
         final long[][] g = M.appendColumn(a, b); // augmented matrix
         final int m = g.length, n = g[0].length, l = Math.min(m, n - 1);
-        final int[] pivot = new int[l];
+        final int[] pivot = new int[l]; // which row `i` is used as pivot for column `j` ; we'd generally use row `i` as pivot for column `i`, but the value there can be 0 and thus cannot be used -> we will be using the row that has the smallest absolute value in the pivot column
         Arrays.fill(pivot, -1);
 
         M.print(g);
@@ -121,18 +122,35 @@ public final class Algebra {
             for (int i = 0; i < m; i++) if (!contains(pivot, i)) reduceRowUsingPivot(g[i], g[p], j);
 
             Out.print("""
-                    
-                    pivot column %2d
-                    pivot row    %2d
-                    
-                    """,
+                                                
+                            pivot column %2d
+                            pivot row    %2d
+                                                
+                            """,
                     j,
                     p);
             M.print(g);
         }
 
         // Jordan
+        for (int j = l - 1; j > -0; j--)
+            for (int i = 0; i < j; i++) reduceRowUsingPivot(g[pivot[i]], g[pivot[j]], j);
 
+        Out.print("""
+                                
+                After Jordan:
+                                
+                """);
+
+        M.print(g);
+
+
+        // Solution
+        for (int i = 0; i < l; i++) {
+            Out.print("x%d = %s    ",
+                    i + 1,
+                    Q.of(g[i][n - 1], g[i][pivot[i]]));
+        }
 
         return g;
     }
@@ -190,11 +208,6 @@ public final class Algebra {
         final long[] b = new long[]{8, -11, -3};
         final long[][] g = gaussJordanEliminationMethod(a, b);
 
-        Out.print("""
-                
-                Solution:
-                """);
 
-        M.print(g);
     }
 }

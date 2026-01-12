@@ -21,11 +21,11 @@ public final class Q implements Comparable<Q> {
         this.positive = positive;
     }
 
-    static Q of(final long a) {
+    public static Q of(final long a) {
         return new Q(a, 1, a == 0, a < 0, a > 0);
     }
 
-    static Q of(final long a, final long b) {
+    public static Q of(final long a, final long b) {
         if (a == 0) return Zero;
         if (b == 0) throw new ArithmeticException("division by 0 not defined");
         if (b < 0) return of(-a, -b);
@@ -34,30 +34,30 @@ public final class Q implements Comparable<Q> {
         return new Q(a / gcd, b / gcd, a == 0, a * b < 0, a * b > 0);
     }
 
-    Q abs() {
+    public Q abs() {
         return negative ? neg() : this;
     }
 
-    Q neg() {
+    public Q neg() {
         return of(-a, b);
     }
 
-    Q add(final Q that) {
+    public Q add(final Q that) {
         return this.b == that.b
                 ? of(this.a + that.a, this.b)
                 : of(this.a * that.b + that.a * this.b, this.b * that.b);
     }
 
-    Q mul(final Q that) {
+    public Q mul(final Q that) {
         return of(this.a * that.a, this.b * that.b);
     }
 
 
-    Q div(final Q that) {
+    public Q div(final Q that) {
         return mul(that.inv());
     }
 
-    Q inv() {
+    public Q inv() {
         return of(b, a);
     }
 
@@ -81,23 +81,23 @@ public final class Q implements Comparable<Q> {
         return Long.compare(this.a * that.b, that.a * this.b);
     }
 
-    boolean is(final long a) {
+    public boolean is(final long a) {
         return this.a == a && this.b == 1;
     }
 
-    boolean is(final long a, final long b) {
+    public boolean is(final long a, final long b) {
         return this.a == a && this.b == b;
     }
 
-    boolean is(final Q that) {
+    public boolean is(final Q that) {
         return this.equals(that);
     }
 
-    boolean lowerThan(final Q that) {
+    public boolean lowerThan(final Q that) {
         return compareTo(that) < 0;
     }
 
-    boolean greaterThan(final Q that) {
+    public boolean greaterThan(final Q that) {
         return compareTo(that) > 0;
     }
 }
