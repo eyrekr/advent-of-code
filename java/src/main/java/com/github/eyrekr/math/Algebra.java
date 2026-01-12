@@ -158,10 +158,10 @@ public final class Algebra {
 
     private static long[] reduceRowUsingPivot(final long[] a, final long[] b, final int c) {
         final int l = a.length;
-        if (c < 0 || b[c] == 0) throw new IllegalStateException("system unsolvable");
+        if (b[c] == 0) throw new IllegalStateException("system unsolvable");
         if (a[c] == 0) return a;
 
-        final long lcm = lcm(Math.abs(a[c]), Math.abs(b[c])),
+        final long lcm = lcm(Math.abs(a[c]), Math.abs(b[c])), // use LCM so that we can calculate with longs everywhere
                 ka = Math.abs(lcm / a[c]),
                 kb = Math.abs(lcm / b[c]),
                 op = -sgn(a[c] * b[c]);
@@ -169,7 +169,7 @@ public final class Algebra {
         for (int i = 0; i < l; i++) a[i] = ka * a[i] + op * kb * b[i];
 
         long gcd = 0;
-        for (final long x : a) if (x != 0) gcd = gcd < 0 ? x : gcd(gcd, Math.abs(x));
+        for (final long x : a) if (x != 0) gcd = gcd == 0 ? x : gcd(gcd, Math.abs(x));
         // equation can be reduced (8x + 4y = 16 -> 2x + y = 4)
         if (gcd > 1) for (int i = 0; i < l; i++) a[i] /= gcd;
 
