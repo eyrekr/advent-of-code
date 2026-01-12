@@ -82,9 +82,18 @@ public final class Algebra {
 
 
     public static long[] gaussJordanEliminationMethod(final long[][] a, final long[] b) {
-        final long[][]
+        final long[][] g = Matrix.appendColumn(a, b); // augmented matrix
+        final int m = g.length - 1, n = g[0].length - 1;
+???
+        return Matrix.column(g, n);
     }
 
+    private static void reduce(final long[] a) {
+        long gcd = a[0];
+        final int l = a.length;
+        for (int i = 1; i < l; i++) gcd = gcd(gcd, a[i]);
+        for (int i = 0; i < l; i++) a[i] /= gcd;
+    }
 
     //endregion
 }
