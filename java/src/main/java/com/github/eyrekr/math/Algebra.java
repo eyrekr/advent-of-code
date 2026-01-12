@@ -79,5 +79,12 @@ public final class Algebra {
         for (int i = 2; i <= n / 2; i++) if (n % i == 0) divisors = divisors.addLast(i);
         return divisors.addLast(n);
     }
+
+
+    public static long[] gaussEliminationMethod(final long[][] a, final long[] b) {
+
+    }
+
+
     //endregion
 }
