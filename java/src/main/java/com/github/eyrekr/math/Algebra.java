@@ -110,6 +110,7 @@ public final class Algebra {
         final long[][] g = M.appendColumn(a, b); // augmented matrix
         final int m = g.length, n = g[0].length, l = Math.min(m, n - 1);
         final int[] pivot = new int[l]; // which row `i` is used as pivot for column `j` ; we'd generally use row `i` as pivot for column `i`, but the value there can be 0 and thus cannot be used -> we will be using the row that has the smallest absolute value in the pivot column
+        // ^^ because of this, we cannot use this version to calculate inverted matrix, because that expects that for pivot row `i` we pick pivot column `i`
         Arrays.fill(pivot, -1);
 
         M.print(g);
@@ -152,7 +153,7 @@ public final class Algebra {
                     Q.of(g[i][n - 1], g[i][pivot[i]]));
         }
 
-        return g;
+        return M.shuffleRows(g, pivot);
     }
 
 
@@ -201,13 +202,20 @@ public final class Algebra {
 
     public static void main(String[] args) {
         final long[][] a = new long[][]{
-                {2, 1, -1},
                 {-3, -1, 2},
+                {2, 1, -1},
                 {-2, 1, 2}};
 
-        final long[] b = new long[]{8, -11, -3};
+        final long[] b = new long[]{-11, 8, -3};
         final long[][] g = gaussJordanEliminationMethod(a, b);
 
+        Out.print("""
+                                
+                                
+                FINAL SOLUTION OF GAUSS-JORDAN ELIMINATION WITH ROWS RESHUFFLED
+                                
+                """);
 
+        M.print(g);
     }
 }

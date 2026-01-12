@@ -104,5 +104,20 @@ public final class M {
         }
         return a;
     }
+
+    public static boolean equals(final long[][] a, final long[][] b) {
+        final int m = a.length, n = a[0].length;
+        if (b.length != m || b[0].length != n) return false;
+        for (int i = 0; i < n; i++) for (int j = 0; j < m; j++) if (a[i][j] != b[i][j]) return false;
+        return true;
+    }
+
+    @ReturnsNewInstance
+    public static long[][] shuffleRows(final long[][] a, final int[] order) {
+        final int m = a.length, n = a[0].length;
+        final long[][] t = new long[m][n];
+        for (int i = 0; i < m; i++) System.arraycopy(a[order[i]], 0, t[i], 0, n);
+        return t;
+    }
     //endregion
 }
