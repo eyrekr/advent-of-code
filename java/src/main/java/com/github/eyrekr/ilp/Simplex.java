@@ -48,7 +48,7 @@ public final class Simplex {
      *    c           -3 -5 -4 -7 -1 │ 0  0  0  0  0  │ 0
      */
     private static Q solve(final Q[][] t) {
-        pivot(t).ifPresent()
+        return null;
     }
 
     private static Opt<P> pivot(final Q[][] t) {

@@ -1,6 +1,7 @@
 package com.github.eyrekr.math;
 
 import com.github.eyrekr.annotation.ReturnsNewInstance;
+import com.github.eyrekr.output.Out;
 
 
 /**
@@ -11,7 +12,7 @@ import com.github.eyrekr.annotation.ReturnsNewInstance;
  *     <li>{@code n} - number of columns; {@code j} - iteration over columns</li>
  * </ol>
  */
-public final class Matrix {
+public final class M {
 
     //region LONG
     @ReturnsNewInstance
@@ -51,7 +52,7 @@ public final class Matrix {
         final int m = a.length, n = a[0].length;
         final long[][] t = new long[m][n + 1];
         paste(a, t, 0, 0);
-        for (int i = 0; i < m; i++) a[i][n] = b[i];
+        for (int i = 0; i < m; i++) t[i][n] = b[i];
         return t;
     }
 
@@ -90,6 +91,18 @@ public final class Matrix {
         final int m = Math.min(src.length, tgt.length), n = Math.min(src[0].length, tgt[0].length);
         for (int i = 0; i < m; i++) System.arraycopy(src[i], 0, tgt[i0 + i], j0, n);
         return tgt;
+    }
+
+    public static long[][] print(final long[][] a) {
+        final int m = a.length, n = a[0].length;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++)
+                if (a[i][j] == 0) Out.print("@k%4d@@", a[i][j]);
+                else if (a[i][j] < 0) Out.print("@r%4d@@", a[i][j]);
+                else Out.print("%4d", a[i][j]);
+            Out.print("\n");
+        }
+        return a;
     }
     //endregion
 }

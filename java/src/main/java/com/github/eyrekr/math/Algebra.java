@@ -1,6 +1,9 @@
 package com.github.eyrekr.math;
 
 import com.github.eyrekr.immutable.Longs;
+import com.github.eyrekr.output.Out;
+
+import java.util.Arrays;
 
 public final class Algebra {
 
@@ -45,6 +48,27 @@ public final class Algebra {
     public static int sgn(final int i) {
         return Integer.compare(i, 0);
     }
+
+    public static int argmin(final int[] a) {
+        int argmin = 0;
+        for (int i = 0; i < a.length; i++) if (a[i] < a[argmin]) argmin = i;
+        return argmin;
+    }
+
+    public static int[] map(final int[] a, final MapInt f) {
+        for (int i = 0; i < a.length; i++) a[i] = f.apply(i, a[i]);
+        return a;
+    }
+
+    public static boolean contains(final int[] a, final long x) {
+        for (final long l : a) if (l == x) return true;
+        return false;
+    }
+
+    @FunctionalInterface
+    public interface MapInt {
+        int apply(int i, int x);
+    }
     //endregion
 
     //region LONG
@@ -81,19 +105,96 @@ public final class Algebra {
     }
 
 
-    public static long[] gaussJordanEliminationMethod(final long[][] a, final long[] b) {
-        final long[][] g = Matrix.appendColumn(a, b); // augmented matrix
-        final int m = g.length - 1, n = g[0].length - 1;
-???
-        return Matrix.column(g, n);
+    public static long[][] gaussJordanEliminationMethod(final long[][] a, final long[] b) {
+        final long[][] g = M.appendColumn(a, b); // augmented matrix
+        final int m = g.length, n = g[0].length, l = Math.min(m, n - 1);
+        final int[] pivot = new int[l];
+        Arrays.fill(pivot, -1);
+
+        M.print(g);
+
+        // Gauss
+        for (int j = 0; j < l; j++) {
+            final long[] c = M.column(g, j);
+            final int p = argmin(map(c, (i, x) -> x == 0 || contains(pivot, i) ? Long.MAX_VALUE : Math.abs(x)));
+            pivot[j] = p;
+            for (int i = 0; i < m; i++) if (!contains(pivot, i)) reduceRowUsingPivot(g[i], g[p], j);
+
+            Out.print("""
+                    
+                    pivot column %2d
+                    pivot row    %2d
+                    
+                    """,
+                    j,
+                    p);
+            M.print(g);
+        }
+
+        // Jordan
+
+
+        return g;
     }
 
-    private static void reduce(final long[] a) {
-        long gcd = a[0];
+
+    private static long[] reduceRowUsingPivot(final long[] a, final long[] b, final int c) {
         final int l = a.length;
-        for (int i = 1; i < l; i++) gcd = gcd(gcd, a[i]);
-        for (int i = 0; i < l; i++) a[i] /= gcd;
+        if (c < 0 || b[c] == 0) throw new IllegalStateException("system unsolvable");
+        if (a[c] == 0) return a;
+
+        final long lcm = lcm(Math.abs(a[c]), Math.abs(b[c])),
+                ka = Math.abs(lcm / a[c]),
+                kb = Math.abs(lcm / b[c]),
+                op = -sgn(a[c] * b[c]);
+
+        for (int i = 0; i < l; i++) a[i] = ka * a[i] + op * kb * b[i];
+
+        long gcd = 0;
+        for (final long x : a) if (x != 0) gcd = gcd < 0 ? x : gcd(gcd, Math.abs(x));
+        // equation can be reduced (8x + 4y = 16 -> 2x + y = 4)
+        if (gcd > 1) for (int i = 0; i < l; i++) a[i] /= gcd;
+
+        return a;
     }
 
+    public static int argmin(final long[] a) {
+        int argmin = 0;
+        for (int i = 0; i < a.length; i++) if (a[i] < a[argmin]) argmin = i;
+        return argmin;
+    }
+
+    public static long[] map(final long[] a, final MapLong f) {
+        for (int i = 0; i < a.length; i++) a[i] = f.apply(i, a[i]);
+        return a;
+    }
+
+    public static boolean contains(final long[] a, final long x) {
+        for (final long l : a) if (l == x) return true;
+        return false;
+    }
+
+
+    @FunctionalInterface
+    public interface MapLong {
+        long apply(int i, long x);
+    }
     //endregion
+
+    public static void main(String[] args) {
+        final long[][] a = new long[][]{
+                {2, 1, -1},
+                {-3, -1, 2},
+                {-2, 1, 2}};
+
+        final long[] b = new long[]{8, -11, -3};
+        final long[][] g = gaussJordanEliminationMethod(a, b);
+
+        Out.print("""
+                
+                Solution:
+                """);
+
+        M.print(g);
+    }
 }
