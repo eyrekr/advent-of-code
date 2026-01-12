@@ -81,8 +81,8 @@ public final class Algebra {
     }
 
 
-    public static long[] gaussEliminationMethod(final long[][] a, final long[] b) {
-
+    public static long[] gaussJordanEliminationMethod(final long[][] a, final long[] b) {
+        final long[][]
     }
 
 
